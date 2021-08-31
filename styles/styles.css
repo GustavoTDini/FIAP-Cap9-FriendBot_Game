@@ -1,0 +1,73 @@
+body {
+    display: flex;
+    flex-direction: column;
+    background-color: #566963;
+}
+
+div {
+    display: flex;
+    flex-direction: column;
+}
+
+H2 {
+    margin: 10px auto 10px auto;
+    font-size: 50px;
+    font-family: Verdana, serif;
+    color: #9a9a9a;
+    text-shadow: 1px 3px 0 #2b2b2b, 1px 5px 5px #000000;;
+}
+
+#body_div {
+    width: 1280px;
+    height: 100%;
+    display: flex;
+    margin: auto;
+    flex-direction: column;
+}
+
+#canvas_div {
+    width: 1280px;
+    height: auto;
+    padding: 1px;
+    border: 7px ridge rgba(118, 141, 135, 0.79);
+    box-shadow: 0 10px 21px 4px rgba(0, 0, 0, 0.65);
+    border-radius: 5px;
+}
+
+#game_canvas {
+    height: 720px;
+    width: 1280px;
+    background-color: black;
+    margin: auto;
+}
+
+#start_game {
+    margin: 20px auto 10px auto;
+    width: 800px;
+    box-shadow: inset 0px 1px 3px 0px #91b8b3;
+    background: #768d87 linear-gradient(to bottom, #768d87 5%, #6c7c7c 100%);
+    border-radius: 5px;
+    border: 1px solid #566963;
+    display: inline-block;
+    cursor: pointer;
+    color: #ffffff;
+    font-family: Verdana, serif;
+    font-size: 35px;
+    font-weight: bold;
+    padding: 11px 23px;
+    text-decoration: none;
+    text-shadow: 0px -1px 0px #2b665e;
+}
+
+button:hover {
+    background: #6c7c7c linear-gradient(to bottom, #6c7c7c 5%, #768d87 100%);
+}
+
+button:active {
+    position: relative;
+    top: 1px;
+}
+
+
+
+
