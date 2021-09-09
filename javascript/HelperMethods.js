@@ -1,81 +1,179 @@
-// define um novo angulo em radianos
-function setAngle() {
-    let degreeAngle = Math.random() * FULL_CIRCLE;
-    return degreeAngle * (PI / SEMI_CIRCLE)
+// ---------------------------------------------------------------------------------
+// Math Helpers
+// ---------------------------------------------------------------------------------
+
+function percentageLeft(n, total) {
+    return (n % total) / total;
 }
 
-// com o angulo achado define o x e y com o seno e cosseno
-function setAngleSpeed(angle) {
-    return [Math.cos(angle), Math.sin(angle)]
+function interpolate(a, b, percent) {
+    return a + (b - a) * percent
 }
 
-// função para inverter um angulo
-function invertAngle(currentAngle) {
-    if (currentAngle >= PI) {
-        return currentAngle - PI
-    } else {
-        return currentAngle + PI;
+function toInt(obj, def){
+    if (obj !== null) {
+        let x = parseInt(obj, 10);
+        if (!isNaN(x)) return x;
+    }
+    return toInt(def, 0);
+}
+
+function smoothIn(a, b, percent) {
+    return a + (b - a) * Math.pow(percent, 2);
+}
+
+function smoothOut(a, b, percent) {
+    return a + (b - a) * (1 - Math.pow(1 - percent, 2));
+}
+
+function smoothInOut(a, b, percent) {
+    return a + (b - a) * ((-Math.cos(percent * Math.PI) / 2) + 0.5);
+}
+
+// ---------------------------------------------------------------------------------
+// Matrix  & 3d Helpers
+// ---------------------------------------------------------------------------------
+
+//Função para multiplicar 2 matrizes(a,b) 3x3
+function multiply3x3Matrix(a, b) {
+    let c = Array(9);
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+            let cij = 0;
+            for (let k = 0; k < 3; k++) {
+                cij += a[3*i + k]*b[3*k + j];
+            }
+            c[3*i + j] = cij;
+        }
+    }
+    return c;
+}
+
+// função fazer uma matrix adjunta de M
+function matrixAdj(m) {
+    return [
+        m[4] * m[8] - m[5] * m[7], m[2] * m[7] - m[1] * m[8], m[1] * m[5] - m[2] * m[4],
+        m[5] * m[6] - m[3] * m[8], m[0] * m[8] - m[2] * m[6], m[2] * m[3] - m[0] * m[5],
+        m[3] * m[7] - m[4] * m[6], m[1] * m[6] - m[0] * m[7], m[0] * m[4] - m[1] * m[3]
+    ];
+}
+
+// Função para multiplicar uma matrix 3x3 (m), por um vetor de 3 (v)
+function multiplyMatrixXVector(m, v) {
+    return [
+        m[0] * v[0] + m[1] * v[1] + m[2] * v[2],
+        m[3] * v[0] + m[4] * v[1] + m[5] * v[2],
+        m[6] * v[0] + m[7] * v[1] + m[8] * v[2]
+    ];
+}
+
+// Função que resolve as equações lineares de 4 pontos
+function solveLinearEquations(x1, y1, x2, y2, x3, y3, x4, y4){
+    let matrix1 = [x1, x2, x3,
+        y1, y2, y3,
+        1,  1,  1 ]
+    let v = multiplyMatrixXVector(matrixAdj(matrix1), [x4,y4, 1])
+    return multiply3x3Matrix(matrix1,
+        [v[0],0,0,
+            0,v[1],0,
+            0,0,v[2]])
+}
+
+// Função que cria a Matrix de transformação entre 2 planos de 4 pontos
+function setTransformMatrix(x1, y1, tx1, ty1,
+                            x2, y2, tx2, ty2,
+                            x3, y3, tx3, ty3,
+                            x4, y4, tx4, ty4) {
+    let sourceMatrix = solveLinearEquations(x1, y1, x2, y2, x3, y3, x4, y4)
+    let destinyMatrix = solveLinearEquations(tx1, ty1, tx2, ty2, tx3, ty3, tx4, ty4)
+    return multiply3x3Matrix(destinyMatrix, matrixAdj(sourceMatrix))
+}
+
+// Função que cria a renderização em fake3d no segmento
+function create3dSegment(image, x1, y1, w1, x2, y2, w2, ctx) {
+    console.log(image)
+    let width = image.width
+    let height = image.height
+    let roadWidth = w1*2
+    let jMax = 12;
+    let iMax = 24;
+    let correctionFactor = 0.98
+    let drawCorrectionPoint = 1.3
+
+    if (roadWidth < 300){
+        jMax/=2;
+        iMax/=2
+        drawCorrectionPoint = 1.1
+    }
+    if (roadWidth < 150){
+        jMax/=2;
+        iMax/=2
+    }
+    if(roadWidth < 50){
+        jMax/=2;
+        iMax/=2
+        drawCorrectionPoint = 1
+    }
+    if(roadWidth < 30){
+        jMax/=2;
+        iMax/=2
+    }
+    if(roadWidth < 10){
+        iMax/=2
+    }
+    if (iMax < 1){
+        iMax = 1
+    }
+    if (jMax < 1){
+        jMax = 1
+    }
+    let correctedWidth1 = w1*correctionFactor
+    let correctedWidth2 = w2*correctionFactor
+    let t = setTransformMatrix(0, 0, x2-correctedWidth2, y2, width, 0, x2+correctedWidth2, y2, width, height, x1+correctedWidth1, y1 + 1, 0, height, x1-correctedWidth1, y1 + 1);
+    let destMatrix = Array(3)
+    let newX = 0;
+    let newY = 0;
+    let roadSize = width/iMax
+    let roadHeight = height/jMax
+    let drawRoadSize = (roadWidth/iMax)*drawCorrectionPoint;
+    let drawRoadHeight = ((y1-y2)/jMax)*drawCorrectionPoint
+
+    for (let j = 0; j <= jMax; j++){
+        for (let i = 0; i <= iMax; i++){
+            let oldX = i*roadSize
+            let oldY = j*roadHeight
+            destMatrix = multiplyMatrixXVector(t, [oldX, oldY, 1])
+            newX = destMatrix[0]/destMatrix[2]
+            newY = destMatrix[1]/destMatrix[2]
+            ctx.drawImage(image,  i*roadSize,              j*roadHeight,
+                                        roadSize,              roadHeight,
+                                        newX,           newY,
+                                        drawRoadSize,              drawRoadHeight)
     }
 }
-
-function rideRoad(){
-    // ctx.setTransform(1,0,-3,1,300,0)
-    // ctx.drawImage(road, 0, 0,
-    //                     256,128,
-    //                     0,100,
-    //                     640,128)
-    // ctx.setTransform(1,0,3,1,-300,0)
-    // ctx.drawImage(road, 256, 0,
-    //                     256,128,
-    //                     640,100,
-    //                     640,128)
-    // for (let j = 1; j <= 16; j++){
-        for (let i = 0; i < 32; i++){
-            ctx.setTransform(1,0,(i*(3/32)-3),1,0,0)
-            ctx.drawImage(road, 8*(i+1), 0,
-                                8,128,
-                                20*(i+1),100,
-                                40,128)
-            ctx.setTransform(1,0,i*(3/32),1,0,0)
-            ctx.drawImage(road, 256 + 8*(i+1), 0,
-                                8,128,
-                                640 + 20*(i+1),100,
-                                40,128)
-        }
-    // }
 }
 
-// for (let i = 0; i < 32; i++) {
-//     ctx.setTransform(1, 0, (i * (3 / 32) - 3), 1, 0, 0)
-//     ctx.drawImage(road, 8 * (i + 1), 0,
-//         8, 128,
-//         20 * (i + 1), 100,
-//         20, 128)
-//     ctx.setTransform(1, 0, i * (3 / 32), 1, 0, 0)
-//     ctx.drawImage(road, 256 + 8 * (i + 1), 0,
-//         8, 128,
-//         640 + 20 * (i + 1), 100,
-//         20, 128)
-// }
+// ---------------------------------------------------------------------------------
+// Draw Helpers
+// ---------------------------------------------------------------------------------
 
-// para rotacionar os sprites
-function rotateSprite(ctx, angle, sprite, x, y) {
-    ctx.save();
-    ctx.translate(x + SPRITE_SIZE / 2, y + SPRITE_SIZE / 2);
-    ctx.rotate(angle * (PI / SEMI_CIRCLE));
-    ctx.drawImage(...sprite, (-SPRITE_SIZE / 2), (-SPRITE_SIZE / 2), SPRITE_SIZE, SPRITE_SIZE);
-    ctx.restore();
+function drawPolygon(x1, y1, x2, y2, x3, y3, x4, y4, color, ctx){
+    ctx.fillStyle = color
+
+    ctx.beginPath();
+
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.lineTo(x3, y3);
+    ctx.lineTo(x4, y4)
+
+    ctx.closePath();
+    ctx.fill();
 }
 
-// função para definir uma colisão entre 2 entidades
-function isColliding(entity1, entity2) {
-    return (((entity1.maskX + entity1.xSpeed + entity1.spriteSize) > entity2.maskX
-        && (entity1.maskX + entity1.xSpeed) < (entity2.maskX + entity2.spriteSize))
-        && ((entity1.maskY + entity1.ySpeed + entity1.spriteSize) > entity2.maskY
-            && (entity1.maskY + entity1.ySpeed) < (entity2.maskY + entity1.spriteSize)
-        ))
+function drawShadow(x, y, SpriteSize, ctx){
+    ctx.fillStyle = "rgba(50, 50, 50, 0.6)";
+    ctx.beginPath();
+    ctx.ellipse(x+SpriteSize/2, y+SpriteSize*0.85, SpriteSize/3, SpriteSize/8, 0, 0, 2 * Math.PI);
+    ctx.fill();
 }
-
-
-
-
