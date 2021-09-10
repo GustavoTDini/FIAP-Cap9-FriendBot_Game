@@ -35,16 +35,17 @@ class Game {
             case LOADING_STATE:
                 game.gameCamera = new Camera(game);
                 game.road = new Road(game)
-                game.player = new Player(game)
+                game.player = new Player(game, GREEN)
                 spriteSheet.src = './images/SpriteSheet.png'
                 road_sprite_1.src = './images/road_sprite_1.png'
                 road_sprite_2.src = './images/road_sprite_2.png'
                 road_sprite_3.src = './images/road_sprite_3.png'
                 road_sprite_4.src = './images/road_sprite_4.png'
                 road_sprite_5.src = './images/road_sprite_5.png'
-                grass_sprite_1.src = './images/road_sprite_1.png'
-                grass_sprite_2.src = './images/road_sprite_2.png'
-                grass_sprite_3.src = './images/road_sprite_3.png'
+                grass_sprite_1.src = './images/grass_sprite_1.png'
+                grass_sprite_1.style = "r"
+                grass_sprite_2.src = './images/grass_sprite_2.png'
+                grass_sprite_3.src = './images/grass_sprite_3.png'
                 game.gameState = SET_STATE;
 
                 game.gameCamera.init()
@@ -57,7 +58,8 @@ class Game {
                 break;
             case PLAY_STATE:
                 game.player.update(dt)
-                game.gameCamera.update();
+                game.road.update(dt)
+                game.gameCamera.update(dt);
                 gameMusic.play()
                 break;
             case PAUSE_STATE:

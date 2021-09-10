@@ -24,6 +24,12 @@ const PLAY_STATE = 2;
 const PAUSE_STATE = 3;
 const GAME_OVER_STATE = 4;
 
+//Player Colors
+const GREEN = 5;
+const BLUE = 6;
+const RED = 7;
+
+
 //kEYS
 const ALLOWED_KEYS = {
     37: 'left',
@@ -38,6 +44,9 @@ const ROAD = {
     HILL:   { NONE: 0, LOW:    20, MEDIUM:  40, HIGH:   60 },
     CURVE:  { NONE: 0, EASY:    2, MEDIUM:   4, HARD:    6 }
 };
+
+//Road Segments
+const ROAD_LANES = [-0.6, -0.2, 0.2, 0.6]
 
 // ---------------------------------------------------------------------------------
 // Images & Sprites
@@ -59,7 +68,7 @@ let grassTextures = [grass_sprite_1, grass_sprite_2, grass_sprite_3]
 const COLORS = {
     LIGHT:	{road: '#888888', grass: '#48a15a', grassTexture: 0 , shoulder: '#BCBCBC', lane: '#FFFFFF'},
     DARK:	{road: '#666666', grass: '#398246', grassTexture: 1 , shoulder: '#FF0000'},
-    DARKER:	{road: '#444444', grass: '#267438', grassTexture: 2 , shoulder: '#BCBCBC'}
+    DARKER:	{road: '#444444', grass: '#3b924c', grassTexture: 2 , shoulder: '#BCBCBC'}
 };
 
 const redCarMaxSteerLeft = [spriteSheet, 0, 0, SPRITE_SIZE, SPRITE_SIZE]
@@ -90,6 +99,21 @@ const racerPolarBear = [spriteSheet, 384, 384, SPRITE_SIZE, SPRITE_SIZE]
 const racerMonkey = [spriteSheet, 512, 384, SPRITE_SIZE, SPRITE_SIZE]
 const jeep1 = [spriteSheet, 640, 384, SPRITE_SIZE, SPRITE_SIZE]
 const jeep2 = [spriteSheet, 768, 384, SPRITE_SIZE, SPRITE_SIZE]
+
+const greenPlayerSprites = {maxLeft: greenCarMaxSteerLeft, medLeft: greenCarMedSteerLeft,
+                            minLeft: greenCarMinSteerLeft, center: greenCarCenter,
+                            minRight: greenCarMinSteerRight, medRight: greenCarMedSteerRight,
+                            maxRight: greenCarMaxSteerRight}
+
+const redPlayerSprites = {maxLeft: redCarMaxSteerLeft, medLeft: redCarMedSteerLeft,
+                            minLeft: redCarMinSteerLeft, center: redCarCenter,
+                            minRight: redCarMinSteerRight, medRight: redCarMedSteerRight,
+                            maxRight: redCarMaxSteerRight}
+
+const bluePlayerSprites = {maxLeft: blueCarMaxSteerLeft, medLeft: blueCarMedSteerLeft,
+                            minLeft: blueCarMinSteerLeft, center: blueCarCenter,
+                            minRight: blueCarMinSteerRight, medRight: blueCarMedSteerRight,
+                            maxRight: blueCarMaxSteerRight}
 
 // ---------------------------------------------------------------------------------
 // Music & Sounds

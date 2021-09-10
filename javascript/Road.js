@@ -45,6 +45,8 @@ class Segment {
         this.scale = -1;
         this.curve = curve
         this.color = this.getColors(this.index)
+        this.roadSideObjects = []
+        this.inRoadObjects = []
     }
 
     getColors(index) {
@@ -78,9 +80,6 @@ class Road {
         let baseSegment = this.findSegment(gameCamera.z);
         let baseSegmentIndex = baseSegment.index;
         let basePercent   = percentageLeft(gameCamera.z, this.segmentLength);
-        //let playerSegment   = percentRemaining(player.z, segmentLength);
-        //let playerPercent = percentRemaining(position+playerZ, segmentLength);
-        //let playerY       = interpolate(playerSegment.p1.world.y, playerSegment.p2.world.y, playerPercent);
 
         let x  = 0;
         let dx = - (baseSegment.curve * basePercent);
@@ -114,8 +113,19 @@ class Road {
         }
     }
 
-    update() {
+    update(dt) {
+        let player = this.game.player
 
+        let playerSegment = this.findSegment(player.z);
+
+        let centrifugal = 0.06;
+        let currentCurve = playerSegment.curve
+        if (currentCurve){
+            this.game.player.lanes = ROAD_LANES.map(x => x + currentCurve*centrifugal);
+        } else {
+            this.game.player.lanes = ROAD_LANES
+        }
+        console.log(this.game.player.lanes)
     }
 
     findSegment(z) {
@@ -224,7 +234,6 @@ class Road {
 
 
     renderSegment(x1, y1, w1, x2, y2, w2, color, ctx){
-        console.log(color.grassTexture)
         let linesWidth1 = w1/20
         let linesWidth2 = w2/20
         let lineDistance1 = w1/2.5
@@ -232,9 +241,7 @@ class Road {
         ctx.fillStyle = color.grass
         ctx.fillRect(0, y2, CANVAS_WIDTH, y1 - y2);
         // draw road
-        drawPolygon(x1-w1, y1,	x1+w1, y1, x2+w2, y2, x2-w2, y2, color.road, ctx);
-        create3dSegment(roadTextures[Math.floor(Math.random()*5)], x1, y1, w1, x2, y2, w2, ctx);
-        //create3dSegment(grassTextures[color.grassTexture], x1, y1, w1, x2, y2, w2);
+        create3dRoad(roadTextures[Math.floor(Math.random()*5)],grassTextures[color.grassTexture], x1, y1, w1, x2, y2, w2, ctx, color.road);
         drawPolygon(x1-w1, y1,	x1-w1+linesWidth1, y1, x2-w2+linesWidth2, y2, x2-w2, y2, color.shoulder, ctx);
         drawPolygon(x1+w1-linesWidth1, y1,	x1+w1, y1, x2+w2, y2, x2+w2-linesWidth2, y2, color.shoulder, ctx);
         if (color.lane){
