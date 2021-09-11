@@ -53,22 +53,23 @@ const ROAD_LANES = [-0.6, -0.2, 0.2, 0.6]
 // ---------------------------------------------------------------------------------
 
 let spriteSheet = new Image();
+let background_sky = new Image();
+let background_mountain = new Image();
+let background_trees = new Image();
 let road_sprite_1 = new Image();
 let road_sprite_2 = new Image();
 let road_sprite_3 = new Image();
 let road_sprite_4 = new Image();
 let road_sprite_5 = new Image();
-let grass_sprite_1 = new Image();
-let grass_sprite_2 = new Image();
-let grass_sprite_3 = new Image();
 
 let roadTextures = [road_sprite_1, road_sprite_2, road_sprite_3, road_sprite_4, road_sprite_5]
-let grassTextures = [grass_sprite_1, grass_sprite_2, grass_sprite_3]
 
 const COLORS = {
-    LIGHT:	{road: '#888888', grass: '#48a15a', grassTexture: 0 , shoulder: '#BCBCBC', lane: '#FFFFFF'},
-    DARK:	{road: '#666666', grass: '#398246', grassTexture: 1 , shoulder: '#FF0000'},
-    DARKER:	{road: '#444444', grass: '#3b924c', grassTexture: 2 , shoulder: '#BCBCBC'}
+    LIGHT:	{road: '#888888', grass: '#48a15a', shoulder: '#BCBCBC', lane: '#FFFFFF'},
+    DARK:	{road: '#666666', grass: '#398246', shoulder: '#FF0000'},
+    DARKER:	{road: '#444444', grass: '#3b924c', shoulder: '#BCBCBC'},
+    SKY: "#CFEFFC",
+    GRASS: "#20BA75"
 };
 
 const redCarMaxSteerLeft = [spriteSheet, 0, 0, SPRITE_SIZE, SPRITE_SIZE]
@@ -98,7 +99,11 @@ const racerBear = [spriteSheet, 256, 384, SPRITE_SIZE, SPRITE_SIZE]
 const racerPolarBear = [spriteSheet, 384, 384, SPRITE_SIZE, SPRITE_SIZE]
 const racerMonkey = [spriteSheet, 512, 384, SPRITE_SIZE, SPRITE_SIZE]
 const jeep1 = [spriteSheet, 640, 384, SPRITE_SIZE, SPRITE_SIZE]
-const jeep2 = [spriteSheet, 768, 384, SPRITE_SIZE, SPRITE_SIZE]
+const lamp = [spriteSheet, 0, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const tree1 = [spriteSheet, 256, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const rock = [spriteSheet, 512, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const tree2 = [spriteSheet, 768, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const billboard = [spriteSheet, 1024, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
 
 const greenPlayerSprites = {maxLeft: greenCarMaxSteerLeft, medLeft: greenCarMedSteerLeft,
                             minLeft: greenCarMinSteerLeft, center: greenCarCenter,
@@ -114,6 +119,10 @@ const bluePlayerSprites = {maxLeft: blueCarMaxSteerLeft, medLeft: blueCarMedStee
                             minLeft: blueCarMinSteerLeft, center: blueCarCenter,
                             minRight: blueCarMinSteerRight, medRight: blueCarMedSteerRight,
                             maxRight: blueCarMaxSteerRight}
+
+const roadSidesSprites = [lamp, tree1, rock, tree2, billboard]
+
+const racers = [racerShark, racerGiraffe, racerBear, racerPolarBear, racerMonkey]
 
 // ---------------------------------------------------------------------------------
 // Music & Sounds

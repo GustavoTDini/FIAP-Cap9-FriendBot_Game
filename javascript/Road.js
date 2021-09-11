@@ -7,9 +7,8 @@ class Camera {
         this.z = 0;
         this.distToPlayer = 1000;
         this.distToPlane = null;
-        this.drawDistace = 150;
+        this.drawDistance = 150;
         this.cameraHeight  = 1000;
-        this.cameraDepth   = null;
         this.fogDensity    = 5;
         this.game = game
     }
@@ -39,9 +38,10 @@ class Segment {
     constructor(segments, curve, y, road){
         this.road = road
         this.index = segments.length;
-        this.worldPoints = {x: 0, y:y, z: this.index*road.segmentLength}
+        this.worldPoints = {x: 0, y:y, z: this.index*Road.segmentLength}
         this.screenPoints = {x:0, y:0, w:0}
         this.lastScreenPoints = {x:0, y:0, w:0}
+        this.maxHeight = CANVAS_HEIGHT
         this.scale = -1;
         this.curve = curve
         this.color = this.getColors(this.index)
@@ -65,13 +65,16 @@ class Segment {
 // classe que define a estrada a ser percorrida
 class Road {
 
+    static MAX_ROAD_WIDTH = 1000;
+    static segmentLength = 100;
+
     constructor(game) {
         this.game = game
         this.segments = []
         this.totalSegments = null
         this.roadLength = null;
-        this.roadWidth = 1000;
-        this.segmentLength = 100;
+        this.roadWidth = Road.MAX_ROAD_WIDTH;
+        this.totalCars = [];
     }
 
     render(ctx) {
@@ -79,13 +82,12 @@ class Road {
 
         let baseSegment = this.findSegment(gameCamera.z);
         let baseSegmentIndex = baseSegment.index;
-        let basePercent   = percentageLeft(gameCamera.z, this.segmentLength);
-
+        let basePercent   = percentageLeft(gameCamera.z, Road.segmentLength);
         let x  = 0;
         let dx = - (baseSegment.curve * basePercent);
-
         let maxBottomLine        = CANVAS_HEIGHT;
-        for (let n=0; n<gameCamera.drawDistace; n++){
+
+        for (let n=0; n<gameCamera.drawDistance; n++){
             // get the current segment
             let currIndex = (baseSegmentIndex + n) % this.totalSegments;
             let currSegment = this.segments[currIndex];
@@ -93,10 +95,16 @@ class Road {
             // project the segment to the screen space
             currSegment.screenPoints = this.project3D(currSegment, gameCamera, offsetZ, x);
             currSegment.lastScreenPoints = this.correctedLastPoints(currIndex)
+            currSegment.maxHeight = maxBottomLine
             // draw this segment only if it is above the clipping bottom line
             let currBottomLine = currSegment.screenPoints.y;
             x  = x + dx;
             dx = dx + currSegment.curve;
+
+            if ((currSegment.screenPoints.z <= gameCamera.distToPlayer) ||
+                (currSegment.screenPoints.y >= maxBottomLine))
+                continue;
+
             if (n>0 && currBottomLine < maxBottomLine){
 
                 let screenPoints = currSegment.screenPoints;
@@ -111,6 +119,28 @@ class Road {
                 maxBottomLine = currBottomLine;
             }
         }
+
+        for(let n = (gameCamera.drawDistance-1) ; n >= 0 ; n--) {
+            let currIndex = (baseSegmentIndex + n) % this.totalSegments;
+            let currSegment = this.segments[currIndex];
+
+            for(let i = 0 ; i < currSegment.roadSideObjects.length ; i++) {
+                let sideObject = currSegment.roadSideObjects[i]
+                let spriteScale = currSegment.scale*2;
+                let x     = currSegment.screenPoints.x + currSegment.screenPoints.w*currSegment.roadSideObjects[i].x
+                let y     = currSegment.screenPoints.y;
+                sideObject.render(ctx, spriteScale, x, y, currSegment.maxHeight)
+            }
+            for(let j = 0 ; j < currSegment.inRoadObjects.length ; j++) {
+                let car = currSegment.inRoadObjects[j]
+                let spriteScale = currSegment.scale;
+                let x     = currSegment.screenPoints.x + currSegment.screenPoints.w*currSegment.inRoadObjects[j].x
+                let y     = currSegment.screenPoints.y;
+                car.render(ctx, spriteScale, x, y, currSegment.maxHeight)
+            }
+
+        }
+
     }
 
     update(dt) {
@@ -125,11 +155,18 @@ class Road {
         } else {
             this.game.player.lanes = ROAD_LANES
         }
-        console.log(this.game.player.lanes)
+        for (let j = 0; j< this.segments.length; j++){
+            this.segments[j].inRoadObjects = []
+        }
+        for (let i = 0; i < this.totalCars.length; i++){
+            let carSegment = this.findSegment(this.totalCars[i].z)
+            carSegment.inRoadObjects.push(this.totalCars[i])
+            this.totalCars[i].update(dt)
+        }
     }
 
     findSegment(z) {
-        return this.segments[Math.floor(z/this.segmentLength) % this.segments.length];
+        return this.segments[Math.floor(z/Road.segmentLength) % this.segments.length];
     }
 
     createRoad() {
@@ -147,14 +184,16 @@ class Road {
         this.addStraight();
         this.addDownhillToEnd();
         this.totalSegments = this.segments.length
-        this.roadLength = this.totalSegments * this.segmentLength;
+        this.roadLength = this.totalSegments * Road.segmentLength;
+        this.addSprites()
+        this.addCars()
     }
 
     getLastY() { return (this.segments.length === 0) ? 0 : this.segments[this.segments.length-1].worldPoints.y; }
 
     addMoreSegments(enter, hold, leave, curve, y) {
         let lastY   = this.getLastY();
-        let endY     = lastY + (toInt(y, 0) * this.segmentLength);
+        let endY     = lastY + (toInt(y, 0) * Road.segmentLength);
         let n, total = enter + hold + leave;
         for(n = 0 ; n < enter ; n++)
             this.segments.push( new Segment(this.segments, smoothIn(0, curve, n/enter), smoothInOut(lastY, endY, n/total), this));
@@ -201,9 +240,40 @@ class Road {
         this.addMoreSegments(ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM,  -ROAD.CURVE.MEDIUM, -ROAD.HILL.MEDIUM);
     }
 
+    addSprites(){
+            for (let n = 0; n < this.segments.length; n++){
+                if (Math.random() > 0.8) {
+                    let spriteInt = Math.floor(Math.random() * 5)
+                    let x = -1.5;
+                    if (Math.random() > 0.5) {
+                        x = 1.5
+                    }
+                    this.segments[n].roadSideObjects.push(new SideObjects(roadSidesSprites[spriteInt], x, LARGE_SPRITE_SIZE, this))
+                }
+            }
+        }
+
+    addCars(){
+        for (let n = 0; n < 200; n++){
+            let spriteInt = Math.floor(Math.random() * 5)
+            let speed = (Math.random()*(Player.maxSpeed*0.4 - Player.maxSpeed*0.1)) + Player.maxSpeed*0.1
+            console.log(speed)
+            let z = Math.random()*this.roadLength
+            let startSegment = this.findSegment(z)
+            this.totalCars.push(new Cars(racers[spriteInt], (Math.random()*2)-1, startSegment.worldPoints.y,  speed, z, SPRITE_SIZE, this))
+            if (Math.random() > 0.8) {
+                let x = -1.5;
+                if (Math.random() > 0.5) {
+                    x = 1.5
+                }
+            }
+        }
+    }
+
+
     addDownhillToEnd(num) {
         num = num || 200;
-        this.addMoreSegments(num, num, num, -ROAD.CURVE.EASY, -this.getLastY()/this.segmentLength);
+        this.addMoreSegments(num, num, num, -ROAD.CURVE.EASY, -this.getLastY()/Road.segmentLength);
     }
 
     // Função para fazer a projeção dos pontos em 3D - usa a regra dos triangulos iguais
@@ -241,7 +311,8 @@ class Road {
         ctx.fillStyle = color.grass
         ctx.fillRect(0, y2, CANVAS_WIDTH, y1 - y2);
         // draw road
-        create3dRoad(roadTextures[Math.floor(Math.random()*5)],grassTextures[color.grassTexture], x1, y1, w1, x2, y2, w2, ctx, color.road);
+        drawPolygon(x1-w1, y1,	x1+w1, y1, x2+w2, y2, x2-w2, y2, color.road, ctx);
+        create3dRoad(roadTextures[Math.floor(Math.random()*5)], x1, y1, w1, x2, y2, w2, ctx);
         drawPolygon(x1-w1, y1,	x1-w1+linesWidth1, y1, x2-w2+linesWidth2, y2, x2-w2, y2, color.shoulder, ctx);
         drawPolygon(x1+w1-linesWidth1, y1,	x1+w1, y1, x2+w2, y2, x2+w2-linesWidth2, y2, color.shoulder, ctx);
         if (color.lane){

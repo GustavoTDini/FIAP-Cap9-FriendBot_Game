@@ -36,6 +36,15 @@ function limitMaxMin(current, next, max, min) {
     return  result
 }
 
+function setMaxMin(current, max, min) {
+    if (current > max){
+        return max
+    } else if (current < min){
+        return min
+    }
+    return  current
+}
+
 // ---------------------------------------------------------------------------------
 // Matrix  & 3d Helpers
 // ---------------------------------------------------------------------------------
@@ -152,9 +161,8 @@ function define3dScale(roadWidth, jMax, iMax) {
 }
 
 // Função que cria a renderização em fake3d no segmento de pista
-function create3dRoad(roadImage, grassImage, x1, y1, w1, x2, y2, w2, ctx, color) {
+function create3dRoad(roadImage, x1, y1, w1, x2, y2, w2, ctx) {
     let roadImageWidth = roadImage.width
-    let grassImageWidth = grassImage.width
     let height = roadImage.height
     let roadWidth = w1*2
     let jMax = 12;
@@ -164,30 +172,9 @@ function create3dRoad(roadImage, grassImage, x1, y1, w1, x2, y2, w2, ctx, color)
     let correctedWidth1 = w1*correctionFactor
     let correctedWidth2 = w2*correctionFactor
     let tRoad = setTransformMatrix(0, 0, x2-correctedWidth2, y2, roadImageWidth, 0, x2+correctedWidth2, y2, roadImageWidth, height, x1+correctedWidth1, y1, 0, height, x1-correctedWidth1, y1);
-    let tGrassLeft = setTransformMatrix(0, 0,
-                                    -200, y2,
-                                    grassImageWidth, 0,
-                                    x2-correctedWidth2, y2,
-                                    grassImageWidth, height,
-                                x1-correctedWidth1, y1,
-                                    0, height,
-                                    -200, y1);
-    let tGrassRight = setTransformMatrix(0, 0,
-                                    x2 + correctedWidth2, y2,
-                            grassImageWidth, 0,
-                        CANVAS_WIDTH+200, y2,
-                        grassImageWidth, height,
-                        CANVAS_WIDTH + 200, y1,
-                        0, height,
-                        x1 + correctedWidth1, y1);
-
-   // renderTexturePoints(grassImageWidth, height, scale.jMax/4, scale.iMax/4, scale.drawCorrectionPoint, roadWidth, y1, y2, tGrassLeft, ctx, grassImage);
-   // renderTexturePoints(grassImageWidth, height, scale.jMax/4, scale.iMax/4, scale.drawCorrectionPoint, roadWidth, y1, y2, tGrassRight, ctx, grassImage);
-    drawPolygon(x1-w1, y1,	x1+w1, y1, x2+w2, y2, x2-w2, y2, color, ctx);
     renderTexturePoints(roadImageWidth, height, scale.jMax, scale.iMax, scale.drawCorrectionPoint, roadWidth, y1, y2, tRoad, ctx, roadImage);
 }
 
-//width, height, scale, roadWidth, y1, y2, t, ctx, image
 // ---------------------------------------------------------------------------------
 // Draw Helpers
 // ---------------------------------------------------------------------------------
