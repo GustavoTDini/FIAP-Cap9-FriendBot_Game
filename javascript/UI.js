@@ -1,3 +1,64 @@
+class UI {
+
+    constructor(game){
+        this.game = game
+    }
+
+    renderGameUI(ctx){
+        let player = this.game.player
+        let separatedScore = extractDigits(player.score)
+        ctx.drawImage(...UIPanel, 10, 50, 300, 100)
+        ctx.drawImage(...UIScore, 80, 10, 160, UI_SPRITE_SIZE)
+        this.drawScore(separatedScore, 240, 70, ctx)
+        let separatedCoins = extractDigits(player.coins)
+        ctx.drawImage(...UIPanel, 970, 50, 300, 100)
+        ctx.drawImage(...UIStar, 1095, 10, UI_SPRITE_SIZE, UI_SPRITE_SIZE)
+        this.drawScore(separatedCoins, 1200, 70, ctx)
+    }
+
+    renderPauseUI(ctx){
+        ctx.drawImage(...UIPause, CANVAS_CENTER_X - UI_SPRITE_SIZE, CANVAS_CENTER_Y - UI_SPRITE_SIZE, 2*UI_SPRITE_SIZE, 2*UI_SPRITE_SIZE)
+    }
+
+    renderGameOverUI(ctx){
+        let player = this.game.player
+        ctx.drawImage(...UIWindow, CANVAS_CENTER_X - 150, CANVAS_CENTER_Y - 168, 300, 336)
+        let separatedScore = extractDigits(player.score)
+        let separatedCoins = extractDigits(player.coins)
+        ctx.drawImage(...UIWin, CANVAS_CENTER_X-110, CANVAS_CENTER_Y - 160, 220, UI_SPRITE_SIZE)
+        this.drawStars(player.score, ctx)
+
+
+    }
+
+    drawScore(score, initialX, initialY, ctx){
+        for (let i = 0; i < score.length; i++){
+            let sprite = numbers[score[i]]
+            ctx.drawImage(...sprite, initialX-UI_SPRITE_SIZE*i, initialY, UI_SPRITE_SIZE, UI_SPRITE_SIZE)
+        }
+    }
+
+    drawStars(score, ctx){
+        let player = this.game.player
+        let starScore = DIFFICULTIES_SETS[player.difficulty].STARS_SCORES
+        console.log(starScore)
+        let stars = starScore.map(x => score > x)
+        ctx.drawImage(...(stars[0] === true? UIFullStar:UIEmptyStar), CANVAS_CENTER_X - 120 , CANVAS_CENTER_Y-50, UI_SPRITE_SIZE*1.6, UI_SPRITE_SIZE*1.6)
+        ctx.drawImage(...(stars[1] === true? UIFullStar:UIEmptyStar), CANVAS_CENTER_X - 40, CANVAS_CENTER_Y-75, UI_SPRITE_SIZE*1.6, UI_SPRITE_SIZE*1.6)
+        ctx.drawImage(...(stars[2] === true? UIFullStar:UIEmptyStar), CANVAS_CENTER_X + 40 , CANVAS_CENTER_Y-50, UI_SPRITE_SIZE*1.6, UI_SPRITE_SIZE*1.6)
+        ctx.drawImage(...UIReturnButton, CANVAS_CENTER_X - 120, CANVAS_CENTER_Y +103, UI_SPRITE_SIZE, UI_SPRITE_SIZE)
+        ctx.drawImage(...UICloseButton, CANVAS_CENTER_X + 70, CANVAS_CENTER_Y +103, UI_SPRITE_SIZE, UI_SPRITE_SIZE)
+    }
+
+
+
+}
+
+
+
+
+
+
 // Se For utilizar texto no jogo, já tem uma classe pronta
 // class CanvasText {
 //     constructor(x, y, text, type) {

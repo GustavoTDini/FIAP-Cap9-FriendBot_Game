@@ -1,14 +1,15 @@
 class RoadObjects {
 
-    constructor(sprite, x, spriteSize, road){
+    constructor(sprite, x, y,spriteSize, road){
         this.sprite = sprite
         this.x = x
+        this.y = y
         this.spriteSize = spriteSize
         this.road = road
     }
 
     render(ctx, scale, destX, destY, maxBottomLine) {
-        let spriteSize = (Road.MAX_ROAD_WIDTH*scale) * this.spriteSize
+        let spriteSize = (MAX_ROAD_WIDTH*scale) * this.spriteSize
         let maxDrawLine = maxBottomLine ? Math.max(0, destY+spriteSize-maxBottomLine) : 0;
         if (maxDrawLine < maxBottomLine){
             let drawSprite = this.sprite.map((x) => x);
@@ -18,14 +19,21 @@ class RoadObjects {
         }
     }
 
+    update(dt){
+        this.setMask()
+    }
+
+    setMask(){
+    }
+
 }
 
 
 // Classe com os atributos de cada segmento da estrada a serem renderizados
 class SideObjects extends RoadObjects{
 
-    constructor(sprite, x, spriteSize, road) {
-        super(sprite, x, spriteSize, road);
+    constructor(sprite, x, y, spriteSize, road) {
+        super(sprite, x, y, spriteSize, road);
     }
 }
 
@@ -33,14 +41,14 @@ class SideObjects extends RoadObjects{
 class Cars extends RoadObjects{
 
     constructor(sprite, x, y, speed, z, spriteSize, road){
-        super(sprite, x, spriteSize, road)
-        this.y = y
+        super(sprite, x,  y, spriteSize, road)
         this.z = z
         this.speed = speed
         this.nextX = x
     }
 
     update(dt){
+        super.update(dt)
         this.randomX()
         this.setX()
         this.z += this.speed*dt
@@ -52,9 +60,9 @@ class Cars extends RoadObjects{
     setX(){
         if (this.nextX !== this.x){
             if (this.x > this.nextX){
-                this.x = this.x - 0.04
+                this.x = this.x - 0.05
             } else{
-                this.x = this.x + 0.04
+                this.x = this.x + 0.05
                 }
             } else{
             this.nextX = this.x
@@ -63,9 +71,61 @@ class Cars extends RoadObjects{
 
     randomX(){
         if (Math.random() > 0.998){
-            this.nextX = (Math.random()*2)-1
+            this.nextX = ROAD_LANES[Math.floor(Math.random()*4)]
         }
     }
+
+}
+
+// Classe com os atributos de cada segmento da estrada a serem renderizados
+class Traffic extends RoadObjects{
+
+    constructor(sprite, x, y, speed, z, spriteSize, road){
+        super(sprite, x, y, spriteSize, road)
+        this.z = z
+        this.speed = speed
+    }
+
+    update(dt){
+        this.z += this.speed*dt
+        if (this.z >= this.road.roadLength){
+            this.z -= this.road.roadLength
+        }
+    }
+
+}
+
+// Classe com os atributos de cada segmento da estrada a serem renderizados
+class Coins extends RoadObjects{
+
+    frame = 0;
+    currentSprite = 0;
+    coinSprites = [coin1, coin2, coin3, coin4, coin5, coin6]
+
+    constructor(sprite, x, y, z, spriteSize, road){
+        super(sprite, x, y, spriteSize, road)
+        this.z = z
+    }
+
+    rotatingCoin() {
+        let MAX_SPRITES = 5;
+        let MAX_FRAMES = 4;
+            this.frame++;
+            if (this.frame > MAX_FRAMES) {
+                this.frame = 0;
+                this.currentSprite++;
+                if (this.currentSprite > MAX_SPRITES) {
+                    this.currentSprite = 0;
+                }
+                this.sprite = this.coinSprites[this.currentSprite]
+            }
+        }
+
+        update(dt) {
+            super.update(dt);
+            this.rotatingCoin()
+        }
+
 
 }
 

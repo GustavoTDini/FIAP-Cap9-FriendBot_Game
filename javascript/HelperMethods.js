@@ -6,6 +6,13 @@ function percentageLeft(n, total) {
     return (n % total) / total;
 }
 
+function extractDigits(num){
+    let digits = num.toString().split('');
+    digits.reverse()
+    return digits.map(Number)
+}
+
+
 function toInt(obj, def){
     if (obj !== null) {
         let x = parseInt(obj, 10);

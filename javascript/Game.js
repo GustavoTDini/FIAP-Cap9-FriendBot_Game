@@ -2,10 +2,10 @@ class Game {
 
     constructor() {
         this.gameState = LOADING_STATE;
-        this.score = 0;
         this.gameCamera = null;
         this.player = null;
         this.road = null;
+        this.UI = null
         this.background = null;
     }
 
@@ -21,10 +21,13 @@ class Game {
                 game.background.render(ctx)
                 game.road.render(ctx)
                 game.player.render(ctx);
+                game.UI.renderGameUI(ctx)
                 break;
             case PAUSE_STATE:
+                game.UI.renderPauseUI(ctx)
                 break;
             case GAME_OVER_STATE:
+                game.UI.renderGameOverUI(ctx)
                 break;
         }
     }
@@ -35,9 +38,12 @@ class Game {
             case LOADING_STATE:
                 game.gameCamera = new Camera(game);
                 game.road = new Road(game)
-                game.player = new Player(game, GREEN)
+                game.player = new Player(game, GREEN, HARD)
                 game.background = new Background(game)
-                spriteSheet.src = './images/SpriteSheet.png'
+                game.UI = new UI(game)
+                spriteSheet_road.src = './images/SpriteSheet_road.png'
+                spriteSheet_road_side.src = './images/SpriteSheet_side_road.png'
+                spriteSheet_ui.src = './images/SpriteSheet_UI.png'
                 background_sky.src = './images/background_sky.png'
                 background_mountain.src = './images/background_mountain.png'
                 background_trees.src = './images/background_trees.png'
@@ -47,7 +53,6 @@ class Game {
                 road_sprite_4.src = './images/road_sprite_4.png'
                 road_sprite_5.src = './images/road_sprite_5.png'
                 game.gameState = SET_STATE;
-
                 game.gameCamera.init()
                 game.player.init()
                 break;

@@ -38,7 +38,7 @@ class Segment {
     constructor(segments, curve, y, road){
         this.road = road
         this.index = segments.length;
-        this.worldPoints = {x: 0, y:y, z: this.index*Road.segmentLength}
+        this.worldPoints = {x: 0, y:y, z: this.index*SEGMENT_LENGTH}
         this.screenPoints = {x:0, y:0, w:0}
         this.lastScreenPoints = {x:0, y:0, w:0}
         this.maxHeight = CANVAS_HEIGHT
@@ -65,16 +65,15 @@ class Segment {
 // classe que define a estrada a ser percorrida
 class Road {
 
-    static MAX_ROAD_WIDTH = 1000;
-    static segmentLength = 100;
-
     constructor(game) {
         this.game = game
         this.segments = []
         this.totalSegments = null
         this.roadLength = null;
-        this.roadWidth = Road.MAX_ROAD_WIDTH;
+        this.roadWidth = MAX_ROAD_WIDTH;
         this.totalCars = [];
+        this.totalTraffic = [];
+        this.totalCoins = [];
     }
 
     render(ctx) {
@@ -82,7 +81,7 @@ class Road {
 
         let baseSegment = this.findSegment(gameCamera.z);
         let baseSegmentIndex = baseSegment.index;
-        let basePercent   = percentageLeft(gameCamera.z, Road.segmentLength);
+        let basePercent   = percentageLeft(gameCamera.z, SEGMENT_LENGTH);
         let x  = 0;
         let dx = - (baseSegment.curve * basePercent);
         let maxBottomLine        = CANVAS_HEIGHT;
@@ -163,10 +162,20 @@ class Road {
             carSegment.inRoadObjects.push(this.totalCars[i])
             this.totalCars[i].update(dt)
         }
+        for (let i = 0; i < this.totalTraffic.length; i++){
+            let trafficSegment = this.findSegment(this.totalTraffic[i].z)
+            trafficSegment.inRoadObjects.push(this.totalTraffic[i])
+            this.totalTraffic[i].update(dt)
+        }
+        for (let i = 0; i < this.totalCoins.length; i++){
+            let coinSegment = this.findSegment(this.totalCoins[i].z)
+            coinSegment.inRoadObjects.push(this.totalCoins[i])
+            this.totalCoins[i].update(dt)
+        }
     }
 
     findSegment(z) {
-        return this.segments[Math.floor(z/Road.segmentLength) % this.segments.length];
+        return this.segments[Math.floor(z/SEGMENT_LENGTH) % this.segments.length];
     }
 
     createRoad() {
@@ -184,16 +193,18 @@ class Road {
         this.addStraight();
         this.addDownhillToEnd();
         this.totalSegments = this.segments.length
-        this.roadLength = this.totalSegments * Road.segmentLength;
+        this.roadLength = this.totalSegments * SEGMENT_LENGTH;
         this.addSprites()
         this.addCars()
+        this.addTraffic()
+        this.addCoins()
     }
 
     getLastY() { return (this.segments.length === 0) ? 0 : this.segments[this.segments.length-1].worldPoints.y; }
 
     addMoreSegments(enter, hold, leave, curve, y) {
         let lastY   = this.getLastY();
-        let endY     = lastY + (toInt(y, 0) * Road.segmentLength);
+        let endY     = lastY + (toInt(y, 0) * SEGMENT_LENGTH);
         let n, total = enter + hold + leave;
         for(n = 0 ; n < enter ; n++)
             this.segments.push( new Segment(this.segments, smoothIn(0, curve, n/enter), smoothInOut(lastY, endY, n/total), this));
@@ -248,7 +259,7 @@ class Road {
                     if (Math.random() > 0.5) {
                         x = 1.5
                     }
-                    this.segments[n].roadSideObjects.push(new SideObjects(roadSidesSprites[spriteInt], x, LARGE_SPRITE_SIZE, this))
+                    this.segments[n].roadSideObjects.push(new SideObjects(roadSidesSprites[spriteInt], x, this.segments[n].worldPoints.y, LARGE_SPRITE_SIZE, this))
                 }
             }
         }
@@ -256,24 +267,34 @@ class Road {
     addCars(){
         for (let n = 0; n < 200; n++){
             let spriteInt = Math.floor(Math.random() * 5)
-            let speed = (Math.random()*(Player.maxSpeed*0.4 - Player.maxSpeed*0.1)) + Player.maxSpeed*0.1
-            console.log(speed)
+            let speed = (Math.random()*(MAX_SPEED*0.4 - MAX_SPEED*0.1)) + MAX_SPEED*0.1
             let z = Math.random()*this.roadLength
             let startSegment = this.findSegment(z)
-            this.totalCars.push(new Cars(racers[spriteInt], (Math.random()*2)-1, startSegment.worldPoints.y,  speed, z, SPRITE_SIZE, this))
-            if (Math.random() > 0.8) {
-                let x = -1.5;
-                if (Math.random() > 0.5) {
-                    x = 1.5
-                }
-            }
+            this.totalCars.push(new Cars(racers[spriteInt], ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y,  speed, z, SPRITE_SIZE, this))
+        }
+    }
+
+    addTraffic(){
+        for (let n = 0; n < 50 ; n++){
+            let speed = (Math.random()*(MAX_SPEED*0.4 - MAX_SPEED*0.1)) + MAX_SPEED*0.1
+            let z = Math.random()*this.roadLength
+            let startSegment = this.findSegment(z)
+            this.totalTraffic.push(new Traffic(jeep, ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y,  speed, z, SPRITE_SIZE, this))
+        }
+    }
+
+    addCoins(){
+        for (let n = 0; n < 500 ; n++){
+            let z = Math.random()*this.roadLength
+            let startSegment = this.findSegment(z)
+            this.totalCoins.push(new Coins(coin1, ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y+50, z, SPRITE_SIZE, this))
         }
     }
 
 
     addDownhillToEnd(num) {
         num = num || 200;
-        this.addMoreSegments(num, num, num, -ROAD.CURVE.EASY, -this.getLastY()/Road.segmentLength);
+        this.addMoreSegments(num, num, num, -ROAD.CURVE.EASY, -this.getLastY()/SEGMENT_LENGTH);
     }
 
     // Função para fazer a projeção dos pontos em 3D - usa a regra dos triangulos iguais

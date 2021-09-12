@@ -5,13 +5,20 @@ window.onload = function (){
     let game = new Game()
     // Listenter para clique das teclas
     document.addEventListener('keyup', function (e) {
-        game.player.handleInputUp(ALLOWED_KEYS[e.keyCode]);
+        game.player.handleInputUp(ALLOWED_KEYS[e.code]);
     });
 
     // Listenter para pressionar das teclas
     document.addEventListener('keydown', function (e) {
-        game.player.handleInputDown(ALLOWED_KEYS[e.keyCode]);
+        game.player.handleInputDown(ALLOWED_KEYS[e.code]);
     });
+    // Listener para gerar o loop da musica de fundo
+    gameMusic.addEventListener('ended', function () {
+        if (game.gameState === PLAY_STATE) {
+            this.currentTime = 0;
+            this.play();
+        }
+    }, false);
     GameEngine.run({canvas: GAME_CANVAS, render: game.render, game: game, update: game.update})
 }
 
@@ -20,12 +27,6 @@ window.onload = function (){
 
 
 
-// Listener para gerar o loop da musica de fundo
-gameMusic.addEventListener('ended', function () {
-    if (gameRunning && gameStart) {
-        this.currentTime = 0;
-        this.play();
-    }
-}, false);
+
 
 

@@ -3,10 +3,10 @@ class Player {
 
     movingLane = false
     nextLane = 1
-    static maxSpeed = (Road.segmentLength/STEP)*3;
 
-    constructor(game, color) {
-        this.game = game
+    constructor(game, color, difficulty) {
+        this.game = game;
+        this.difficulty = difficulty;
         this.x = 0;
         this.y = 0;
         this.z = 0;
@@ -17,6 +17,8 @@ class Player {
         this.speed = 0;
         this.lanes = ROAD_LANES
         this.currentLane = 1
+        this.score = 56455;
+        this.coins = 25;
     }
 
     init(){
@@ -37,7 +39,7 @@ class Player {
         this.y = 0;
         this.z = 0;
 
-        this.speed = Player.maxSpeed/10;
+        this.speed = MAX_SPEED/4;
     }
 
     setSprites(color){
@@ -70,58 +72,70 @@ class Player {
         drawShadow(this.screen.x, this.screen.y, SPRITE_SIZE, ctx)
         let playerSegmentCurve = road.findSegment(this.z).curve;
         if (playerSegmentCurve === 6){
-            if (this.movingLane && this.nextLane > this.currentLane){
-                ctx.drawImage(...this.sprites.maxRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
-            } else if (this.movingLane && this.nextLane < this.currentLane){
-                ctx.drawImage(...this.sprites.medRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
-            } else {
+            if (this.movingLane){
+                if (this.nextLane > this.currentLane){
+                    ctx.drawImage(...this.sprites.maxRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                } else if (this.nextLane < this.currentLane){
+                    ctx.drawImage(...this.sprites.minRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                }
+            }  else {
                 ctx.drawImage(...this.sprites.maxRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
             }
         } else if ( playerSegmentCurve  < 6 && playerSegmentCurve > 3){
-            if (this.movingLane && this.nextLane > this.currentLane){
-                ctx.drawImage(...this.sprites.minRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
-            } else if (this.movingLane && this.nextLane < this.currentLane){
-                ctx.drawImage(...this.sprites.maxRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
-            } else {
+            if (this.movingLane){
+                if (this.nextLane > this.currentLane){
+                    ctx.drawImage(...this.sprites.maxRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                } else if (this.nextLane < this.currentLane){
+                    ctx.drawImage(...this.sprites.center, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                }
+            }  else {
                 ctx.drawImage(...this.sprites.medRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
             }
          } else if ( playerSegmentCurve  < 3 && playerSegmentCurve > 0){
-            if (this.movingLane && this.nextLane > this.currentLane){
-                ctx.drawImage(...this.sprites.center, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
-            } else if (this.movingLane && this.nextLane < this.currentLane){
-                ctx.drawImage(...this.sprites.medRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
-            } else{
+            if (this.movingLane){
+                if (this.nextLane > this.currentLane){
+                    ctx.drawImage(...this.sprites.maxRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                } else if (this.nextLane < this.currentLane){
+                    ctx.drawImage(...this.sprites.minLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                }
+            }  else {
                 ctx.drawImage(...this.sprites.minRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
             }
         } else if ( playerSegmentCurve  < 0 && playerSegmentCurve > -3) {
-            if (this.movingLane && this.nextLane > this.currentLane){
-                ctx.drawImage(...this.sprites.center, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
-            } else if (this.movingLane && this.nextLane < this.currentLane){
-                ctx.drawImage(...this.sprites.medLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
-            } else{
+            if (this.movingLane){
+                if (this.nextLane > this.currentLane){
+                    ctx.drawImage(...this.sprites.minRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                } else if (this.nextLane < this.currentLane){
+                    ctx.drawImage(...this.sprites.maxLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                }
+            }  else {
                 ctx.drawImage(...this.sprites.minLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
             }
         } else if ( playerSegmentCurve  < -3 && playerSegmentCurve > -6) {
-            if (this.movingLane && this.nextLane > this.currentLane){
-                ctx.drawImage(...this.sprites.minLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
-            } else if (this.movingLane && this.nextLane < this.currentLane){
-                ctx.drawImage(...this.sprites.maxLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
-            } else {
+            if (this.movingLane){
+                if (this.nextLane > this.currentLane){
+                    ctx.drawImage(...this.sprites.center, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                } else if (this.nextLane < this.currentLane){
+                    ctx.drawImage(...this.sprites.maxLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                }
+            }  else {
                 ctx.drawImage(...this.sprites.medLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
             }
         } else if  ( playerSegmentCurve  === -6) {
-            if (this.movingLane && this.nextLane > this.currentLane){
-                ctx.drawImage(...this.sprites.medLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
-            } else if (this.movingLane && this.nextLane < this.currentLane){
-                ctx.drawImage(...this.sprites.maxLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
-            } else {
+            if (this.movingLane){
+                if (this.nextLane > this.currentLane){
+                    ctx.drawImage(...this.sprites.minLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                } else if (this.nextLane < this.currentLane){
+                    ctx.drawImage(...this.sprites.maxLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                }
+            }  else {
                 ctx.drawImage(...this.sprites.maxLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
             }
         } else {
             if (this.nextLane > this.currentLane){
-                ctx.drawImage(...this.sprites.minRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                ctx.drawImage(...this.sprites.medRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
             } else if (this.nextLane < this.currentLane){
-                ctx.drawImage(...this.sprites.minLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                ctx.drawImage(...this.sprites.medLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
             } else if (!this.movingLane){
                 ctx.drawImage(...this.sprites.center, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
             }
@@ -180,9 +194,14 @@ class Player {
                     this.movingLane = true
                 }
                 break;
-            case ('up'):
+            case ('pause'):
+                if(this.game.gameState === PLAY_STATE){
+                    this.game.gameState = PAUSE_STATE
+                } else if (this.game.gameState === PAUSE_STATE){
+                    this.game.gameState = PLAY_STATE
+                }
                 break;
-            case ('down'):
+            case ('jump'):
                 break;
         }
     }
