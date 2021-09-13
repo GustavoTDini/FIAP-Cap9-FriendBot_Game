@@ -3,15 +3,11 @@ window.onload = function (){
     GAME_CANVAS.width = CANVAS_WIDTH;
     GAME_CANVAS.height = CANVAS_HEIGHT;
     let game = new Game()
-    // Listenter para clique das teclas
+    // Listener para clique das teclas
     document.addEventListener('keyup', function (e) {
         game.player.handleInputUp(ALLOWED_KEYS[e.code]);
     });
 
-    // Listenter para pressionar das teclas
-    document.addEventListener('keydown', function (e) {
-        game.player.handleInputDown(ALLOWED_KEYS[e.code]);
-    });
     // Listener para gerar o loop da musica de fundo
     gameMusic.addEventListener('ended', function () {
         if (game.gameState === PLAY_STATE) {
@@ -20,6 +16,7 @@ window.onload = function (){
         }
     }, false);
     GameEngine.run({canvas: GAME_CANVAS, render: game.render, game: game, update: game.update})
+    window.focus();
 }
 
 

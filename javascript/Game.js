@@ -52,6 +52,9 @@ class Game {
                 road_sprite_3.src = './images/road_sprite_3.png'
                 road_sprite_4.src = './images/road_sprite_4.png'
                 road_sprite_5.src = './images/road_sprite_5.png'
+                grass_texture1.src = './images/grass_texture_1.png'
+                grass_texture2.src = './images/grass_texture_2.png'
+                grass_texture3.src = './images/grass_texture_3.png'
                 game.gameState = SET_STATE;
                 game.gameCamera.init()
                 game.player.init()

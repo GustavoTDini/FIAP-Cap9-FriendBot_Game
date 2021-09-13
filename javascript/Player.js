@@ -3,6 +3,8 @@ class Player {
 
     movingLane = false
     nextLane = 1
+    gravity = 0.3
+    jumpSpeed = -12
 
     constructor(game, color, difficulty) {
         this.game = game;
@@ -19,6 +21,12 @@ class Player {
         this.currentLane = 1
         this.score = 56455;
         this.coins = 25;
+        this.jumping = false;
+        this.over = false;
+        this.turbo = false;
+        this.transparent = false;
+        this.ySpeed = 0;
+
     }
 
     init(){
@@ -64,12 +72,13 @@ class Player {
         }
 
         this.setLanes()
-        this.setY()
+        this.SettingJumpingY(dt)
     }
 
     render(ctx) {
         let road = this.game.road
-        drawShadow(this.screen.x, this.screen.y, SPRITE_SIZE, ctx)
+        let shadowScale = SPRITE_SIZE*this.screen.y/586
+        drawShadow(this.screen.x,  CANVAS_HEIGHT - this.screen.h, shadowScale, ctx)
         let playerSegmentCurve = road.findSegment(this.z).curve;
         if (playerSegmentCurve === 6){
             if (this.movingLane){
@@ -169,30 +178,41 @@ class Player {
         }
     }
 
-    setY(){
+    SettingJumpingY(){
         let road = this.game.road
         let playerSegment = road.findSegment(this.z);
-        this.y = playerSegment.worldPoints.y
-        this.screen.y = CANVAS_HEIGHT - this.screen.h + Math.floor((Math.random()*5))-10
-    }
-
-    handleInputDown(keys) {
-
+        if (!this.jumping ){
+            this.ySpeed = 0;
+            this.y = playerSegment.worldPoints.y
+            this.screen.y = CANVAS_HEIGHT - this.screen.h + Math.floor((Math.random()*5))-10
+        } else {
+            this.screen.y += this.ySpeed
+            this.ySpeed += this.gravity
+            if (this.screen.y > CANVAS_HEIGHT - this.screen.h){
+                this.jumping = false
+            }
+        }
+        this.over = this.screen.y < 450;
     }
 
     handleInputUp(keys) {
         switch (keys) {
             case ('right'):
-                this.nextLane = limitMaxMin(this.currentLane, this.currentLane+1, 3, 0)
-                if (this.nextLane !== this.currentLane){
-                    this.movingLane = true
+                if (!this.jumping){
+                    this.nextLane = limitMaxMin(this.currentLane, this.currentLane+1, 3, 0)
+                    if (this.nextLane !== this.currentLane){
+                        this.movingLane = true
+                    }
                 }
                 break;
             case ('left'):
-                this.nextLane = limitMaxMin(this.currentLane, this.currentLane-1, 3, 0)
-                if (this.nextLane !== this.currentLane){
-                    this.movingLane = true
+                if (!this.jumping){
+                    this.nextLane = limitMaxMin(this.currentLane, this.currentLane-1, 3, 0)
+                    if (this.nextLane !== this.currentLane){
+                        this.movingLane = true
+                    }
                 }
+
                 break;
             case ('pause'):
                 if(this.game.gameState === PLAY_STATE){
@@ -202,6 +222,10 @@ class Player {
                 }
                 break;
             case ('jump'):
+                if (!this.movingLane && !this.jumping){
+                    this.jumping = true
+                    this.ySpeed = this.jumpSpeed
+                }
                 break;
         }
     }

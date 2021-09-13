@@ -3,11 +3,11 @@
 // ---------------------------------------------------------------------------------
 
 // Sizes
+const CANVAS_WIDTH = 1280;
+const CANVAS_HEIGHT = 720;
 const SPRITE_SIZE = 128;
 const LARGE_SPRITE_SIZE = 2*SPRITE_SIZE
 const UI_SPRITE_SIZE = 50
-const CANVAS_WIDTH = 1280;
-const CANVAS_HEIGHT = 720;
 const CANVAS_CENTER_X = CANVAS_WIDTH/2;
 const CANVAS_CENTER_Y = CANVAS_HEIGHT/2;
 const FPS = 60;
@@ -72,8 +72,16 @@ const ROAD = {
     CURVE:  { NONE: 0, EASY:    2, MEDIUM:   4, HARD:    6 }
 };
 
-//Road Segments
+//Road Lanes
 const ROAD_LANES = [-0.6, -0.2, 0.2, 0.6]
+
+// Power Ups
+const TURBO = 8
+const TRANSPARENT = 9
+
+// animals
+const GUARA = 10
+const JAGUAR = 11
 
 // ---------------------------------------------------------------------------------
 // Images & Sprites
@@ -90,13 +98,17 @@ let road_sprite_2 = new Image();
 let road_sprite_3 = new Image();
 let road_sprite_4 = new Image();
 let road_sprite_5 = new Image();
+let grass_texture1 = new Image();
+let grass_texture2 = new Image();
+let grass_texture3 = new Image();
 
 let roadTextures = [road_sprite_1, road_sprite_2, road_sprite_3, road_sprite_4, road_sprite_5]
+let grassTextures = [grass_texture1, grass_texture2, grass_texture3]
 
 const COLORS = {
-    LIGHT:	{road: '#888888', grass: '#48a15a', shoulder: '#BCBCBC', lane: '#FFFFFF'},
-    DARK:	{road: '#666666', grass: '#398246', shoulder: '#FF0000'},
-    DARKER:	{road: '#444444', grass: '#3b924c', shoulder: '#BCBCBC'},
+    LIGHT:	{road: '#888888', grass: '#48a15a', grassTextures: 0, shoulder: '#BCBCBC', lane: '#FFFFFF'},
+    DARK:	{road: '#666666', grass: '#398246', grassTextures: 1, shoulder: '#FF0000'},
+    DARKER:	{road: '#444444', grass: '#398246', grassTextures: 2, shoulder: '#BCBCBC'},
     SKY: "#CFEFFC",
     GRASS: "#20BA75"
 };
@@ -140,18 +152,28 @@ const coin4 = [spriteSheet_road, 384, 512, SPRITE_SIZE, SPRITE_SIZE]
 const coin5 = [spriteSheet_road, 512, 512, SPRITE_SIZE, SPRITE_SIZE]
 const coin6 = [spriteSheet_road, 640, 512, SPRITE_SIZE, SPRITE_SIZE]
 const log = [spriteSheet_road, 768, 512, SPRITE_SIZE, SPRITE_SIZE]
-const jaguar1 = [spriteSheet_road, 0, 640, SPRITE_SIZE, SPRITE_SIZE]
-const jaguar2 = [spriteSheet_road, 128, 640, SPRITE_SIZE, SPRITE_SIZE]
-const jaguar3 = [spriteSheet_road, 256, 640, SPRITE_SIZE, SPRITE_SIZE]
-const jaguar4 = [spriteSheet_road, 384, 640, SPRITE_SIZE, SPRITE_SIZE]
-const jaguar5 = [spriteSheet_road, 512, 640, SPRITE_SIZE, SPRITE_SIZE]
+const jaguar1Left = [spriteSheet_road, 0, 640, SPRITE_SIZE, SPRITE_SIZE]
+const jaguar2Left = [spriteSheet_road, 128, 640, SPRITE_SIZE, SPRITE_SIZE]
+const jaguar3Left = [spriteSheet_road, 256, 640, SPRITE_SIZE, SPRITE_SIZE]
+const jaguar4Left = [spriteSheet_road, 384, 640, SPRITE_SIZE, SPRITE_SIZE]
+const jaguar5Left = [spriteSheet_road, 512, 640, SPRITE_SIZE, SPRITE_SIZE]
+const jaguar1Right = [spriteSheet_road, 0, 896, SPRITE_SIZE, SPRITE_SIZE]
+const jaguar2Right = [spriteSheet_road, 128, 896, SPRITE_SIZE, SPRITE_SIZE]
+const jaguar3Right = [spriteSheet_road, 256, 896, SPRITE_SIZE, SPRITE_SIZE]
+const jaguar4Right = [spriteSheet_road, 384, 896, SPRITE_SIZE, SPRITE_SIZE]
+const jaguar5Right = [spriteSheet_road, 512, 896, SPRITE_SIZE, SPRITE_SIZE]
 const transparent1 = [spriteSheet_road, 640, 640, SPRITE_SIZE, SPRITE_SIZE]
 const transparent2 = [spriteSheet_road, 768, 640, SPRITE_SIZE, SPRITE_SIZE]
-const guara1 = [spriteSheet_road, 0, 768, SPRITE_SIZE, SPRITE_SIZE]
-const guara2 = [spriteSheet_road, 128, 768, SPRITE_SIZE, SPRITE_SIZE]
-const guara3 = [spriteSheet_road, 256, 768, SPRITE_SIZE, SPRITE_SIZE]
-const guara4 = [spriteSheet_road, 384, 768, SPRITE_SIZE, SPRITE_SIZE]
-const guara5 = [spriteSheet_road, 512, 768, SPRITE_SIZE, SPRITE_SIZE]
+const guara1Left = [spriteSheet_road, 0, 768, SPRITE_SIZE, SPRITE_SIZE]
+const guara2Left = [spriteSheet_road, 128, 768, SPRITE_SIZE, SPRITE_SIZE]
+const guara3Left = [spriteSheet_road, 256, 768, SPRITE_SIZE, SPRITE_SIZE]
+const guara4Left = [spriteSheet_road, 384, 768, SPRITE_SIZE, SPRITE_SIZE]
+const guara5Left = [spriteSheet_road, 512, 768, SPRITE_SIZE, SPRITE_SIZE]
+const guara1Right = [spriteSheet_road, 0, 1024, SPRITE_SIZE, SPRITE_SIZE]
+const guara2Right = [spriteSheet_road, 128, 1024, SPRITE_SIZE, SPRITE_SIZE]
+const guara3Right = [spriteSheet_road, 256, 1024, SPRITE_SIZE, SPRITE_SIZE]
+const guara4Right = [spriteSheet_road, 384, 1024, SPRITE_SIZE, SPRITE_SIZE]
+const guara5Right = [spriteSheet_road, 512, 1024, SPRITE_SIZE, SPRITE_SIZE]
 const turbo1 = [spriteSheet_road, 640, 768, SPRITE_SIZE, SPRITE_SIZE]
 const turbo2 = [spriteSheet_road, 768, 768, SPRITE_SIZE, SPRITE_SIZE]
 
@@ -175,7 +197,7 @@ const UICloseButton = [spriteSheet_ui, 400, 0, UI_SPRITE_SIZE, UI_SPRITE_SIZE]
 const UIReturnButton = [spriteSheet_ui, 400, 50, UI_SPRITE_SIZE, UI_SPRITE_SIZE]
 const UIEmptyStar = [spriteSheet_ui, 450, 0, UI_SPRITE_SIZE, UI_SPRITE_SIZE]
 const UIFullStar = [spriteSheet_ui, 450, 50, UI_SPRITE_SIZE, UI_SPRITE_SIZE]
-const UIRedLamp = [spriteSheet_ui, 500, 0, 260, 2*UI_SPRITE_SIZE]
+const UISemaphore = [spriteSheet_ui, 500, 0, 260, 2*UI_SPRITE_SIZE]
 const UIPanel = [spriteSheet_ui, 300, 100, 500, 2*UI_SPRITE_SIZE]
 const UIStar = [spriteSheet_ui, 300, 200, UI_SPRITE_SIZE, UI_SPRITE_SIZE]
 const UI1 = [spriteSheet_ui, 350, 200, UI_SPRITE_SIZE, UI_SPRITE_SIZE]
@@ -191,7 +213,11 @@ const UI0 = [spriteSheet_ui, 800, 200, UI_SPRITE_SIZE, UI_SPRITE_SIZE]
 const UIWin = [spriteSheet_ui, 300, 250, 220, UI_SPRITE_SIZE]
 const UIScore = [spriteSheet_ui, 300, 300, 160, UI_SPRITE_SIZE]
 const UIGreenLamp = [spriteSheet_ui, 550, 250, 260, 2*UI_SPRITE_SIZE]
+const UIRedLamp = [spriteSheet_ui, 500, 0, 260, 2*UI_SPRITE_SIZE]
 
+// ---------------------------------------------------------------------------------
+// Sprites Groups
+// ---------------------------------------------------------------------------------
 const greenPlayerSprites = {maxLeft: greenCarMaxSteerLeft, medLeft: greenCarMedSteerLeft,
                             minLeft: greenCarMinSteerLeft, center: greenCarCenter,
                             minRight: greenCarMinSteerRight, medRight: greenCarMedSteerRight,

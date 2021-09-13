@@ -74,6 +74,9 @@ class Road {
         this.totalCars = [];
         this.totalTraffic = [];
         this.totalCoins = [];
+        this.powerUps = [];
+        this.obstacles = []
+        this.animals = []
     }
 
     render(ctx) {
@@ -172,6 +175,21 @@ class Road {
             coinSegment.inRoadObjects.push(this.totalCoins[i])
             this.totalCoins[i].update(dt)
         }
+        for (let i = 0; i < this.powerUps.length; i++){
+            let upSegment = this.findSegment(this.powerUps[i].z)
+            upSegment.inRoadObjects.push(this.powerUps[i])
+            this.powerUps[i].update(dt)
+        }
+        for (let i = 0; i < this.obstacles.length; i++){
+            let obstaclesSegment = this.findSegment(this.obstacles[i].z)
+            obstaclesSegment.inRoadObjects.push(this.obstacles[i])
+            this.obstacles[i].update(dt)
+        }
+        for (let i = 0; i < this.animals.length; i++){
+            let animalSegment = this.findSegment(this.animals[i].z)
+            animalSegment.inRoadObjects.push(this.animals[i])
+            this.animals[i].update(dt)
+        }
     }
 
     findSegment(z) {
@@ -191,13 +209,17 @@ class Road {
         this.addCurve(ROAD.LENGTH.LONG, ROAD.CURVE.MEDIUM, -ROAD.HILL.LOW);
         this.addHill(ROAD.LENGTH.LONG, -ROAD.HILL.MEDIUM);
         this.addStraight();
+        this.addSCurves();
         this.addDownhillToEnd();
         this.totalSegments = this.segments.length
         this.roadLength = this.totalSegments * SEGMENT_LENGTH;
         this.addSprites()
-        this.addCars()
-        this.addTraffic()
-        this.addCoins()
+        // this.addCars()
+        //this.addTraffic()
+        // this.addCoins()
+        // this.addPowerUps()
+        // this.addObstacles()
+        this.addAnimals()
     }
 
     getLastY() { return (this.segments.length === 0) ? 0 : this.segments[this.segments.length-1].worldPoints.y; }
@@ -259,7 +281,8 @@ class Road {
                     if (Math.random() > 0.5) {
                         x = 1.5
                     }
-                    this.segments[n].roadSideObjects.push(new SideObjects(roadSidesSprites[spriteInt], x, this.segments[n].worldPoints.y, LARGE_SPRITE_SIZE, this))
+                    //sprite, x, y, z, spriteSize, road, camera
+                    this.segments[n].roadSideObjects.push(new SideObjects(roadSidesSprites[spriteInt], x, this.segments[n].worldPoints.y, this.segments[n].worldPoints.z, LARGE_SPRITE_SIZE, this, this.game.gameCamera))
                 }
             }
         }
@@ -275,7 +298,7 @@ class Road {
     }
 
     addTraffic(){
-        for (let n = 0; n < 50 ; n++){
+        for (let n = 0; n < 100 ; n++){
             let speed = (Math.random()*(MAX_SPEED*0.4 - MAX_SPEED*0.1)) + MAX_SPEED*0.1
             let z = Math.random()*this.roadLength
             let startSegment = this.findSegment(z)
@@ -284,13 +307,40 @@ class Road {
     }
 
     addCoins(){
-        for (let n = 0; n < 500 ; n++){
+        for (let n = 0; n < 200 ; n++){
             let z = Math.random()*this.roadLength
             let startSegment = this.findSegment(z)
-            this.totalCoins.push(new Coins(coin1, ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y+50, z, SPRITE_SIZE, this))
+            this.totalCoins.push(new Coins(coin1, ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y+100, z, SPRITE_SIZE, this))
         }
     }
 
+    addPowerUps(){
+        for (let n = 0; n < 20 ; n++){
+            let z = Math.random()*this.roadLength
+            let startSegment = this.findSegment(z)
+            let type = Math.floor(Math.random() * 2)
+            this.powerUps.push(new PowerUps(ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y+100, z, SPRITE_SIZE, this, (type ===0)?TURBO:TRANSPARENT, null))
+        }
+    }
+
+    addObstacles(){
+        for (let n = 0; n < 50 ; n++){
+            let z = Math.random()*this.roadLength
+            let startSegment = this.findSegment(z)
+            let type = Math.floor(Math.random() * 2)
+            this.obstacles.push(new Obstacles(ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y+100, z, SPRITE_SIZE, this, (type ===0)?rock:log))
+        }
+    }
+
+    addAnimals(){
+        for (let n = 0; n < 50 ; n++){
+            let z = Math.random()*this.roadLength
+            let startSegment = this.findSegment(z)
+            let type = Math.floor(Math.random() * 2)
+            let startX = Math.floor(Math.random()*2)
+            this.animals.push(new Animals(null, startX === 0?1:-1, startSegment.worldPoints.y, z, SPRITE_SIZE, this, this.game.gameCamera, type === 0?GUARA: JAGUAR))
+        }
+    }
 
     addDownhillToEnd(num) {
         num = num || 200;
@@ -330,8 +380,10 @@ class Road {
         let lineDistance1 = w1/2.5
         let lineDistance2 = w2/2.5
         ctx.fillStyle = color.grass
+        //ctx.fillStyle = ctx.createPattern(grassTextures[color.grassTextures], "repeat")
         ctx.fillRect(0, y2, CANVAS_WIDTH, y1 - y2);
         // draw road
+        //ctx.restore()
         drawPolygon(x1-w1, y1,	x1+w1, y1, x2+w2, y2, x2-w2, y2, color.road, ctx);
         create3dRoad(roadTextures[Math.floor(Math.random()*5)], x1, y1, w1, x2, y2, w2, ctx);
         drawPolygon(x1-w1, y1,	x1-w1+linesWidth1, y1, x2-w2+linesWidth2, y2, x2-w2, y2, color.shoulder, ctx);
@@ -341,8 +393,6 @@ class Road {
             drawPolygon(x1+lineDistance1, y1,	x1+lineDistance1+linesWidth1, y1, x2+lineDistance2+linesWidth2, y2, x2+lineDistance2, y2, color.lane, ctx);
             drawPolygon(x1-lineDistance1, y1,	x1-lineDistance1-linesWidth1, y1, x2-lineDistance2-linesWidth2, y2, x2-lineDistance2, y2, color.lane, ctx);
         }
-
-
     }
 }
 

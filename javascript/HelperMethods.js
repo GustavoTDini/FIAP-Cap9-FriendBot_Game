@@ -203,6 +203,14 @@ function drawPolygon(x1, y1, x2, y2, x3, y3, x4, y4, color, ctx){
 function drawShadow(x, y, SpriteSize, ctx){
     ctx.fillStyle = "rgba(50, 50, 50, 0.6)";
     ctx.beginPath();
-    ctx.ellipse(x+SpriteSize/2, y+SpriteSize*0.85, SpriteSize/3, SpriteSize/8, 0, 0, 2 * Math.PI);
+    ctx.ellipse(x+SPRITE_SIZE/2, y+SPRITE_SIZE*0.85, SpriteSize/3, SpriteSize/8, 0, 0, 2 * Math.PI);
     ctx.fill();
+}
+
+// para rotacionar os sprites dos meteoros
+function setSpriteDirection(ctx, sprite, x, y, dir, spriteSize) {
+    ctx.save();
+    ctx.scale(dir, 1);
+    ctx.drawImage(...sprite, (-spriteSize / 2), (-spriteSize / 2), spriteSize, spriteSize);
+    ctx.restore();
 }
