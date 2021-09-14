@@ -5,45 +5,40 @@ class RoadObjects {
         this.x = x
         this.y = y
         this.z = z
-        this.spriteSize = spriteSize
         this.road = road
         this.speed = 0
+        this.spriteSize = spriteSize
         this.screen = {x:0, y:0, spriteSize:0}
         this.mask = [x, y, z, spriteSize]
         this.segment = null
         this.camera = camera
         this.dir = 1;
+        this.relativeSize = SPRITE_SIZE
+        if (this instanceof SideObjects){
+            this.relativeSize *=4
+        }
+        if (this instanceof Obstacles){
+            this.relativeSize *=2
+        }
+
     }
 
-    render(ctx, scale, destX, destY, maxBottomLine) {
-        let spriteSize = (MAX_ROAD_WIDTH*scale) * this.spriteSize
-        let maxDrawLine = maxBottomLine ? Math.max(0, destY+spriteSize-maxBottomLine) : 0;
-        if (maxDrawLine < maxBottomLine){
+    render(ctx, maxDrawLine) {
+        this.segment = this.road.findSegment(this.z)
+        this.screen = this.project3D(this.segment, this.camera)
+
+        if (maxDrawLine > this.screen.y){
+            //TODO - Rafazer render de objetos para corrigir deformações
+            let spriteHeight = (maxDrawLine - this.screen.y)
+            // aqui reorganizamos os tamanhos dos elementos que não são laterais
+            if (!(this instanceof SideObjects)){
+                spriteHeight *=2
+            }
             let drawSprite = this.sprite.map((x) => x);
-            drawSprite[4]= ((destY + spriteSize - maxBottomLine)/spriteSize)*this.spriteSize
-            destY = (destY - spriteSize) > maxDrawLine ? destY - spriteSize: maxDrawLine;
-            ctx.drawImage(...drawSprite, destX - spriteSize/2, destY, spriteSize, spriteSize*(this.spriteSize/drawSprite[4]));
+            drawSprite[4]= Math.min(drawSprite[4], (drawSprite[4] * spriteHeight) / this.screen.spriteSize)
+            ctx.drawImage(...drawSprite, this.screen.x, this.screen.y, this.screen.spriteSize,spriteHeight);
         }
     }
-
-    // render(ctx, scale, destX, destY, maxBottomLine) {
-    //     this.segment = this.road.findSegment(this.z)
-    //     this.screen = this.project3D(this.segment, this.camera)
-    //     // let spriteSize = (MAX_ROAD_WIDTH*scale) * this.spriteSize
-    //     let maxDrawLine = maxBottomLine ? Math.max(0, this.screen.y+this.screen.spriteSize-maxBottomLine) : 0;
-    //     if (maxDrawLine < maxBottomLine){
-    //         let drawSprite = this.sprite.map((x) => x);
-    //         drawSprite[4]= SPRITE_SIZE - (SPRITE_SIZE*maxDrawLine/this.screen.spriteSize)
-    //             //destY = (destY - spriteSize) > maxDrawLine ? destY - spriteSize: maxDrawLine;
-    //         ctx.drawImage(...drawSprite, this.screen.x - this.screen.spriteSize/2, this.screen.y, this.screen.spriteSize, this.screen.spriteSize - maxDrawLine);
-    //     }
-    // }
-
-    //But if a sprite is on a segment which is either not visible or partially visible, we can easily crop it.
-    // First, find the top of the sprite. Then, every line of the sprite will be drawn until it hits the last
-    // visible segment's screen Y position. That is, if there is a segment behind the sprite which is supposed to
-    // cover part of it, you stop drawing the sprite when you hit that line. And if the top of the sprite is below the last
-    // segment's Y position, the sprite won't be visible at all and will be skipped.
 
 
     update(dt){
@@ -52,27 +47,27 @@ class RoadObjects {
     }
 
     setMask(){
-        this.mask = [this.x, this.y, this.z, this.spriteSize]
+        this.mask = [this.x, this.z, this.spriteSize]
     }
 
     project3D(segment, camera){
-        // definimos as distancias em relação a camera
-        let transX = this.x - camera.x
         let transY = this.y - camera.y;
-
+        let scale = segment.scale
         // definimos esses pontos no plano cartesiano utilizando a escala
-        let projectedX = segment.scale * transX;
-        let projectedY = segment.scale * transY;
-        let projectedW = segment.scale * this.spriteSize;
-
+        let projectedY = scale * transY;
+        let projectedSize = scale * this.relativeSize;
         // utilizando a pontos do plano, e o tamanho da tela - definimos os segmentos na Canvas
-        let x = Math.round((1 + projectedX) * CANVAS_CENTER_X);
-        let y = Math.round((1 - projectedY) * CANVAS_CENTER_Y);
-        let spriteSize = Math.round(projectedW * CANVAS_CENTER_X);
-        //console.log(this)
-        return {x:x, y:y, sprite:spriteSize}
-    }
+        let spriteSize = Math.round(projectedSize * CANVAS_CENTER_X*2);
+        let y = Math.round((1 - projectedY) * CANVAS_CENTER_Y) - spriteSize/2;
+        // caso seja um elemento do lado da pista temos que corrigir
+        if (this instanceof SideObjects){
+            y -= spriteSize/2
+        }
+        let w = this.segment.screenPoints.w
+        let x = this.segment.screenPoints.x + w*this.x - spriteSize/2
 
+        return {x:x, y:y, spriteSize:spriteSize}
+    }
 }
 
 
@@ -97,6 +92,7 @@ class Cars extends RoadObjects{
         super.update(dt)
         this.randomX()
         this.setX()
+        this.y = this.road.findSegment(this.z).worldPoints.y
         this.z += this.speed*dt
         if (this.z >= this.road.roadLength){
             this.z -= this.road.roadLength
@@ -132,6 +128,7 @@ class Traffic extends RoadObjects{
     }
 
     update(dt){
+        this.y = this.road.findSegment(this.z).worldPoints.y
         this.z -= this.speed*dt
         if (this.z <= this.road.roadLength){
             this.z += this.road.roadLength
@@ -219,11 +216,6 @@ class Obstacles extends RoadObjects{
 
     constructor(sprite, x, y, z, spriteSize, road, camera) {
         super(sprite, x, y, z, spriteSize, road, camera);
-        if (this.type === TURBO){
-            this.sprite = this.turboSprites[0]
-        } else if (this.type === TRANSPARENT){
-            this.sprite = this.transparentSprite[0]
-        }
     }
 
     update(dt) {
@@ -245,6 +237,7 @@ class Animals extends RoadObjects{
         super(sprite, x, y, z, spriteSize, road, camera);
         this.type = type
         this.sprites = this.type === GUARA? this.guaraSpritesLeft:this.jaguarSpritesRight
+        this.sprite = this.type === GUARA? this.guaraSpritesLeft[0]:this.jaguarSpritesRight[0]
         this.speed = this.x === 1? -0.01: 0.01
         if (this.type === GUARA){
             if (this.speed < 0) {

@@ -47,7 +47,7 @@ class Player {
         this.y = 0;
         this.z = 0;
 
-        this.speed = MAX_SPEED/4;
+        this.speed = MAX_SPEED/2;
     }
 
     setSprites(color){

@@ -7,7 +7,7 @@ class Camera {
         this.z = 0;
         this.distToPlayer = 1000;
         this.distToPlane = null;
-        this.drawDistance = 150;
+        this.drawDistance = 200;
         this.cameraHeight  = 1000;
         this.fogDensity    = 5;
         this.game = game
@@ -125,20 +125,18 @@ class Road {
         for(let n = (gameCamera.drawDistance-1) ; n >= 0 ; n--) {
             let currIndex = (baseSegmentIndex + n) % this.totalSegments;
             let currSegment = this.segments[currIndex];
+            let maxBottomLine = CANVAS_HEIGHT;
+            for (let j=0; j<n; j++){
+                let maxLineIndex = (baseSegmentIndex + n) % this.totalSegments;
+                maxBottomLine = Math.min(maxBottomLine, this.segments[maxLineIndex].maxHeight)
+                // console.log(maxBottomLine)
+            }
 
             for(let i = 0 ; i < currSegment.roadSideObjects.length ; i++) {
-                let sideObject = currSegment.roadSideObjects[i]
-                let spriteScale = currSegment.scale*2;
-                let x     = currSegment.screenPoints.x + currSegment.screenPoints.w*currSegment.roadSideObjects[i].x
-                let y     = currSegment.screenPoints.y;
-                sideObject.render(ctx, spriteScale, x, y, currSegment.maxHeight)
+                currSegment.roadSideObjects[i].render(ctx, maxBottomLine)
             }
             for(let j = 0 ; j < currSegment.inRoadObjects.length ; j++) {
-                let car = currSegment.inRoadObjects[j]
-                let spriteScale = currSegment.scale;
-                let x     = currSegment.screenPoints.x + currSegment.screenPoints.w*currSegment.inRoadObjects[j].x
-                let y     = currSegment.screenPoints.y;
-                car.render(ctx, spriteScale, x, y, currSegment.maxHeight)
+                currSegment.inRoadObjects[j].render(ctx, maxBottomLine)
             }
 
         }
@@ -214,11 +212,11 @@ class Road {
         this.totalSegments = this.segments.length
         this.roadLength = this.totalSegments * SEGMENT_LENGTH;
         this.addSprites()
-        // this.addCars()
-        //this.addTraffic()
-        // this.addCoins()
-        // this.addPowerUps()
-        // this.addObstacles()
+        this.addCars()
+        this.addTraffic()
+        this.addCoins()
+        this.addPowerUps()
+        this.addObstacles()
         this.addAnimals()
     }
 
@@ -281,7 +279,6 @@ class Road {
                     if (Math.random() > 0.5) {
                         x = 1.5
                     }
-                    //sprite, x, y, z, spriteSize, road, camera
                     this.segments[n].roadSideObjects.push(new SideObjects(roadSidesSprites[spriteInt], x, this.segments[n].worldPoints.y, this.segments[n].worldPoints.z, LARGE_SPRITE_SIZE, this, this.game.gameCamera))
                 }
             }
@@ -293,7 +290,7 @@ class Road {
             let speed = (Math.random()*(MAX_SPEED*0.4 - MAX_SPEED*0.1)) + MAX_SPEED*0.1
             let z = Math.random()*this.roadLength
             let startSegment = this.findSegment(z)
-            this.totalCars.push(new Cars(racers[spriteInt], ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y,  speed, z, SPRITE_SIZE, this))
+            this.totalCars.push(new Cars(racers[spriteInt], ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y,  z, SPRITE_SIZE, this, this.game.gameCamera, speed))
         }
     }
 
@@ -302,7 +299,7 @@ class Road {
             let speed = (Math.random()*(MAX_SPEED*0.4 - MAX_SPEED*0.1)) + MAX_SPEED*0.1
             let z = Math.random()*this.roadLength
             let startSegment = this.findSegment(z)
-            this.totalTraffic.push(new Traffic(jeep, ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y,  speed, z, SPRITE_SIZE, this))
+            this.totalTraffic.push(new Traffic(jeep, ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y, z, SPRITE_SIZE, this,this.game.gameCamera, speed))
         }
     }
 
@@ -310,7 +307,7 @@ class Road {
         for (let n = 0; n < 200 ; n++){
             let z = Math.random()*this.roadLength
             let startSegment = this.findSegment(z)
-            this.totalCoins.push(new Coins(coin1, ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y+100, z, SPRITE_SIZE, this))
+            this.totalCoins.push(new Coins(coin1, ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y+100, z, SPRITE_SIZE, this, this.game.gameCamera))
         }
     }
 
@@ -319,7 +316,7 @@ class Road {
             let z = Math.random()*this.roadLength
             let startSegment = this.findSegment(z)
             let type = Math.floor(Math.random() * 2)
-            this.powerUps.push(new PowerUps(ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y+100, z, SPRITE_SIZE, this, (type ===0)?TURBO:TRANSPARENT, null))
+            this.powerUps.push(new PowerUps(null, ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y+100, z, SPRITE_SIZE, this, this.game.gameCamera,(type ===0)?TURBO:TRANSPARENT))
         }
     }
 
@@ -328,7 +325,7 @@ class Road {
             let z = Math.random()*this.roadLength
             let startSegment = this.findSegment(z)
             let type = Math.floor(Math.random() * 2)
-            this.obstacles.push(new Obstacles(ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y+100, z, SPRITE_SIZE, this, (type ===0)?rock:log))
+            this.obstacles.push(new Obstacles((type ===0)?rock:log, ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y+100, z, SPRITE_SIZE, this, this.game.gameCamera ))
         }
     }
 
@@ -337,8 +334,7 @@ class Road {
             let z = Math.random()*this.roadLength
             let startSegment = this.findSegment(z)
             let type = Math.floor(Math.random() * 2)
-            let startX = Math.floor(Math.random()*2)
-            this.animals.push(new Animals(null, startX === 0?1:-1, startSegment.worldPoints.y, z, SPRITE_SIZE, this, this.game.gameCamera, type === 0?GUARA: JAGUAR))
+            this.animals.push(new Animals(null, Math.random()-2, startSegment.worldPoints.y, z, SPRITE_SIZE, this, this.game.gameCamera, type === 0?GUARA: JAGUAR))
         }
     }
 
