@@ -188,36 +188,60 @@ class Road {
             animalSegment.inRoadObjects.push(this.animals[i])
             this.animals[i].update(dt)
         }
+        this.addMoreRoad()
     }
 
     findSegment(z) {
         return this.segments[Math.floor(z/SEGMENT_LENGTH) % this.segments.length];
     }
 
+    //TODO - fazer um editor de pista melhor
+
     createRoad() {
-        this.addStraight(ROAD.LENGTH.SHORT/2);
-        this.addHill(ROAD.LENGTH.SHORT, ROAD.HILL.LOW);
-        this.addLowRollingHills();
-        this.addCurve(ROAD.LENGTH.MEDIUM, ROAD.CURVE.MEDIUM, ROAD.HILL.LOW);
-        this.addLowRollingHills();
-        this.addCurve(ROAD.LENGTH.LONG, ROAD.CURVE.MEDIUM, ROAD.HILL.MEDIUM);
-        this.addStraight();
-        this.addCurve(ROAD.LENGTH.LONG, -ROAD.CURVE.MEDIUM, ROAD.HILL.MEDIUM);
-        this.addHill(ROAD.LENGTH.LONG, ROAD.HILL.HIGH);
-        this.addCurve(ROAD.LENGTH.LONG, ROAD.CURVE.MEDIUM, -ROAD.HILL.LOW);
-        this.addHill(ROAD.LENGTH.LONG, -ROAD.HILL.MEDIUM);
-        this.addStraight();
+        this.StartSegment()
+        this.hillsSegment()
+        this.curvesSegment()
+        this.animalSegment()
         this.addSCurves();
         this.addDownhillToEnd();
         this.totalSegments = this.segments.length
         this.roadLength = this.totalSegments * SEGMENT_LENGTH;
-        this.addSprites()
-        this.addCars()
-        this.addTraffic()
-        this.addCoins()
-        this.addPowerUps()
-        this.addObstacles()
-        this.addAnimals()
+        this.addCars(500, this.totalSegments-1)
+        this.addCoins(100, this.totalSegments-1)
+        this.addPowerUps(100, this.totalSegments-1)
+    }
+
+    addMoreRoad(){
+        if (this.game.player.currentSegment.index > this.totalSegments -1000){
+            let startSegment = this.segments.length
+            for (let n = 1; n < 20; n++){
+                let random = randomIntFromInterval(0, 5)
+                switch (random){
+                    case 0:
+                        this.hillsSegment();
+                        break
+                    case 1:
+                        this.animalSegment();
+                        break
+                    case 2:
+                        this.curvesSegment();
+                        break
+                    case 3:
+                        this.sCurveSegment();
+                        break
+                    case 4:
+                        this.crazySegment()
+                        break
+                    case 5:
+                        this.straightSegment()
+                        break
+                }
+                this.totalSegments = this.segments.length
+                this.roadLength = this.totalSegments * SEGMENT_LENGTH;
+                this.addCoins(startSegment, this.totalSegments-1)
+                this.addPowerUps(startSegment, this.totalSegments-1)
+            }
+        }
     }
 
     getLastY() { return (this.segments.length === 0) ? 0 : this.segments[this.segments.length-1].worldPoints.y; }
@@ -271,76 +295,159 @@ class Road {
         this.addMoreSegments(ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM,  -ROAD.CURVE.MEDIUM, -ROAD.HILL.MEDIUM);
     }
 
-    addSprites(){
-            for (let n = 0; n < this.segments.length; n++){
+    addDownhillToEnd(num) {
+        num = num || 200;
+        this.addMoreSegments(num, num, num, -ROAD.CURVE.EASY, -this.getLastY()/SEGMENT_LENGTH);
+    }
+
+    StartSegment(){
+        let startSegment = this.segments.length
+        this.addStraight(ROAD.LENGTH.LONG*2)
+        this.addSprites(startSegment ,  ROAD.LENGTH.LONG, roadSidesSprites[3])
+        this.addSprites(startSegment, ROAD.LENGTH.LONG, roadSidesSprites[2])
+    }
+
+    hillsSegment(){
+        let startSegment = this.segments.length
+        this.addHill(ROAD.LENGTH.SHORT, ROAD.HILL.LOW);
+        this.addLowRollingHills();
+        this.addCurve(ROAD.LENGTH.MEDIUM, ROAD.CURVE.MEDIUM, ROAD.HILL.LOW);
+        this.addLowRollingHills();
+        let finalSegment = this.segments.length
+        this.addSprites(startSegment, finalSegment, roadSidesSprites[0])
+        this.addSprites(startSegment, finalSegment, roadSidesSprites[5])
+        this.addObstacles(startSegment, finalSegment)
+    }
+    curvesSegment(){
+        let startSegment = this.segments.length
+        this.addCurve(ROAD.LENGTH.LONG, ROAD.CURVE.MEDIUM, ROAD.HILL.MEDIUM);
+        this.addStraight();
+        this.addCurve(ROAD.LENGTH.LONG, -ROAD.CURVE.MEDIUM, ROAD.HILL.MEDIUM);
+        let finalSegment = this.segments.length
+        this.addSprites(startSegment, finalSegment, roadSidesSprites[1])
+        this.addTraffic(startSegment, finalSegment)
+    }
+
+    animalSegment() {
+        let startSegment = this.segments.length
+        this.addHill(ROAD.LENGTH.LONG, ROAD.HILL.HIGH);
+        this.addCurve(ROAD.LENGTH.LONG, ROAD.CURVE.MEDIUM, -ROAD.HILL.LOW);
+        this.addHill(ROAD.LENGTH.LONG, -ROAD.HILL.MEDIUM);
+        this.addStraight();
+        let finalSegment = this.segments.length
+        this.addSprites(startSegment, startSegment + 100, roadSidesSprites[4])
+        this.addSprites(startSegment+ 100, finalSegment, roadSidesSprites[0])
+        this.addAnimals(startSegment+100, finalSegment)
+    }
+
+    sCurveSegment(){
+        let startSegment = this.segments.length
+        this.addSCurves();
+        this.addHill(ROAD.LENGTH.LONG, ROAD.HILL.HIGH);
+        this.addCurve(ROAD.LENGTH.LONG, ROAD.CURVE.MEDIUM, -ROAD.HILL.LOW);
+        this.addCurve(ROAD.LENGTH.LONG, ROAD.CURVE.MEDIUM, ROAD.HILL.MEDIUM);
+        this.addStraight();
+        let finalSegment = this.segments.length
+        this.addSprites(startSegment+ 100, finalSegment, roadSidesSprites[0])
+        this.addSprites(startSegment+ 100, finalSegment, roadSidesSprites[5])
+    }
+
+    crazySegment(){
+        let startSegment = this.segments.length
+        this.addSCurves();
+        this.addHill(ROAD.LENGTH.LONG, ROAD.HILL.HIGH);
+        this.addCurve(ROAD.LENGTH.LONG, ROAD.CURVE.MEDIUM, -ROAD.HILL.LOW);
+        this.addCurve(ROAD.LENGTH.LONG, ROAD.CURVE.MEDIUM, ROAD.HILL.MEDIUM);
+        this.addHill(ROAD.LENGTH.LONG, -ROAD.HILL.HIGH);
+        this.addSCurves()
+        this.addCurve(ROAD.LENGTH.MEDIUM, -ROAD.CURVE.MEDIUM, -ROAD.HILL.HIGH);
+        let finalSegment = this.segments.length
+        this.addSprites(startSegment+ 100, finalSegment, roadSidesSprites[0])
+        this.addSprites(startSegment+ 100, finalSegment, roadSidesSprites[5])
+        this.addAnimals(startSegment, finalSegment)
+        this.addObstacles(startSegment, finalSegment)
+    }
+
+    straightSegment(){
+        let startSegment = this.segments.length
+        this.addStraight(ROAD.LENGTH.LONG*3);
+        let finalSegment = this.segments.length
+        this.addSprites(startSegment+ 100, finalSegment, roadSidesSprites[2])
+        this.addSprites(startSegment+ 100, finalSegment, roadSidesSprites[3])
+        this.addTraffic(startSegment, finalSegment)
+    }
+
+
+
+    addSprites(start, finish, sprite){
+            for (let n = start; n < finish; n++){
                 if (Math.random() > 0.8) {
-                    let spriteInt = Math.floor(Math.random() * 5)
                     let x = -1.5;
                     if (Math.random() > 0.5) {
                         x = 1.5
                     }
-                    this.segments[n].roadSideObjects.push(new SideObjects(roadSidesSprites[spriteInt], x, this.segments[n].worldPoints.y, this.segments[n].worldPoints.z, LARGE_SPRITE_SIZE, this, this.game.gameCamera))
+                    this.segments[n].roadSideObjects.push(new SideObjects(sprite, x, this.segments[n].worldPoints.y, this.segments[n].worldPoints.z, LARGE_SPRITE_SIZE, this, this.game.gameCamera))
                 }
             }
         }
 
-    addCars(){
-        for (let n = 0; n < 200; n++){
+    addCars(start, finish){
+        for (let n = 0; n < 50; n++){
+            console.log("Here")
             let spriteInt = Math.floor(Math.random() * 5)
-            let speed = (Math.random()*(MAX_SPEED*0.4 - MAX_SPEED*0.1)) + MAX_SPEED*0.1
-            let z = Math.random()*this.roadLength
-            let startSegment = this.findSegment(z)
+            let playerSpeed = this.game.player.speed
+            let speed = (Math.random()*(playerSpeed*0.4 - playerSpeed*0.1)) + playerSpeed*0.1
+            let startSegment = this.segments[randomIntFromInterval(start, finish)]
+            console.log(startSegment)
+            let z = startSegment.worldPoints.z
             this.totalCars.push(new Cars(racers[spriteInt], ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y,  z, SPRITE_SIZE, this, this.game.gameCamera, speed))
         }
+        console.log(this.totalCars)
     }
 
-    addTraffic(){
-        for (let n = 0; n < 100 ; n++){
-            let speed = (Math.random()*(MAX_SPEED*0.4 - MAX_SPEED*0.1)) + MAX_SPEED*0.1
-            let z = Math.random()*this.roadLength
-            let startSegment = this.findSegment(z)
+    addTraffic(start, finish){
+        for (let n = 0; n < 20 ; n++){
+            let playerSpeed = this.game.player.speed
+            let speed = (Math.random()*(playerSpeed*0.4 - playerSpeed*0.1)) + playerSpeed*0.1
+            let startSegment = this.segments[randomIntFromInterval(start, finish)]
+            let z = startSegment.worldPoints.z
             this.totalTraffic.push(new Traffic(jeep, ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y, z, SPRITE_SIZE, this,this.game.gameCamera, speed))
         }
     }
 
-    addCoins(){
-        for (let n = 0; n < 200 ; n++){
-            let z = Math.random()*this.roadLength
-            let startSegment = this.findSegment(z)
+    addCoins(start, finish){
+        for (let n = 0; n < 500 ; n++){
+            let startSegment = this.segments[randomIntFromInterval(start, finish)]
+            let z = startSegment.worldPoints.z
             this.totalCoins.push(new Coins(coin1, ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y+100, z, SPRITE_SIZE, this, this.game.gameCamera))
         }
     }
 
-    addPowerUps(){
-        for (let n = 0; n < 20 ; n++){
-            let z = Math.random()*this.roadLength
-            let startSegment = this.findSegment(z)
+    addPowerUps(start, finish){
+        for (let n = 0; n < 10 ; n++){
+            let startSegment = this.segments[randomIntFromInterval(start, finish)]
+            let z = startSegment.worldPoints.z
             let type = Math.floor(Math.random() * 2)
             this.powerUps.push(new PowerUps(null, ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y+100, z, SPRITE_SIZE, this, this.game.gameCamera,(type ===0)?TURBO:TRANSPARENT))
         }
     }
 
-    addObstacles(){
-        for (let n = 0; n < 50 ; n++){
-            let z = Math.random()*this.roadLength
-            let startSegment = this.findSegment(z)
+    addObstacles(start, finish){
+        for (let n = 0; n < 10 ; n++){
+            let startSegment = this.segments[randomIntFromInterval(start, finish)]
+            let z = startSegment.worldPoints.z
             let type = Math.floor(Math.random() * 2)
             this.obstacles.push(new Obstacles((type ===0)?rock:log, ROAD_LANES[Math.floor(Math.random()*4)], startSegment.worldPoints.y+100, z, SPRITE_SIZE, this, this.game.gameCamera ))
         }
     }
 
-    addAnimals(){
-        for (let n = 0; n < 50 ; n++){
-            let z = Math.random()*this.roadLength
-            let startSegment = this.findSegment(z)
+    addAnimals(start, finish){
+        for (let n = 0; n < 20 ; n++){
+            let startSegment = this.segments[randomIntFromInterval(start, finish)]
+            let z = startSegment.worldPoints.z
             let type = Math.floor(Math.random() * 2)
             this.animals.push(new Animals(null, Math.random()-2, startSegment.worldPoints.y, z, SPRITE_SIZE, this, this.game.gameCamera, type === 0?GUARA: JAGUAR))
         }
-    }
-
-    addDownhillToEnd(num) {
-        num = num || 200;
-        this.addMoreSegments(num, num, num, -ROAD.CURVE.EASY, -this.getLastY()/SEGMENT_LENGTH);
     }
 
     // Função para fazer a projeção dos pontos em 3D - usa a regra dos triangulos iguais

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isaac Game</title>
+    <link href="styles/make.css" rel="stylesheet" />
+    <script type="text/javascript" src="javascript/Constants.js"></script>
+    <script src="javascript/menu.js"></script>
+    <script type="text/javascript" src="./javascript/HelperMethods.js"></script>
+    <script type="text/javascript" src="./javascript/Road.js"></script>
+    <script type="text/javascript" src="javascript/Player.js"></script>
+    <script type="text/javascript" src="javascript/RoadElements.js"></script>
+    <script type="text/javascript" src="javascript/UI.js"></script>
+    <script type="text/javascript" src="javascript/Game.js"></script>
+    <script type="text/javascript" src="javascript/Main.js"></script>
+</head>
+<body>
+    <div id="canvas_div">
+    <canvas id="game_canvas"></canvas>
+    </div>
+    <h1>Isaac Runs</h1>
+    <div id="menu">
+        <label id="levelLabel" for="level">Escolha o Level</label>
+        <select name="level" id= "levelSelect">
+                <option value="EASY" >Fácil</option>
+                <option value="MEDIUM">Médio</option>
+                <option value="HARD">Difícil</option>
+        </select>
+        <label id="colorLabel" for="level">Escolha o Jogador</label>
+        <select name="color" id= "colorSelect" onchange="pandaColor()">
+            <option value="GREEN" selected>Verde</option>
+            <option value="BLUE">Azul</option>
+            <option value="RED">Vermelho</option>
+        </select>
+        <a href="index.html" id="back">Voltar</a>
+        <button id="startButton" onclick="startGame()" >Jogar</button>
+        <button class="btn btn-green" onclick="myFunctionG()" id="btVerd">Iniciar</button>
+        <input type="image" src="./image/panda.png" id="panda">
+        <button class="btn btn-purple" onclick="myFunctionP()"id="btRoxo">Sobre</button>        
+        <div id="sobre">
+        <h3>Primeira versão do game 3D que foi desenvolvido usando HTML, CSS e JavaScript pelo grupo Turing com o objetivo avançar na etapa de conclusão do curso de sistemas de Informação. </h3>
+        <h2>Grupo:</h2>
+        <ul>
+            <li>Fábio de Lima Bandeira</li>
+            <li>Gustavo Trevisan DIni </li>
+            <li>Gustavo Bonet</li>
+            <li>Lorenzo Magalhães Furuli</li>
+            <li>Rafael Antonio Ramos Alves</li>
+        </ul>
+        </div>
+        <button class="btn btn-red" onclick="myFunctionR()"id="btVerm">Manual</button>
+        <h3 id="manual">O game foi projetado para rodar em dispositivos mobile, será controlado através do touch e terá interatividade com o FriendBot</h3>
+    </div> 
+    
+</body>
+</html>

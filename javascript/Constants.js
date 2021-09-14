@@ -25,9 +25,9 @@ const PAUSE_STATE = 3;
 const GAME_OVER_STATE = 4;
 
 //Player Colors
-const GREEN = 5;
-const BLUE = 6;
-const RED = 7;
+const GREEN = "GREEN";
+const BLUE = "BLUE";
+const RED = "RED";
 
 //Player Difficulties
 const EASY = "EASY";
@@ -38,18 +38,21 @@ const HARD = "HARD";
 const DIFFICULTIES_SETS = {
   EASY: {
       STARS_SCORES: [10000, 50000,100000],
+      START_SPEED: MAX_SPEED/10,
       MAX_SPEED:  MAX_SPEED/2,
       MAX_CARS: 10,
       MAX_CARS_SPEEDS: MAX_SPEED/10
   } ,
     MEDIUM: {
         STARS_SCORES: [50000,150000,300000],
+        START_SPEED: MAX_SPEED/8,
         MAX_SPEED:  MAX_SPEED*0.75,
         MAX_CARS: 20,
         MAX_CARS_SPEEDS: MAX_SPEED/3
     },
     HARD: {
         STARS_SCORES: [100000,300000,500000],
+        START_SPEED: MAX_SPEED/5,
         MAX_SPEED:  MAX_SPEED,
         MAX_CARS: 50,
         MAX_CARS_SPEEDS: MAX_SPEED*0.75
@@ -243,3 +246,13 @@ const numbers = [UI0, UI1, UI2, UI3, UI4, UI5, UI6, UI7, UI8, UI9]
 // Music & Sounds
 // ---------------------------------------------------------------------------------
 const gameMusic = new Audio("sounds/passing_breeze.mp3");
+const coinPick = new Audio("sounds/coin.mp3");
+const hit = new Audio("sounds/hit.mp3");
+const jump = new Audio("sounds/jump.mp3");
+const light1 = new Audio("sounds/light1.ogg");
+const light2 = new Audio("sounds/light2.ogg");
+const tire = new Audio("sounds/tire.mp3");
+const turbo = new Audio("sounds/transparent.ogg");
+const transparent = new Audio("sounds/turbo.mp3");
+const failSound = new Audio("sounds/fail.mp3")
+const pauseSound = new Audio("sounds/pause.mp3")

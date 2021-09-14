@@ -52,6 +52,10 @@ function setMaxMin(current, max, min) {
     return  current
 }
 
+function randomIntFromInterval(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
 // ---------------------------------------------------------------------------------
 // Matrix  & 3d Helpers
 // ---------------------------------------------------------------------------------
@@ -213,4 +217,15 @@ function setSpriteDirection(ctx, sprite, x, y, dir, spriteSize) {
     ctx.scale(dir, 1);
     ctx.drawImage(...sprite, (-spriteSize / 2), (-spriteSize / 2), spriteSize, spriteSize);
     ctx.restore();
+}
+
+// ---------------------------------------------------------------------------------
+// Sound Helpers
+// ---------------------------------------------------------------------------------
+
+//TODO refazer o sistema de som com uso de Audio JS
+
+function stopSound(sound){
+    sound.pause()
+    sound.currentTime = 0
 }

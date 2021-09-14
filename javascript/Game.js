@@ -7,6 +7,7 @@ class Game {
         this.road = null;
         this.UI = null
         this.background = null;
+
     }
 
     // Função principal para renderizar os elementos do canvas
@@ -33,12 +34,12 @@ class Game {
     }
 
     // função principal para atualizar os estados dos elementos do jogo
-    update(game, dt) {
+    update(game, dt, difficulty, playerColor) {
         switch(game.gameState){
             case LOADING_STATE:
                 game.gameCamera = new Camera(game);
                 game.road = new Road(game)
-                game.player = new Player(game, GREEN, HARD)
+                game.player = new Player(game, playerColor, difficulty)
                 game.background = new Background(game)
                 game.UI = new UI(game)
                 spriteSheet_road.src = './images/SpriteSheet_road.png'
@@ -82,11 +83,14 @@ class Game {
 let GameEngine = {
 
     run: function(options) {
+        console.log(options)
 
         let canvas = options.canvas,
             game   = options.game,
             update = options.update,
             render = options.render,
+            difficulty = options.difficulty,
+            playerColor = options.playerColor,
             step   = STEP,
             now    = null,
             last   = new Date().getTime(),
@@ -100,7 +104,7 @@ let GameEngine = {
             gdt = gdt + dt;
             while (gdt > step) {
                 gdt = gdt - step;
-                update(game, step);
+                update(game, step, DIFFICULTIES_SETS[difficulty], playerColor);
             }
             render(game, ctx);
             last = now;

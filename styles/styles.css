@@ -9,20 +9,6 @@ div {
     flex-direction: column;
 }
 
-#body_div {
-    width: 1280px;
-    height: 100%;
-    display: flex;
-    margin: auto;
-    flex-direction: column;
-}
-
-#game_canvas {
-    height: 720px;
-    width: 1280px;
-    background-color: black;
-    margin: auto;
-}
 
 
 

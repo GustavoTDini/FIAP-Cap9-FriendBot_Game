@@ -1,0 +1,203 @@
+@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap');
+
+html { 
+    min-width: 760px; 
+    max-width: 1400px; 
+}
+
+body {
+    font-family: arial;
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+    background: url(../image/kart.gif);
+    background-size: cover;
+}
+
+.btn {
+    font-size: 160%;
+    text-transform: uppercase;
+    font-weight: 700;
+    border: none; 
+    padding: 3%;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    display:flex;
+    justify-content: center;
+    margin: 8% 0% 0% 27%;
+    width: 45%;
+
+}
+
+.btn-green:hover{
+    background: #006000;
+    color: #fff;
+    box-shadow: 0 5px 0 #003f00;
+
+}
+
+.btn-green{
+    background: green;
+    color: #fff;
+    box-shadow: 0 5px 0 #006000;
+    
+
+}
+
+.btn-purple:hover{
+    background: rgb(94, 4, 94);
+    color: #fff;
+    box-shadow: 0 5px 0 rgb(39, 2, 39);
+
+}
+
+.btn-purple{
+    background: purple;
+    color: #fff;
+    box-shadow: 0 5px 0 rgb(94, 4, 94);
+    
+}
+
+.btn-red:hover{
+    background: rgb(158, 14, 14);
+    color: #fff;
+    box-shadow: 0 5px 0 rgb(109, 6, 6);
+
+}
+
+.btn-red{
+    background: red;
+    color: #fff;
+    box-shadow: 0 5px 0 rgb(158, 14, 14);
+    
+}
+
+.btn:active{
+    position: relative;
+    top: 5px;
+    box-shadow: none;
+    
+}
+
+
+h1 {
+    font-size: 100px;
+    text-align: center;
+    font-family: 'Architects Daughter', cursive;
+    margin: 0;
+
+}
+
+#menu{
+    border: 1px solid gray;
+    background-color: rgba(255, 255, 70%, 255);
+    margin: 0 30%;
+    padding-bottom: 3%;
+
+}
+
+#sobre{
+    display: none;
+}
+
+#manual, #panda{
+    display: none;
+}
+
+#panda:hover{
+    position: relative;
+    width: 90%;
+    right: 30px;
+}
+
+#levelSelect{
+    display: none;
+    width: 50%;
+    background-color: greenyellow;
+    font-size: x-large;
+}
+
+#colorSelect{
+    display: none;
+    width: 50%;
+    background-color: greenyellow;
+    font-size: x-large;
+}
+
+#levelLabel{
+    display: none;
+    font-family: cursive;
+    font-size: x-large;
+}
+
+#colorLabel{
+    display: none;
+    font-family: cursive;
+    font-size: x-large;
+}
+
+#back{
+    display: none;
+    text-decoration: none;
+    background-color: rgb(245, 79, 79);
+    position:static;
+    color: white;
+    margin: 10px 80% 10px 10px;
+    padding: 1%;
+    text-align: center;
+    box-shadow: 0 5px 0 rgb(139, 6, 6);
+    border-radius: 5px;
+}
+
+#back:hover{
+    background-color: rgb(139, 6, 6);
+    box-shadow: 0 5px 0 rgb(105, 3, 3);
+}
+
+#back:active{
+    position: relative;
+    top: 5px;
+    box-shadow: none;
+}
+
+#startButton{
+    display: none;
+    text-decoration: none;
+    background-color: rgb(245, 79, 79);
+    position:static;
+    color: white;
+    margin: 10px 80% 10px 10px;
+    padding: 1%;
+    text-align: center;
+    box-shadow: 0 5px 0 rgb(139, 6, 6);
+    border-radius: 5px;
+}
+
+#startButton:hover{
+    background-color: rgb(139, 6, 6);
+    box-shadow: 0 5px 0 rgb(105, 3, 3);
+}
+
+#startButton:active{
+    position: relative;
+    top: 5px;
+    box-shadow: none;
+}
+
+
+#canvas_div {
+    width: 1280px;
+    height: 100%;
+    display: none;
+    margin: auto;
+    flex-direction: column;
+}
+
+#game_canvas {
+    height: 720px;
+    width: 1280px;
+    background-color: black;
+    margin: auto;
+}

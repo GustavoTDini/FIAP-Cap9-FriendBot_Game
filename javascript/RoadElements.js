@@ -94,8 +94,8 @@ class Cars extends RoadObjects{
         this.setX()
         this.y = this.road.findSegment(this.z).worldPoints.y
         this.z += this.speed*dt
-        if (this.z >= this.road.roadLength){
-            this.z -= this.road.roadLength
+        if (this.z <= this.road.game.player.currentSegment.z -100){
+            this.z += 4000
         }
     }
 
@@ -134,6 +134,9 @@ class Traffic extends RoadObjects{
         this.z -= this.speed*dt
         if (this.z <= this.road.roadLength){
             this.z += this.road.roadLength
+        }
+        if (this.z <= this.road.game.player.currentSegment.z -100){
+            this.z += 4000
         }
     }
 
@@ -208,7 +211,8 @@ class PowerUps extends RoadObjects{
     }
 
     update(dt) {
-        super.update(dt);
+        this.segment = this.road.findSegment(this.z)
+        this.setMask()
         this.flashingTurbo()
     }
 }
@@ -221,6 +225,8 @@ class Obstacles extends RoadObjects{
     }
 
     update(dt) {
+        this.segment = this.road.findSegment(this.z)
+        this.setMask()
         super.update(dt);
     }
 }
