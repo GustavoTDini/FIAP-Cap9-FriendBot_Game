@@ -12,7 +12,7 @@ class Player {
         this.x = 0;
         this.y = 0;
         this.z = 0;
-        this.w = (SPRITE_SIZE/game.road.roadWidth)*2;
+        this.w = 0.2;
         this.color = color
         this.sprites = null
         this.screen = {x:0, y:0, w:0, h:0}
@@ -26,6 +26,7 @@ class Player {
         this.turbo = false;
         this.transparent = false;
         this.ySpeed = 0;
+        this.mask = {x:this.x, y:this.y, w:this.w, s: 500}
 
     }
 
@@ -47,6 +48,7 @@ class Player {
         this.y = 0;
         this.z = 0;
 
+
         this.speed = MAX_SPEED/2;
     }
 
@@ -64,15 +66,65 @@ class Player {
         }
     }
 
+    // função para definir uma colisão entre o jogador e outro elemento
+    isColliding(entity) {
+        return (((this.mask.x + this.mask.w) > entity.mask.x
+                && (this.mask.x) < (entity.mask.x + entity.mask.w))
+            && ((this.mask.z + this.mask.s) > entity.mask.z
+                && (this.mask.z) < (entity.mask.z + entity.mask.s)
+            ))
+    }
+
+    checkCollidingCars(){
+        for (let n = 0; n < this.game.road.totalCars.length; n++){
+            if (this.isColliding(this.game.road.totalCars[n])){
+                this.game.gameState = GAME_OVER_STATE
+            }
+        }
+    }
+
+    checkCollidingTraffic(){
+        for (let n = 0; n < this.game.road.totalTraffic.length; n++){
+            if (this.isColliding(this.game.road.totalTraffic[n])){
+                this.game.gameState = GAME_OVER_STATE
+            }
+        }
+    }
+
+    checkCollidingCoins(){
+        for (let n = 0; n < this.game.road.totalCoins.length; n++){
+            if (this.isColliding(this.game.road.totalCoins[n])){
+                this.game.road.totalCoins.splice(n, 1)
+                this.coins++
+            }
+        }
+    }
+
+    checkCollidingCoins(){
+        for (let n = 0; n < this.game.road.totalCoins.length; n++){
+            if (this.isColliding(this.game.road.totalCoins[n])){
+                this.game.road.totalCoins.splice(n, 1)
+                this.coins++
+            }
+        }
+    }
+
     update(dt) {
         let road = this.game.road
         this.z += this.speed*dt
         if (this.z >= road.roadLength){
             this.z -= road.roadLength
         }
-
+        this.setMask()
         this.setLanes()
         this.SettingJumpingY(dt)
+        // this.checkCollidingCars()
+        // this.checkCollidingTraffic()
+        this.checkCollidingCoins()
+    }
+
+    setMask(){
+        this.mask = {x:this.x, z:this.z, w:this.w, s: 500}
     }
 
     render(ctx) {

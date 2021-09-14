@@ -9,7 +9,7 @@ class RoadObjects {
         this.speed = 0
         this.spriteSize = spriteSize
         this.screen = {x:0, y:0, spriteSize:0}
-        this.mask = [x, y, z, spriteSize]
+        this.mask = {x:this.x, z:this.z, w:0.2, s: 500}
         this.segment = null
         this.camera = camera
         this.dir = 1;
@@ -47,7 +47,7 @@ class RoadObjects {
     }
 
     setMask(){
-        this.mask = [this.x, this.z, this.spriteSize]
+        this.mask = {x:this.x, z:this.z, w:0.2, s: 500}
     }
 
     project3D(segment, camera){
@@ -128,6 +128,8 @@ class Traffic extends RoadObjects{
     }
 
     update(dt){
+        this.segment = this.road.findSegment(this.z)
+        this.setMask()
         this.y = this.road.findSegment(this.z).worldPoints.y
         this.z -= this.speed*dt
         if (this.z <= this.road.roadLength){
