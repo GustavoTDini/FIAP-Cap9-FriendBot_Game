@@ -34,6 +34,8 @@ class RoadObjects {
             if (!(this instanceof SideObjects)){
                 spriteHeight *=2
             }
+            ctx.fillStyle = "#d500f6"
+            ctx.fillRect(this.screen.x, this.screen.y, 10,spriteHeight)
             let drawSprite = this.sprite.map((x) => x);
             drawSprite[4]= Math.min(drawSprite[4], (drawSprite[4] * spriteHeight) / this.screen.spriteSize)
             ctx.drawImage(...drawSprite, this.screen.x, this.screen.y, this.screen.spriteSize,spriteHeight);
@@ -53,6 +55,7 @@ class RoadObjects {
     project3D(segment, camera){
         let transY = this.y - camera.y;
         let scale = segment.scale
+        let centrifugal = 0.06;
         // definimos esses pontos no plano cartesiano utilizando a escala
         let projectedY = scale * transY;
         let projectedSize = scale * this.relativeSize;
@@ -64,8 +67,15 @@ class RoadObjects {
             y -= spriteSize/2
         }
         let w = this.segment.screenPoints.w
-        let x = this.segment.screenPoints.x + w*this.x - spriteSize/2
+        sprite      = segment.sprites[i];
+        spriteScale = segment.p1.screen.scale;
+        spriteX     = segment.p1.screen.x + (spriteScale * sprite.offset * roadWidth * width/2);
+        spriteY     = segment.p1.screen.y;
 
+        let correction = (camera.x/CANVAS_CENTER_X)*CANVAS_CENTER_X*scale
+        let x = this.segment.screenPoints.x + w*(this.x + correction) - this.segment.curve * centrifugal
+
+        console.log(correction)
         return {x:x, y:y, spriteSize:spriteSize}
     }
 }

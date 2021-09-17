@@ -47,9 +47,7 @@ function myFunctionR() {
 
 function pandaColor(){
   let color = document.getElementById("colorSelect").value
-  console.log(color)
   let pandaImage = document.getElementById("panda")
-  console.log(pandaImage)
   switch (color){
     case "GREEN":
       pandaImage.src = "./image/panda.png"

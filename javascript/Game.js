@@ -83,7 +83,6 @@ class Game {
 let GameEngine = {
 
     run: function(options) {
-        console.log(options)
 
         let canvas = options.canvas,
             game   = options.game,
@@ -91,23 +90,29 @@ let GameEngine = {
             render = options.render,
             difficulty = options.difficulty,
             playerColor = options.playerColor,
-            step   = STEP,
+            frameStep   = FRAME_STEP,
+            updateStep = UPDATE_STEP,
             now    = null,
             last   = new Date().getTime(),
             dt     = 0,
-            gdt    = 0,
+            udt    = 0,
+            fdt    = 0,
             ctx    = canvas.getContext("2d")
 
         function frame() {
             now = new Date().getTime();
             dt  = Math.min(1, (now - last) / 1000);
-            gdt = gdt + dt;
-            while (gdt > step) {
-                gdt = gdt - step;
-                update(game, step, DIFFICULTIES_SETS[difficulty], playerColor);
-            }
-            render(game, ctx);
+            udt = udt + dt;
+            fdt = fdt + dt;
             last = now;
+            if (fdt > frameStep) {
+                fdt = fdt - frameStep;
+                render(game, ctx);
+            }
+            if (udt > updateStep) {
+                udt = udt - updateStep;
+                update(game, updateStep, DIFFICULTIES_SETS[difficulty], playerColor);
+            }
             requestAnimationFrame(frame);
         }
         frame();

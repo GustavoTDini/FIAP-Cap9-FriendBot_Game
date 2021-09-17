@@ -11,10 +11,12 @@ const UI_SPRITE_SIZE = 50
 const CANVAS_CENTER_X = CANVAS_WIDTH/2;
 const CANVAS_CENTER_Y = CANVAS_HEIGHT/2;
 const FPS = 60;
-const STEP = 1/FPS
+const UPS = 120;
+const FRAME_STEP = 1/FPS
+const UPDATE_STEP = 1/UPS
 const SEGMENT_LENGTH = 100;
 const MAX_ROAD_WIDTH = 1000;
-const MAX_SPEED = (SEGMENT_LENGTH/STEP);
+const MAX_SPEED = (SEGMENT_LENGTH/UPDATE_STEP);
 
 
 //States
@@ -52,7 +54,7 @@ const DIFFICULTIES_SETS = {
     },
     HARD: {
         STARS_SCORES: [100000,300000,500000],
-        START_SPEED: MAX_SPEED/5,
+        START_SPEED: MAX_SPEED,
         MAX_SPEED:  MAX_SPEED,
         MAX_CARS: 50,
         MAX_CARS_SPEEDS: MAX_SPEED*0.75
@@ -76,7 +78,8 @@ const ROAD = {
 };
 
 //Road Lanes
-const ROAD_LANES = [-0.6, -0.2, 0.2, 0.6]
+const ROAD_LANES = [-0.65, -0.2, 0.2, 0.65]
+const OBJECTS_ROAD_LANES = [-0.7, -0.3, 0.3, 0.7]
 
 // Power Ups
 const TURBO = 8

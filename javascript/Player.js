@@ -46,18 +46,19 @@ class Player {
         this.screen.y = CANVAS_HEIGHT - this.screen.h;
 
         // set the player Colors
-        console.log(this.color)
+
         this.sprites = this.setSprites(this.color)
     }
 
     reset(){
         this.x = 0;
         this.y = 0;
-        this.z = 0;
+        this.z = 1200;
         this.currentSegment = this.game.road.findSegment(this.z)
 
-        this.speed = this.difficulty.START_SPEED
+        this.speed = MAX_SPEED
     }
+
 
     setSprites(color){
         switch (color){
@@ -97,7 +98,6 @@ class Player {
         //TODO - Adicionar os PowerUps
         for (let n = 0; n < this.game.road.powerUps.length; n++){
             if (this.isColliding(this.game.road.powerUps[n])){
-                console.log("collide")
                 if (this.game.road.powerUps[n].type === TURBO){
                     this.turbo = true
                     turbo.play()
@@ -120,6 +120,7 @@ class Player {
         }
         for (let n = 0; n < this.game.road.totalCars.length; n++){
             if (this.isColliding(this.game.road.totalCars[n])){
+                console.log(this.mask.z,this.game.road.totalCars[n].mask.z)
                 this.game.gameState = GAME_OVER_STATE
                 hit.play()
             }
@@ -161,7 +162,7 @@ class Player {
         this.setMask()
         this.setLanes()
         this.SettingJumpingY(dt)
-        this.checkCollidingGameOver()
+        //this.checkCollidingGameOver()
         this.checkCollidingCoins()
         this.checkCollidingPowerUp()
     }
@@ -251,7 +252,7 @@ class Player {
         if (this.movingLane){
             if (this.currentLane > this.nextLane){
                 if (this.x > this.lanes[this.nextLane]){
-                    this.x = this.x - 0.04
+                    this.x = this.x - 0.15
                 } else{
                     this.currentLane = this.nextLane
                     this.movingLane = false
@@ -259,7 +260,7 @@ class Player {
                 }
             } else if (this.currentLane < this.nextLane){
                 if (this.x < this.lanes[this.nextLane]){
-                    this.x = this.x + 0.04
+                    this.x = this.x + 0.15
                 } else{
                     this.currentLane = this.nextLane
                     this.movingLane = false
@@ -294,7 +295,7 @@ class Player {
     handleInputUp(keys) {
         switch (keys) {
             case ('right'):
-                if (!this.jumping){
+                if (!this.jumping && this.game.gameState === PLAY_STATE){
                     this.nextLane = limitMaxMin(this.currentLane, this.currentLane+1, 3, 0)
                     tire.play()
                     if (this.nextLane !== this.currentLane){
@@ -303,7 +304,7 @@ class Player {
                 }
                 break;
             case ('left'):
-                if (!this.jumping){
+                if (!this.jumping && this.game.gameState === PLAY_STATE){
                     this.nextLane = limitMaxMin(this.currentLane, this.currentLane-1, 3, 0)
                     tire.play()
                     if (this.nextLane !== this.currentLane){
@@ -322,9 +323,10 @@ class Player {
                 }
                 break;
             case ('jump'):
-                if (!this.movingLane && !this.jumping){
+                if (!this.movingLane && !this.jumping && this.game.gameState === PLAY_STATE){
                     jump.play()
                     this.jumping = true
+
                     this.ySpeed = this.jumpSpeed
                 }
                 break;

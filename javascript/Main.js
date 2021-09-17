@@ -1,5 +1,4 @@
-function startGame(){
-    console.log("clik")
+window.onload = function(){
     const GAME_CANVAS = document.getElementById("game_canvas")
     document.getElementById("canvas_div").style.display = "flex"
     GAME_CANVAS.width = CANVAS_WIDTH;
@@ -17,11 +16,9 @@ function startGame(){
             this.play();
         }
     }, false);
-    let color = document.getElementById("colorSelect").value
-    console.log(color)
-    let difficulty = document.getElementById("levelSelect").value
-    console.log(difficulty)
-    GameEngine.run({canvas: GAME_CANVAS, render: game.render, game: game, update: game.update, playerColor: color, difficulty: difficulty})
+    // let color = document.getElementById("colorSelect").value
+    // let difficulty = document.getElementById("levelSelect").value
+    GameEngine.run({canvas: GAME_CANVAS, render: game.render, game: game, update: game.update, playerColor: GREEN, difficulty: HARD})
 }
 
 
