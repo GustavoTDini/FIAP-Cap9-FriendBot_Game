@@ -32,7 +32,7 @@ class Player {
         this.ySpeed = 0;
         this.segmentCounter = 0
         this.currentSegment = null
-        this.mask = {x:this.x, y:this.y, w:this.w, s: 500}
+        this.mask = {x:this.x, y:this.y, w:this.w, s: 200}
 
     }
 
@@ -56,7 +56,7 @@ class Player {
         this.z = 1200;
         this.currentSegment = this.game.road.findSegment(this.z)
 
-        this.speed = MAX_SPEED
+        this.speed = MAX_SPEED*2
     }
 
 
@@ -140,6 +140,7 @@ class Player {
         }
     }
 
+
     update(dt) {
         let road = this.game.road
         this.z += this.speed*dt
@@ -162,13 +163,13 @@ class Player {
         this.setMask()
         this.setLanes()
         this.SettingJumpingY(dt)
-        //this.checkCollidingGameOver()
+        this.checkCollidingGameOver()
         this.checkCollidingCoins()
         this.checkCollidingPowerUp()
     }
 
     setMask(){
-        this.mask = {x:this.x, z:this.z, w:this.w, s: 500}
+        this.mask = {x:this.x, z:this.z, w:this.w, s: 200}
     }
 
     render(ctx) {

@@ -89,9 +89,35 @@ const TRANSPARENT = 9
 const GUARA = 10
 const JAGUAR = 11
 
+function addLoadEvent(func) {
+    let oldOnLoad = window.onload;
+    console.log("addLoad")
+    if (typeof window.onload != 'function') {
+        window.onload = func;
+    } else {
+        window.onload = function() {
+            if (oldOnLoad) {
+                oldOnLoad();
+
+            }
+            func();
+        }
+    }
+}
+
 // ---------------------------------------------------------------------------------
 // Images & Sprites
 // ---------------------------------------------------------------------------------
+
+let images = {
+    "spriteSheet_road": new Image(),
+}
+function preload() {
+    for (let image in images) {
+        console.log(image)
+        images[image].src = "./images/" +  image + ".png'"
+    }
+}
 
 let spriteSheet_road = new Image();
 let spriteSheet_road_side = new Image();
@@ -168,8 +194,8 @@ const jaguar2Right = [spriteSheet_road, 128, 896, SPRITE_SIZE, SPRITE_SIZE]
 const jaguar3Right = [spriteSheet_road, 256, 896, SPRITE_SIZE, SPRITE_SIZE]
 const jaguar4Right = [spriteSheet_road, 384, 896, SPRITE_SIZE, SPRITE_SIZE]
 const jaguar5Right = [spriteSheet_road, 512, 896, SPRITE_SIZE, SPRITE_SIZE]
-const transparent1 = [spriteSheet_road, 640, 640, SPRITE_SIZE, SPRITE_SIZE]
-const transparent2 = [spriteSheet_road, 768, 640, SPRITE_SIZE, SPRITE_SIZE]
+const turbo1 = [spriteSheet_road, 640, 640, SPRITE_SIZE, SPRITE_SIZE]
+const turbo2 = [spriteSheet_road, 768, 640, SPRITE_SIZE, SPRITE_SIZE]
 const guara1Left = [spriteSheet_road, 0, 768, SPRITE_SIZE, SPRITE_SIZE]
 const guara2Left = [spriteSheet_road, 128, 768, SPRITE_SIZE, SPRITE_SIZE]
 const guara3Left = [spriteSheet_road, 256, 768, SPRITE_SIZE, SPRITE_SIZE]
@@ -180,8 +206,8 @@ const guara2Right = [spriteSheet_road, 128, 1024, SPRITE_SIZE, SPRITE_SIZE]
 const guara3Right = [spriteSheet_road, 256, 1024, SPRITE_SIZE, SPRITE_SIZE]
 const guara4Right = [spriteSheet_road, 384, 1024, SPRITE_SIZE, SPRITE_SIZE]
 const guara5Right = [spriteSheet_road, 512, 1024, SPRITE_SIZE, SPRITE_SIZE]
-const turbo1 = [spriteSheet_road, 640, 768, SPRITE_SIZE, SPRITE_SIZE]
-const turbo2 = [spriteSheet_road, 768, 768, SPRITE_SIZE, SPRITE_SIZE]
+const transparent1 = [spriteSheet_road, 640, 768, SPRITE_SIZE, SPRITE_SIZE]
+const transparent2 = [spriteSheet_road, 768, 768, SPRITE_SIZE, SPRITE_SIZE]
 
 // ---------------------------------------------------------------------------------
 // Side Road Sprites

@@ -9,36 +9,21 @@ class RoadObjects {
         this.speed = 0
         this.spriteSize = spriteSize
         this.screen = {x:0, y:0, spriteSize:0}
-        this.mask = {x:this.x, z:this.z, w:0.2, s: 500}
+        this.mask = {x:this.x, z:this.z, w:0.2, s: 200}
         this.segment = null
-        this.camera = camera
         this.dir = 1;
-        this.relativeSize = SPRITE_SIZE
-        if (this instanceof SideObjects){
-            this.relativeSize *=4
-        }
-        if (this instanceof Obstacles){
-            this.relativeSize *=2
-        }
 
     }
 
     render(ctx, maxDrawLine) {
-        this.segment = this.road.findSegment(this.z)
-        this.screen = this.project3D(this.segment, this.camera)
+        this.screen = this.project3D()
+
 
         if (maxDrawLine > this.screen.y){
-            //TODO - Rafazer render de objetos para corrigir deformações
             let spriteHeight = (maxDrawLine - this.screen.y)
-            // aqui reorganizamos os tamanhos dos elementos que não são laterais
-            if (!(this instanceof SideObjects)){
-                spriteHeight *=2
-            }
-            ctx.fillStyle = "#d500f6"
-            ctx.fillRect(this.screen.x, this.screen.y, 10,spriteHeight)
             let drawSprite = this.sprite.map((x) => x);
             drawSprite[4]= Math.min(drawSprite[4], (drawSprite[4] * spriteHeight) / this.screen.spriteSize)
-            ctx.drawImage(...drawSprite, this.screen.x, this.screen.y, this.screen.spriteSize,spriteHeight);
+            ctx.drawImage(...drawSprite, this.screen.x - this.screen.spriteSize/2, this.screen.y, this.screen.spriteSize,spriteHeight);
         }
     }
 
@@ -49,33 +34,31 @@ class RoadObjects {
     }
 
     setMask(){
-        this.mask = {x:this.x, z:this.z, w:0.2, s: 500}
+        this.mask = {x:this.x, z:this.z, w:0.2, s: 200}
     }
 
-    project3D(segment, camera){
+    project3D(){
+        this.segment = this.road.findSegment(this.z)
+        let camera = this.road.game.gameCamera
+        // definimos as distancias em relação a camera
         let transY = this.y - camera.y;
-        let scale = segment.scale
-        let centrifugal = 0.06;
+        let transZ = this.z - camera.z;
+        // escalamos com base nos triangulos iguais
+        let scale = camera.distToPlane/transZ;
+
         // definimos esses pontos no plano cartesiano utilizando a escala
         let projectedY = scale * transY;
-        let projectedSize = scale * this.relativeSize;
-        // utilizando a pontos do plano, e o tamanho da tela - definimos os segmentos na Canvas
-        let spriteSize = Math.round(projectedSize * CANVAS_CENTER_X*2);
-        let y = Math.round((1 - projectedY) * CANVAS_CENTER_Y) - spriteSize/2;
-        // caso seja um elemento do lado da pista temos que corrigir
+        let projectedSize = scale * this.spriteSize*2;
+
         if (this instanceof SideObjects){
-            y -= spriteSize/2
+            projectedSize *=2
         }
-        let w = this.segment.screenPoints.w
-        sprite      = segment.sprites[i];
-        spriteScale = segment.p1.screen.scale;
-        spriteX     = segment.p1.screen.x + (spriteScale * sprite.offset * roadWidth * width/2);
-        spriteY     = segment.p1.screen.y;
 
-        let correction = (camera.x/CANVAS_CENTER_X)*CANVAS_CENTER_X*scale
-        let x = this.segment.screenPoints.x + w*(this.x + correction) - this.segment.curve * centrifugal
+        // utilizando a pontos do plano, o tamanho da tela  e o segmento atual- dfinimos os pontos do sprite
+        let x = this.segment.screenPoints.x + (this.segment.screenPoints.w * this.x)
+        let spriteSize = Math.round(projectedSize * CANVAS_CENTER_X);
+        let y = Math.round((1 - projectedY) * CANVAS_CENTER_Y) - spriteSize;
 
-        console.log(correction)
         return {x:x, y:y, spriteSize:spriteSize}
     }
 }
@@ -165,7 +148,7 @@ class Coins extends RoadObjects{
 
     rotatingCoin() {
         let MAX_SPRITES = 5;
-        let MAX_FRAMES = 4;
+        let MAX_FRAMES = 1;
             this.frame++;
             if (this.frame > MAX_FRAMES) {
                 this.frame = 0;
@@ -203,7 +186,7 @@ class PowerUps extends RoadObjects{
 
     flashingTurbo() {
         let MAX_SPRITES = 1;
-        let MAX_FRAMES = 8;
+        let MAX_FRAMES = 1;
         this.frame++;
         if (this.frame > MAX_FRAMES) {
             this.frame = 0;

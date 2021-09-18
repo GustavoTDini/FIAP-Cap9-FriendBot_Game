@@ -451,7 +451,7 @@ class Road {
         // definimos as distancias em relação a camera
         let transX = segment.worldPoints.x - (camera.x - xCurve);
         let transY = segment.worldPoints.y - camera.y;
-        let transZ = segment.worldPoints.z - camera.z - offSetZ;
+        let transZ = segment.worldPoints.z - (camera.z - offSetZ);
 
         // escalamos com base nos triangulos iguais
         segment.scale = camera.distToPlane/transZ;
@@ -477,11 +477,11 @@ class Road {
         let linesWidth2 = w2/20
         let lineDistance1 = w1/2.5
         let lineDistance2 = w2/2.5
-        ctx.fillStyle = color.grass
-        //ctx.fillStyle = ctx.createPattern(grassTextures[color.grassTextures], "repeat")
-        ctx.fillRect(0, y2, CANVAS_WIDTH, y1 - y2);
+        //ctx.fillStyle = color.grass
+        ctx.fillStyle = ctx.createPattern(grassTextures[color.grassTextures], "repeat")
+        ctx.fillRect(0, y2-1, CANVAS_WIDTH, y1 - y2);
         // draw road
-        //ctx.restore()
+        ctx.restore()
         drawPolygon(x1-w1, y1,	x1+w1, y1, x2+w2, y2, x2-w2, y2, color.road, ctx);
         create3dRoad(roadTextures[Math.floor(Math.random()*5)], x1, y1, w1, x2, y2, w2, ctx);
         drawPolygon(x1-w1, y1,	x1-w1+linesWidth1, y1, x2-w2+linesWidth2, y2, x2-w2, y2, color.shoulder, ctx);
