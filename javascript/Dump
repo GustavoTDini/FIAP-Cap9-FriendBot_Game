@@ -1,0 +1,87 @@
+function exponentialFog(distance, density) {
+    return 1 / (Math.pow(Math.E, (distance * distance * density)));
+}
+
+function increase (start, increment, max) { // with looping
+    var result = start + increment;
+    while (result >= max)
+        result -= max;
+    while (result < 0)
+        result += max;
+    return result;
+}
+
+// função para incrementar uma diferença segundo os passos
+function incrementSteps(a, b, step, totalsteps) {
+    let max = a, min = b
+    if (b > a){
+        max = b
+        min = a
+    }
+    return min + ((max - min)/totalsteps)*step
+}
+
+// função para decrementar uma diferença segundo os passos
+function decrementSteps(a, b, step, totalsteps) {
+    let max = a, min = b
+    if (b > a){
+        max = b
+        min = a
+    }
+    return max - ((max - min)/totalsteps)*step
+}
+
+// Função para aumentar até um maximo
+function increaseToMax(initial, increment, max){
+    let result = initial + increment
+    while (result >= max){
+        result -= max;
+    }
+    while (result < 0){
+        result += max;
+    }
+    return result;
+}
+
+// Função simples para calcular a aceleração
+function accelerate(speed, acceleration, dt){
+    return speed + (acceleration*dt)
+}
+
+// para rotacionar os sprites
+function rotateSprite(ctx, angle, sprite, x, y) {
+    ctx.save();
+    ctx.translate(x + SPRITE_SIZE / 2, y + SPRITE_SIZE / 2);
+    ctx.rotate(angle * (PI / SEMI_CIRCLE));
+    ctx.drawImage(...sprite, (-SPRITE_SIZE / 2), (-SPRITE_SIZE / 2), SPRITE_SIZE, SPRITE_SIZE);
+    ctx.restore();
+}
+
+// função para definir uma colisão entre 2 entidades
+function isColliding(entity1, entity2) {
+    return (((entity1.maskX + entity1.xSpeed + entity1.spriteSize) > entity2.maskX
+            && (entity1.maskX + entity1.xSpeed) < (entity2.maskX + entity2.spriteSize))
+        && ((entity1.maskY + entity1.ySpeed + entity1.spriteSize) > entity2.maskY
+            && (entity1.maskY + entity1.ySpeed) < (entity2.maskY + entity1.spriteSize)
+        ))
+}
+
+// define um novo angulo em radianos
+function setAngle() {
+    let degreeAngle = Math.random() * FULL_CIRCLE;
+    return degreeAngle * (PI / SEMI_CIRCLE)
+}
+
+// com o angulo achado define o x e y com o seno e cosseno
+function setAngleSpeed(angle) {
+    return [Math.cos(angle), Math.sin(angle)]
+}
+
+// função para inverter um angulo
+function invertAngle(currentAngle) {
+    if (currentAngle >= PI) {
+        return currentAngle - PI
+    } else {
+        return currentAngle + PI;
+    }
+}

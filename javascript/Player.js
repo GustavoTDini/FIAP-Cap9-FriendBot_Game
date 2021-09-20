@@ -13,7 +13,7 @@ class Player {
         this.x = 0;
         this.y = 0;
         this.z = 0;
-        this.w = 0.2;
+        this.w = 0.3;
         this.color = color
         this.sprites = null
         this.screen = {x:0, y:0, w:0, h:0}
@@ -32,7 +32,7 @@ class Player {
         this.ySpeed = 0;
         this.segmentCounter = 0
         this.currentSegment = null
-        this.mask = {x:this.x, y:this.y, w:this.w, s: 500}
+        this.mask = {x:this.x, y:this.y, w:this.w, s: 200}
 
     }
 
@@ -56,7 +56,7 @@ class Player {
         this.z = 1200;
         this.currentSegment = this.game.road.findSegment(this.z)
 
-        this.speed = MAX_SPEED
+        this.speed = MAX_SPEED*2
     }
 
 
@@ -110,7 +110,6 @@ class Player {
         }
     }
 
-    //TODO ajustar as colisões
     checkCollidingGameOver(){
         for (let n = 0; n < this.game.road.totalTraffic.length; n++){
             if (this.isColliding(this.game.road.totalTraffic[n])){
@@ -140,6 +139,7 @@ class Player {
         }
     }
 
+
     update(dt) {
         let road = this.game.road
         this.z += this.speed*dt
@@ -168,7 +168,7 @@ class Player {
     }
 
     setMask(){
-        this.mask = {x:this.x, z:this.z, w:this.w, s: 500}
+        this.mask = {x:this.x, z:this.z, w:this.w, s: 200}
     }
 
     render(ctx) {

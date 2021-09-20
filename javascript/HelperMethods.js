@@ -140,24 +140,26 @@ function renderTexturePoints(width, height, jMax, iMax, drawCorrectionPoint, roa
 }
 
 function define3dScale(roadWidth, jMax, iMax) {
-    let drawCorrectionPoint = 1.3
+    let drawCorrectionPoint = 1.5
     if (roadWidth < 300) {
         jMax /= 2;
         iMax /= 2
-        drawCorrectionPoint = 1.1
+        drawCorrectionPoint = 1.4
     }
-    if (roadWidth < 150) {
+    if (roadWidth < 100) {
         jMax /= 2;
         iMax /= 2
+        drawCorrectionPoint = 1.3
     }
     if (roadWidth < 50) {
         jMax /= 2;
         iMax /= 2
-        drawCorrectionPoint = 1
+        drawCorrectionPoint = 1.2
     }
     if (roadWidth < 30) {
         jMax /= 2;
         iMax /= 2
+        drawCorrectionPoint = 1.1
     }
     if (roadWidth < 10) {
         iMax /= 2
@@ -176,7 +178,7 @@ function create3dRoad(roadImage, x1, y1, w1, x2, y2, w2, ctx) {
     let roadImageWidth = roadImage.width
     let height = roadImage.height
     let roadWidth = w1*2
-    let jMax = 12;
+    let jMax = 6;
     let iMax = 24;
     let correctionFactor = 0.98
     const scale = define3dScale(roadWidth, jMax, iMax);
@@ -184,6 +186,32 @@ function create3dRoad(roadImage, x1, y1, w1, x2, y2, w2, ctx) {
     let correctedWidth2 = w2*correctionFactor
     let tRoad = setTransformMatrix(0, 0, x2-correctedWidth2, y2, roadImageWidth, 0, x2+correctedWidth2, y2, roadImageWidth, height, x1+correctedWidth1, y1, 0, height, x1-correctedWidth1, y1);
     renderTexturePoints(roadImageWidth, height, scale.jMax, scale.iMax, scale.drawCorrectionPoint, roadWidth, y1, y2, tRoad, ctx, roadImage);
+}
+
+// Função que cria a renderização em Canvas Transform no segmento de pista
+function createTransformRoad(roadImage, x1, y1, w1, x2, y2, w2, ctx) {
+    let roadImageWidth = roadImage.width
+    let height = roadImage.height
+    let roadWidth = w1*2
+    let jMax = 2;
+    let iMax = 1;
+
+    //const scale = define3dScale(roadWidth, jMax, iMax);
+
+    let cutWidth = roadImageWidth / iMax
+    let cutHeight = height / jMax
+    let drawWidth = (roadWidth / iMax);
+    let drawHeight = ((y1 - y2) / jMax)
+    for (let j = 0; j <= jMax; j++) {
+        for (let i = 0; i <= iMax; i++) {
+            ctx.setTransform(1,0,-1,1,0,0)
+            ctx.drawImage(roadImage, i * cutWidth, j * cutHeight,
+                cutWidth, cutHeight,
+                newX, newY,
+                drawWidth, drawHeight)
+        }
+    }
+
 }
 
 // ---------------------------------------------------------------------------------
@@ -217,6 +245,22 @@ function setSpriteDirection(ctx, sprite, x, y, dir, spriteSize) {
     ctx.scale(dir, 1);
     ctx.drawImage(...sprite, (-spriteSize / 2), (-spriteSize / 2), spriteSize, spriteSize);
     ctx.restore();
+}
+
+function addLoadEvent(func) {
+    let oldOnLoad = window.onload;
+    console.log("addLoad")
+    if (typeof window.onload != 'function') {
+        window.onload = func;
+    } else {
+        window.onload = function() {
+            if (oldOnLoad) {
+                oldOnLoad();
+
+            }
+            func();
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------------
