@@ -13,7 +13,7 @@ class Player {
         this.x = 0;
         this.y = 0;
         this.z = 0;
-        this.w = 0.2;
+        this.w = 0.3;
         this.color = color
         this.sprites = null
         this.screen = {x:0, y:0, w:0, h:0}
@@ -110,7 +110,6 @@ class Player {
         }
     }
 
-    //TODO ajustar as colisões
     checkCollidingGameOver(){
         for (let n = 0; n < this.game.road.totalTraffic.length; n++){
             if (this.isColliding(this.game.road.totalTraffic[n])){
@@ -163,7 +162,7 @@ class Player {
         this.setMask()
         this.setLanes()
         this.SettingJumpingY(dt)
-        this.checkCollidingGameOver()
+        //this.checkCollidingGameOver()
         this.checkCollidingCoins()
         this.checkCollidingPowerUp()
     }

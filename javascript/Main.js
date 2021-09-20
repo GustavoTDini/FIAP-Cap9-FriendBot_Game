@@ -1,4 +1,4 @@
-addLoadEvent(preload);
+//addLoadEvent(preload);
 
 window.onload = function(){
     spriteSheet_road.src = './images/spriteSheet_road.png'
@@ -17,6 +17,7 @@ window.onload = function(){
     grass_texture3.src = './images/grass_texture_3.png'
     const GAME_CANVAS = document.getElementById("game_canvas")
     document.getElementById("canvas_div").style.display = "flex"
+    let audioContext = new (window.AudioContext || window.webkitAudioContext)()
     GAME_CANVAS.width = CANVAS_WIDTH;
     GAME_CANVAS.height = CANVAS_HEIGHT;
     console.log(images)
@@ -35,7 +36,13 @@ window.onload = function(){
     }, false);
     // let color = document.getElementById("colorSelect").value
     // let difficulty = document.getElementById("levelSelect").value
-    GameEngine.run({canvas: GAME_CANVAS, render: game.render, game: game, update: game.update, playerColor: GREEN, difficulty: HARD})
+    GameEngine.run({ canvas: GAME_CANVAS,
+                            audio: audioContext,
+                            render: game.render,
+                            game: game,
+                            update: game.update,
+                            playerColor: GREEN,
+                            difficulty: HARD})
 }
 
 

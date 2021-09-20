@@ -247,6 +247,22 @@ function setSpriteDirection(ctx, sprite, x, y, dir, spriteSize) {
     ctx.restore();
 }
 
+function addLoadEvent(func) {
+    let oldOnLoad = window.onload;
+    console.log("addLoad")
+    if (typeof window.onload != 'function') {
+        window.onload = func;
+    } else {
+        window.onload = function() {
+            if (oldOnLoad) {
+                oldOnLoad();
+
+            }
+            func();
+        }
+    }
+}
+
 // ---------------------------------------------------------------------------------
 // Sound Helpers
 // ---------------------------------------------------------------------------------

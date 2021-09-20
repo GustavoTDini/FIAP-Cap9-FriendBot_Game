@@ -146,12 +146,12 @@ class Road {
 
         let playerSegment = this.findSegment(player.z);
 
-        let centrifugal = 0.06;
+        let centrifugal = 30;
         let currentCurve = playerSegment.curve
         if (currentCurve){
-            this.game.player.lanes = ROAD_LANES.map(x => x + currentCurve*centrifugal);
+            this.game.player.screen.x =  CANVAS_CENTER_X - SPRITE_SIZE/2 + currentCurve*centrifugal
         } else {
-            this.game.player.lanes = ROAD_LANES
+            this.game.player.screen.x =  CANVAS_CENTER_X - SPRITE_SIZE/2
         }
         for (let j = 0; j< this.segments.length; j++){
             this.segments[j].inRoadObjects = []

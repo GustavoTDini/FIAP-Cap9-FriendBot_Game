@@ -89,29 +89,14 @@ const TRANSPARENT = 9
 const GUARA = 10
 const JAGUAR = 11
 
-function addLoadEvent(func) {
-    let oldOnLoad = window.onload;
-    console.log("addLoad")
-    if (typeof window.onload != 'function') {
-        window.onload = func;
-    } else {
-        window.onload = function() {
-            if (oldOnLoad) {
-                oldOnLoad();
-
-            }
-            func();
-        }
-    }
-}
-
 // ---------------------------------------------------------------------------------
 // Images & Sprites
 // ---------------------------------------------------------------------------------
 
-let images = {
-    "spriteSheet_road": new Image(),
-}
+let images = [
+    spriteSheet_road = new Image(),
+]
+
 function preload() {
     for (let image in images) {
         console.log(image)

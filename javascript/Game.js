@@ -28,13 +28,14 @@ class Game {
                 game.UI.renderPauseUI(ctx)
                 break;
             case GAME_OVER_STATE:
+                //TODO - programar o gameOver e Start
                 game.UI.renderGameOverUI(ctx)
                 break;
         }
     }
 
     // função principal para atualizar os estados dos elementos do jogo
-    update(game, dt, difficulty, playerColor) {
+    update(game, dt, difficulty, playerColor, audioCtx) {
         switch(game.gameState){
             case LOADING_STATE:
                 game.gameCamera = new Camera(game);
@@ -83,7 +84,8 @@ let GameEngine = {
             dt     = 0,
             udt    = 0,
             fdt    = 0,
-            ctx    = canvas.getContext("2d")
+            ctx    = canvas.getContext("2d"),
+            audioCtx = options.audio
 
         function frame() {
             now = new Date().getTime();
@@ -97,7 +99,7 @@ let GameEngine = {
             }
             if (udt > updateStep) {
                 udt = udt - updateStep;
-                update(game, updateStep, DIFFICULTIES_SETS[difficulty], playerColor);
+                update(game, updateStep, DIFFICULTIES_SETS[difficulty], playerColor, audioCtx);
             }
             requestAnimationFrame(frame);
         }
