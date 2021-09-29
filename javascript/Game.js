@@ -7,6 +7,7 @@ class Game {
         this.road = null;
         this.UI = null
         this.background = null;
+        this.playingMusic = false;
 
     }
 
@@ -53,11 +54,13 @@ class Game {
                 game.gameState = PLAY_STATE;
                 break;
             case PLAY_STATE:
-                game.player.update(dt)
+                game.player.update(dt, audioCtx)
                 game.road.update(dt)
                 game.gameCamera.update(dt)
                 game.background.update(dt)
-                gameMusic.play()
+                if (game.playingMusic === false){
+                    game.playingMusic = playMusic(contextSounds["passing_breeze"], audioCtx)
+                }
                 break;
             case PAUSE_STATE:
                 break;

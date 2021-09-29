@@ -218,6 +218,13 @@ function createTransformRoad(roadImage, x1, y1, w1, x2, y2, w2, ctx) {
 // Draw Helpers
 // ---------------------------------------------------------------------------------
 
+function preloadImages(images) {
+    for (let image in images) {
+        images[image].src = "./images/" +  image.toString() + ".png"
+    }
+}
+
+
 function drawPolygon(x1, y1, x2, y2, x3, y3, x4, y4, color, ctx){
     ctx.fillStyle = color
 
@@ -246,30 +253,55 @@ function setSpriteDirection(ctx, sprite, x, y, dir, spriteSize) {
     ctx.drawImage(...sprite, (-spriteSize / 2), (-spriteSize / 2), spriteSize, spriteSize);
     ctx.restore();
 }
-
-function addLoadEvent(func) {
-    let oldOnLoad = window.onload;
-    console.log("addLoad")
-    if (typeof window.onload != 'function') {
-        window.onload = func;
-    } else {
-        window.onload = function() {
-            if (oldOnLoad) {
-                oldOnLoad();
-
-            }
-            func();
-        }
-    }
-}
-
 // ---------------------------------------------------------------------------------
 // Sound Helpers
 // ---------------------------------------------------------------------------------
 
-//TODO refazer o sistema de som com uso de Audio JS
+async function getSound(soundName, audioCtx) {
+    let url = "./sounds/" +  soundName + ".mp3"
+    const response = await fetch(url);
+    const arrayBuffer = await response.arrayBuffer();
+    return await audioCtx.decodeAudioData(arrayBuffer);
+}
 
-function stopSound(sound){
+async function loadSound(soundName, audioCtx) {
+    contextSounds[soundName] = await getSound(soundName, audioCtx)
+}
+
+function preloadSounds(sounds, audioCtx) {
+    for (let i in sounds) {
+        loadSound(sounds[i], audioCtx)
+    }
+}
+
+function playTrack(audioBuffer, audioCtx) {
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    const trackSource = audioCtx.createBufferSource();
+    trackSource.buffer = audioBuffer;
+    trackSource.connect(audioCtx.destination)
+    trackSource.start();
+}
+
+function playMusic(audioBuffer, audioCtx) {
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    const trackSource = audioCtx.createBufferSource();
+    trackSource.buffer = audioBuffer;
+    trackSource.connect(audioCtx.destination)
+    if (trackSource.buffer !== null){
+        trackSource.loop = true
+        trackSource.start();
+        return true
+    }
+    return false
+}
+
+
+
+function stopSound(soundName, audioCtx){
     sound.pause()
     sound.currentTime = 0
 }

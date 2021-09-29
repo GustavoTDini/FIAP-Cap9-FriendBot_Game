@@ -172,7 +172,9 @@ class PowerUps extends RoadObjects{
     frame = 0;
     currentSprite = 0;
     turboSprites = [turbo1, turbo2]
-    transparentSprite = [transparent1, transparent2]
+    transparentSprites = [transparent1, transparent2]
+    doubleSprites = [turbo1, turbo2]
+    transparentSprites = [transparent1, transparent2]
 
     constructor(sprite, x, y, z, spriteSize, road, camera, type) {
         super(sprite, x, y, z, spriteSize, road, camera);
@@ -180,7 +182,7 @@ class PowerUps extends RoadObjects{
         if (this.type === TURBO){
             this.sprite = this.turboSprites[0]
         } else if (this.type === TRANSPARENT){
-            this.sprite = this.transparentSprite[0]
+            this.sprite = this.transparentSprites[0]
         }
     }
 
@@ -197,7 +199,7 @@ class PowerUps extends RoadObjects{
             if (this.type === TURBO){
                 this.sprite = this.turboSprites[this.currentSprite]
             } else if (this.type === TRANSPARENT){
-                this.sprite = this.transparentSprite[this.currentSprite]
+                this.sprite = this.transparentSprites[this.currentSprite]
             }
 
         }
@@ -302,9 +304,9 @@ class Background {
 
     constructor(game){
         this.game = game
-        this.sky = background_sky
-        this.mountains = background_mountain
-        this.forest = background_trees
+        this.sky = images.background_sky
+        this.mountains = images.background_mountain
+        this.forest = images.background_trees
         this.offSetX = 0
         this.offSetY = 0
 

@@ -3,8 +3,8 @@ class Player {
 
     movingLane = false
     nextLane = 1
-    gravity = 0.3
-    jumpSpeed = -12
+    gravity = 1
+    jumpSpeed = -18
     MAX_POWERUP_COUNTER = 180;
 
     constructor(game, color, difficulty) {
@@ -80,67 +80,66 @@ class Player {
                 && (this.mask.x) < (entity.mask.x + entity.mask.w))
             && ((this.mask.z + this.mask.s) > entity.mask.z
                 && (this.mask.z) < (entity.mask.z + entity.mask.s)
-            ))
+            ) && !this.over)
     }
 
-    checkCollidingCoins(){
+    checkCollidingCoins(audioCtx){
         for (let n = 0; n < this.game.road.totalCoins.length; n++){
             if (this.isColliding(this.game.road.totalCoins[n])){
                 this.game.road.totalCoins.splice(n, 1)
                 this.coins++
                 this.score++
-                coinPick.play()
+                playTrack(contextSounds["coin"], audioCtx)
             }
         }
     }
 
-    checkCollidingPowerUp(){
+    checkCollidingPowerUp(audioCtx){
         //TODO - Adicionar os PowerUps
         for (let n = 0; n < this.game.road.powerUps.length; n++){
             if (this.isColliding(this.game.road.powerUps[n])){
                 if (this.game.road.powerUps[n].type === TURBO){
                     this.turbo = true
-                    turbo.play()
+                    playTrack(contextSounds["turbo"], audioCtx)
                 }
                 if (this.game.road.powerUps[n].type === TRANSPARENT){
                     this.transparent = true
-                    transparent.play()
                 }
             }
         }
     }
 
-    checkCollidingGameOver(){
+    checkCollidingGameOver(audioCtx){
         for (let n = 0; n < this.game.road.totalTraffic.length; n++){
             if (this.isColliding(this.game.road.totalTraffic[n])){
                 this.game.gameState = GAME_OVER_STATE
-                hit.play()
+                playTrack(contextSounds["hit"], audioCtx)
             }
         }
         for (let n = 0; n < this.game.road.totalCars.length; n++){
             if (this.isColliding(this.game.road.totalCars[n])){
                 console.log(this.mask.z,this.game.road.totalCars[n].mask.z)
                 this.game.gameState = GAME_OVER_STATE
-                hit.play()
+                playTrack(contextSounds["hit"], audioCtx)
             }
         }
         for (let n = 0; n < this.game.road.obstacles.length; n++){
             if (this.isColliding(this.game.road.obstacles[n])){
                 this.game.gameState = GAME_OVER_STATE
-                hit.play()
+                playTrack(contextSounds["hit"], audioCtx)
             }
         }
         for (let n = 0; n < this.game.road.animals.length; n++){
             if (this.isColliding(this.game.road.animals[n])){
                 this.game.gameState = GAME_OVER_STATE
-                hit.play()
+                playTrack(contextSounds["hit"], audioCtx)
 
             }
         }
     }
 
 
-    update(dt) {
+    update(dt, audioCtx) {
         let road = this.game.road
         this.z += this.speed*dt
         if (this.z >= road.roadLength){
@@ -162,9 +161,9 @@ class Player {
         this.setMask()
         this.setLanes()
         this.SettingJumpingY(dt)
-        //this.checkCollidingGameOver()
-        this.checkCollidingCoins()
-        this.checkCollidingPowerUp()
+        this.checkCollidingGameOver(audioCtx)
+        this.checkCollidingCoins(audioCtx)
+        this.checkCollidingPowerUp(audioCtx)
     }
 
     setMask(){
@@ -256,7 +255,6 @@ class Player {
                 } else{
                     this.currentLane = this.nextLane
                     this.movingLane = false
-                    stopSound(tire)
                 }
             } else if (this.currentLane < this.nextLane){
                 if (this.x < this.lanes[this.nextLane]){
@@ -264,12 +262,10 @@ class Player {
                 } else{
                     this.currentLane = this.nextLane
                     this.movingLane = false
-                    stopSound(tire)
                 }
             }
             if (this.nextLane > this.lanes.length || this.nextLane < 0){
                 this.movingLane = false
-                stopSound(tire)
             }
         } else {
             this.x = this.lanes[this.currentLane]
@@ -292,12 +288,12 @@ class Player {
     }
 
     // TODO = colocar a interatividade mobile
-    handleInputUp(keys) {
+    handleInputUp(keys, audioCtx) {
         switch (keys) {
             case ('right'):
                 if (!this.jumping && this.game.gameState === PLAY_STATE){
                     this.nextLane = limitMaxMin(this.currentLane, this.currentLane+1, 3, 0)
-                    tire.play()
+                    playTrack(contextSounds["tire"], audioCtx)
                     if (this.nextLane !== this.currentLane){
                         this.movingLane = true
                     }
@@ -306,7 +302,7 @@ class Player {
             case ('left'):
                 if (!this.jumping && this.game.gameState === PLAY_STATE){
                     this.nextLane = limitMaxMin(this.currentLane, this.currentLane-1, 3, 0)
-                    tire.play()
+                    playTrack(contextSounds["tire"], audioCtx)
                     if (this.nextLane !== this.currentLane){
                         this.movingLane = true
                     }
@@ -315,16 +311,16 @@ class Player {
                 break;
             case ('pause'):
                 if(this.game.gameState === PLAY_STATE){
-                    pauseSound.play()
+                    playTrack(contextSounds["pause"], audioCtx)
                     this.game.gameState = PAUSE_STATE
                 } else if (this.game.gameState === PAUSE_STATE){
-                    pauseSound.play()
+                    playTrack(contextSounds["pause"], audioCtx)
                     this.game.gameState = PLAY_STATE
                 }
                 break;
             case ('jump'):
                 if (!this.movingLane && !this.jumping && this.game.gameState === PLAY_STATE){
-                    jump.play()
+                    playTrack(contextSounds["jump"], audioCtx)
                     this.jumping = true
 
                     this.ySpeed = this.jumpSpeed
