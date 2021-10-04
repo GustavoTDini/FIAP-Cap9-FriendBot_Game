@@ -5,7 +5,10 @@ class Player {
     nextLane = 1
     gravity = 1
     jumpSpeed = -18
-    MAX_POWERUP_COUNTER = 180;
+    MAX_POWER_UP_COUNTER = 300;
+    MAX_FUEL = 100;
+    currentSprite = 0
+    frame = 0
 
     constructor(game, color, difficulty) {
         this.game = game;
@@ -15,6 +18,7 @@ class Player {
         this.z = 0;
         this.w = 0.3;
         this.color = color
+        this.fuel = this.MAX_FUEL;
         this.sprites = null
         this.screen = {x:0, y:0, w:0, h:0}
         this.speed = 0;
@@ -24,15 +28,17 @@ class Player {
         this.coins = 0;
         this.jumping = false;
         this.over = false;
-        this.powerupCounter = 0
-        this.turbo = false;
         this.turboSpeed = MAX_SPEED*2
         this.currentSpeed = this.speed
-        this.transparent = false;
+        this.transparent = 0;
+        this.turbo = 0;
+        this.double = 0;
+        this.shield = 0;
         this.ySpeed = 0;
         this.segmentCounter = 0
         this.currentSegment = null
         this.mask = {x:this.x, y:this.y, w:this.w, s: 200}
+        this.spriteHeight = SPRITE_SIZE
 
     }
 
@@ -56,7 +62,7 @@ class Player {
         this.z = 1200;
         this.currentSegment = this.game.road.findSegment(this.z)
 
-        this.speed = MAX_SPEED*2
+        this.speed = MAX_SPEED/2
     }
 
 
@@ -65,8 +71,8 @@ class Player {
             case BLUE: {
                 return  bluePlayerSprites
             }
-            case RED: {
-                return  redPlayerSprites
+            case PINK: {
+                return  pinkPlayerSprites
             }
             case GREEN: {
                 return  greenPlayerSprites
@@ -89,6 +95,20 @@ class Player {
                 this.game.road.totalCoins.splice(n, 1)
                 this.coins++
                 this.score++
+                if (this.double > 0){
+                    this.coins++
+                    this.score++
+                }
+                playTrack(contextSounds["coin"], audioCtx)
+            }
+        }
+    }
+
+    checkCollidingFuel(audioCtx){
+        for (let n = 0; n < this.game.road.totalFuel.length; n++){
+            if (this.isColliding(this.game.road.totalFuel[n])){
+                this.game.road.totalFuel.splice(n, 1)
+                this.fuel = this.MAX_FUEL
                 playTrack(contextSounds["coin"], audioCtx)
             }
         }
@@ -98,39 +118,57 @@ class Player {
         //TODO - Adicionar os PowerUps
         for (let n = 0; n < this.game.road.powerUps.length; n++){
             if (this.isColliding(this.game.road.powerUps[n])){
-                if (this.game.road.powerUps[n].type === TURBO){
-                    this.turbo = true
-                    playTrack(contextSounds["turbo"], audioCtx)
-                }
-                if (this.game.road.powerUps[n].type === TRANSPARENT){
-                    this.transparent = true
+                switch (this.game.road.powerUps[n].type){
+                    case (TURBO):
+                        this.turbo = this.MAX_POWER_UP_COUNTER
+                        playTrack(contextSounds["turbo"], audioCtx)
+                        this.currentSpeed = this.speed
+                        this.speed = this.turboSpeed
+                        break;
+                    case (BOLT):
+                        this.transparent = this.MAX_POWER_UP_COUNTER
+                        playTrack(contextSounds["turbo"], audioCtx)
+                        break;
+                    case (DOUBLE):
+                        this.double = this.MAX_POWER_UP_COUNTER
+                        playTrack(contextSounds["turbo"], audioCtx)
+                        break;
+                    case (SHIELD):
+                        this.shield = this.MAX_POWER_UP_COUNTER
+                        playTrack(contextSounds["turbo"], audioCtx)
+                        break;
                 }
             }
         }
     }
 
+
+
     checkCollidingGameOver(audioCtx){
         for (let n = 0; n < this.game.road.totalTraffic.length; n++){
             if (this.isColliding(this.game.road.totalTraffic[n])){
+                this.speed = 0
                 this.game.gameState = GAME_OVER_STATE
                 playTrack(contextSounds["hit"], audioCtx)
             }
         }
         for (let n = 0; n < this.game.road.totalCars.length; n++){
             if (this.isColliding(this.game.road.totalCars[n])){
-                console.log(this.mask.z,this.game.road.totalCars[n].mask.z)
+                this.speed = 0
                 this.game.gameState = GAME_OVER_STATE
                 playTrack(contextSounds["hit"], audioCtx)
             }
         }
         for (let n = 0; n < this.game.road.obstacles.length; n++){
             if (this.isColliding(this.game.road.obstacles[n])){
+                this.speed = 0
                 this.game.gameState = GAME_OVER_STATE
                 playTrack(contextSounds["hit"], audioCtx)
             }
         }
         for (let n = 0; n < this.game.road.animals.length; n++){
             if (this.isColliding(this.game.road.animals[n])){
+                this.speed = 0
                 this.game.gameState = GAME_OVER_STATE
                 playTrack(contextSounds["hit"], audioCtx)
 
@@ -142,6 +180,10 @@ class Player {
     update(dt, audioCtx) {
         let road = this.game.road
         this.z += this.speed*dt
+        if (this.speed > 0){
+            this.fuel -= dt*15
+        }
+
         if (this.z >= road.roadLength){
             this.z -= road.roadLength
         }
@@ -157,17 +199,58 @@ class Player {
             this.segmentCounter = 0;
 
         }
-        this.score +=dt
+        this.score +=(dt*24)
         this.setMask()
         this.setLanes()
+        this.countPowerUps()
         this.SettingJumpingY(dt)
-        this.checkCollidingGameOver(audioCtx)
+        //this.checkCollidingGameOver(audioCtx)
         this.checkCollidingCoins(audioCtx)
         this.checkCollidingPowerUp(audioCtx)
+        this.checkCollidingFuel(audioCtx)
+        this.setSprite()
+
+    }
+
+    countPowerUps(){
+        if (this.turbo > 0){
+            this.turbo--
+            if (this.turbo === 0){
+                this.speed = this.currentSpeed
+            }
+        }
+
+        if (this.transparent > 0){
+            this.transparent--
+        }
+        if (this.double > 0){
+            this.double--
+        }
+        if (this.shield > 0){
+            this.shield--
+        }
     }
 
     setMask(){
         this.mask = {x:this.x, z:this.z, w:this.w, s: 200}
+    }
+
+    setSprite() {
+        if (this.speed > 0){
+            let MAX_SPRITES = 2;
+            let MAX_FRAMES = 0;
+            this.frame++;
+            if (this.frame > MAX_FRAMES) {
+                this.frame = 0;
+                this.currentSprite++;
+                if (this.currentSprite > MAX_SPRITES) {
+                    this.currentSprite = 0;
+                }
+            }
+        } else{
+            this.currentSprite = 0
+        }
+
     }
 
     render(ctx) {
@@ -175,73 +258,53 @@ class Player {
         let shadowScale = SPRITE_SIZE*this.screen.y/586
         drawShadow(this.screen.x,  CANVAS_HEIGHT - this.screen.h, shadowScale, ctx)
         let playerSegmentCurve = road.findSegment(this.z).curve;
-        if (playerSegmentCurve === 6){
+        if (playerSegmentCurve >= 4 ){
             if (this.movingLane){
                 if (this.nextLane > this.currentLane){
-                    ctx.drawImage(...this.sprites.maxRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                    ctx.drawImage(...this.sprites.maxRight[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
                 } else if (this.nextLane < this.currentLane){
-                    ctx.drawImage(...this.sprites.minRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                    ctx.drawImage(...this.sprites.right[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
                 }
             }  else {
-                ctx.drawImage(...this.sprites.maxRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                ctx.drawImage(...this.sprites.maxRight[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
             }
-        } else if ( playerSegmentCurve  < 6 && playerSegmentCurve > 3){
+        } else if ( playerSegmentCurve  < 4 && playerSegmentCurve > 2){
             if (this.movingLane){
                 if (this.nextLane > this.currentLane){
-                    ctx.drawImage(...this.sprites.maxRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                    ctx.drawImage(...this.sprites.maxRight[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
                 } else if (this.nextLane < this.currentLane){
-                    ctx.drawImage(...this.sprites.center, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                    ctx.drawImage(...this.sprites.center[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
                 }
             }  else {
-                ctx.drawImage(...this.sprites.medRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                ctx.drawImage(...this.sprites.right[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
             }
-         } else if ( playerSegmentCurve  < 3 && playerSegmentCurve > 0){
+        } else if ( playerSegmentCurve  < -2 && playerSegmentCurve > -4) {
             if (this.movingLane){
                 if (this.nextLane > this.currentLane){
-                    ctx.drawImage(...this.sprites.maxRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                    ctx.drawImage(...this.sprites.center[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
                 } else if (this.nextLane < this.currentLane){
-                    ctx.drawImage(...this.sprites.minLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                    ctx.drawImage(...this.sprites.maxLeft[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
                 }
             }  else {
-                ctx.drawImage(...this.sprites.minRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                ctx.drawImage(...this.sprites.left[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
             }
-        } else if ( playerSegmentCurve  < 0 && playerSegmentCurve > -3) {
+        } else if  ( playerSegmentCurve  <= -4) {
             if (this.movingLane){
                 if (this.nextLane > this.currentLane){
-                    ctx.drawImage(...this.sprites.minRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                    ctx.drawImage(...this.sprites.left[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
                 } else if (this.nextLane < this.currentLane){
-                    ctx.drawImage(...this.sprites.maxLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                    ctx.drawImage(...this.sprites.maxLeft[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
                 }
             }  else {
-                ctx.drawImage(...this.sprites.minLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
-            }
-        } else if ( playerSegmentCurve  < -3 && playerSegmentCurve > -6) {
-            if (this.movingLane){
-                if (this.nextLane > this.currentLane){
-                    ctx.drawImage(...this.sprites.center, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
-                } else if (this.nextLane < this.currentLane){
-                    ctx.drawImage(...this.sprites.maxLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
-                }
-            }  else {
-                ctx.drawImage(...this.sprites.medLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
-            }
-        } else if  ( playerSegmentCurve  === -6) {
-            if (this.movingLane){
-                if (this.nextLane > this.currentLane){
-                    ctx.drawImage(...this.sprites.minLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
-                } else if (this.nextLane < this.currentLane){
-                    ctx.drawImage(...this.sprites.maxLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
-                }
-            }  else {
-                ctx.drawImage(...this.sprites.maxLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                ctx.drawImage(...this.sprites.maxLeft[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
             }
         } else {
             if (this.nextLane > this.currentLane){
-                ctx.drawImage(...this.sprites.medRight, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                ctx.drawImage(...this.sprites.right[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
             } else if (this.nextLane < this.currentLane){
-                ctx.drawImage(...this.sprites.medLeft, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                ctx.drawImage(...this.sprites.left[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
             } else if (!this.movingLane){
-                ctx.drawImage(...this.sprites.center, this.screen.x, this.screen.y, SPRITE_SIZE, SPRITE_SIZE)
+                ctx.drawImage(...this.sprites.center[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
             }
 
         }
@@ -273,18 +336,23 @@ class Player {
     }
 
     SettingJumpingY(){
-        if (!this.jumping ){
-            this.ySpeed = 0;
-            this.y = this.currentSegment.worldPoints.y
-            this.screen.y = CANVAS_HEIGHT - this.screen.h + Math.floor((Math.random()*5))-10
-        } else {
-            this.screen.y += this.ySpeed
-            this.ySpeed += this.gravity
-            if (this.screen.y > CANVAS_HEIGHT - this.screen.h){
-                this.jumping = false
+        console.log(this.screen.y)
+        this.spriteHeight = SPRITE_SIZE - this.ySpeed*1.5
+        //console.log(this.spriteHeight)
+        if (this.speed > 0){
+            if (!this.jumping){
+                this.ySpeed = 0;
+                this.y = this.currentSegment.worldPoints.y
+                this.screen.y = CANVAS_HEIGHT - this.screen.h + Math.floor((Math.random()*5))-10
+            } else {
+                this.screen.y += this.ySpeed
+                this.ySpeed += this.gravity
+                if (this.screen.y > CANVAS_HEIGHT - this.screen.h){
+                    this.jumping = false
+                }
             }
+            this.over = this.screen.y < 450;
         }
-        this.over = this.screen.y < 450;
     }
 
     // TODO = colocar a interatividade mobile
@@ -293,6 +361,7 @@ class Player {
             case ('right'):
                 if (!this.jumping && this.game.gameState === PLAY_STATE){
                     this.nextLane = limitMaxMin(this.currentLane, this.currentLane+1, 3, 0)
+                    audioCtx.gain = 1
                     playTrack(contextSounds["tire"], audioCtx)
                     if (this.nextLane !== this.currentLane){
                         this.movingLane = true
@@ -302,12 +371,12 @@ class Player {
             case ('left'):
                 if (!this.jumping && this.game.gameState === PLAY_STATE){
                     this.nextLane = limitMaxMin(this.currentLane, this.currentLane-1, 3, 0)
+                    audioCtx.gain = 1
                     playTrack(contextSounds["tire"], audioCtx)
                     if (this.nextLane !== this.currentLane){
                         this.movingLane = true
                     }
                 }
-
                 break;
             case ('pause'):
                 if(this.game.gameState === PLAY_STATE){

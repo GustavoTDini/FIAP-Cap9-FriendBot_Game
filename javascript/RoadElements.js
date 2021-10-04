@@ -1,6 +1,6 @@
 class RoadObjects {
 
-    constructor(sprite, x, y, z, spriteSize, road, camera){
+    constructor(sprite, x, y, z, spriteSize, road){
         this.sprite = sprite
         this.x = x
         this.y = y
@@ -8,7 +8,7 @@ class RoadObjects {
         this.road = road
         this.speed = 0
         this.spriteSize = spriteSize
-        this.screen = {x:0, y:0, spriteSize:0}
+        this.screen = {x:0, y:0, spriteSize:0, spriteHeight: 0}
         this.mask = {x:this.x, z:this.z, w:0.2, s: 200}
         this.segment = null
         this.dir = 1;
@@ -17,12 +17,10 @@ class RoadObjects {
 
     render(ctx, maxDrawLine) {
         this.screen = this.project3D()
-
-
         if (maxDrawLine > this.screen.y){
             let spriteHeight = (maxDrawLine - this.screen.y)
             let drawSprite = this.sprite.map((x) => x);
-            drawSprite[4]= Math.min(drawSprite[4], (drawSprite[4] * spriteHeight) / this.screen.spriteSize)
+            drawSprite[4]= Math.min(drawSprite[4], (drawSprite[4] * spriteHeight) / this.screen.spriteHeight)
             ctx.drawImage(...drawSprite, this.screen.x - this.screen.spriteSize/2, this.screen.y, this.screen.spriteSize,spriteHeight);
         }
     }
@@ -50,16 +48,13 @@ class RoadObjects {
         let projectedY = scale * transY;
         let projectedSize = scale * this.spriteSize*2;
 
-        if (this instanceof SideObjects){
-            projectedSize *=2
-        }
-
         // utilizando a pontos do plano, o tamanho da tela  e o segmento atual- dfinimos os pontos do sprite
         let x = this.segment.screenPoints.x + (this.segment.screenPoints.w * this.x)
         let spriteSize = Math.round(projectedSize * CANVAS_CENTER_X);
+        let spriteHeight = Math.round(projectedSize*CANVAS_CENTER_Y)
         let y = Math.round((1 - projectedY) * CANVAS_CENTER_Y) - spriteSize;
 
-        return {x:x, y:y, spriteSize:spriteSize}
+        return {x:x, y:y, spriteSize:spriteSize, spriteHeight:spriteHeight}
     }
 }
 
@@ -67,18 +62,18 @@ class RoadObjects {
 // Classe com os atributos de cada segmento da estrada a serem renderizados
 class SideObjects extends RoadObjects{
 
-    constructor(sprite, x, y, z, spriteSize, road, camera) {
-        super(sprite, x, y, z, spriteSize, road, camera);
+    constructor(sprite, x, y, z, spriteSize, road) {
+        super(sprite, x, y, z, spriteSize, road);
     }
 }
 
 // Classe com os atributos de cada segmento da estrada a serem renderizados
 class Cars extends RoadObjects{
 
-    constructor(sprite, x, y, z, spriteSize, road, camera, speed) {
-        super(sprite, x, y, z, spriteSize, road, camera);
-            this.speed = speed
-            this.nextX = x
+    constructor(sprite, x, y, z, spriteSize, road) {
+        super(sprite, x, y, z, spriteSize, road);
+        this.nextX = x
+        this.speed = randomIntFromInterval(20,100)
     }
 
     update(dt){
@@ -86,9 +81,10 @@ class Cars extends RoadObjects{
         this.randomX()
         this.setX()
         this.y = this.road.findSegment(this.z).worldPoints.y
-        this.z += this.speed*dt
-        if (this.z <= this.road.game.player.currentSegment.z -100){
-            this.z += 4000
+        this.z += this.speed
+        if (this.z <= this.road.game.player.currentSegment.worldPoints.z -100){
+            let finalSegment = this.road.segments.length
+            this.z = this.road.segments[finalSegment-1].worldPoints.z
         }
     }
 
@@ -115,21 +111,19 @@ class Cars extends RoadObjects{
 // Classe com os atributos de cada segmento da estrada a serem renderizados
 class Traffic extends RoadObjects{
 
-    constructor(sprite, x, y, z, spriteSize, road, camera, speed) {
-        super(sprite, x, y, z, spriteSize, road, camera);
-        this.speed = speed
+    constructor(sprite, x, y, z, spriteSize, road) {
+        super(sprite, x, y, z, spriteSize, road);
+        this.speed = 200
     }
 
     update(dt){
+        this.z = this.z -  this.speed
         this.segment = this.road.findSegment(this.z)
+        this.y = this.segment.worldPoints.y
         this.setMask()
-        this.y = this.road.findSegment(this.z).worldPoints.y
-        this.z -= this.speed*dt
-        if (this.z <= this.road.roadLength){
-            this.z += this.road.roadLength
-        }
-        if (this.z <= this.road.game.player.currentSegment.z -100){
-            this.z += 4000
+
+        if (this.z <= this.road.game.player.currentSegment.worldPoints.z -100){
+            this.speed = 0
         }
     }
 
@@ -142,8 +136,8 @@ class Coins extends RoadObjects{
     currentSprite = 0;
     coinSprites = [coin1, coin2, coin3, coin4, coin5, coin6]
 
-    constructor(sprite, x, y, z, spriteSize, road, camera) {
-        super(sprite, x, y, z, spriteSize, road, camera);
+    constructor(sprite, x, y, z, spriteSize, road) {
+        super(sprite, x, y, z, spriteSize, road);
     }
 
     rotatingCoin() {
@@ -167,26 +161,65 @@ class Coins extends RoadObjects{
 }
 
 // Classe com os atributos de cada segmento da estrada a serem renderizados
+class Fuel extends RoadObjects{
+
+    frame = 0;
+    currentSprite = 0;
+    coinSprites = [gas1, gas2, gas3, gas4, gas5, gas6]
+
+    constructor(sprite, x, y, z, spriteSize, road) {
+        super(sprite, x, y, z, spriteSize, road);
+    }
+
+    shiningFuel() {
+        let MAX_SPRITES = 5;
+        let MAX_FRAMES = 0;
+        this.frame++;
+        if (this.frame > MAX_FRAMES) {
+            this.frame = 0;
+            this.currentSprite++;
+            if (this.currentSprite > MAX_SPRITES) {
+                this.currentSprite = 0;
+            }
+            this.sprite = this.coinSprites[this.currentSprite]
+        }
+    }
+
+    update(dt) {
+        super.update(dt);
+        this.shiningFuel()
+    }
+}
+
+// Classe com os atributos de cada segmento da estrada a serem renderizados
 class PowerUps extends RoadObjects{
 
     frame = 0;
     currentSprite = 0;
-    turboSprites = [turbo1, turbo2]
-    transparentSprites = [transparent1, transparent2]
-    doubleSprites = [turbo1, turbo2]
-    transparentSprites = [transparent1, transparent2]
+    turboSprites = [turboItem1, turboItem2]
+    boltSprites = [boltItem1, boltItem2]
+    doubleSprites = [doubleItem1, doubleItem2]
+    shieldSprites = [shieldItem1, shieldItem2]
 
-    constructor(sprite, x, y, z, spriteSize, road, camera, type) {
-        super(sprite, x, y, z, spriteSize, road, camera);
+    constructor(sprite, x, y, z, spriteSize, road, type) {
+        super(sprite, x, y, z, spriteSize, road);
         this.type = type
-        if (this.type === TURBO){
-            this.sprite = this.turboSprites[0]
-        } else if (this.type === TRANSPARENT){
-            this.sprite = this.transparentSprites[0]
+        switch (this.type){
+            case (TURBO):
+                this.sprite = this.turboSprites[0]
+                break;
+            case (BOLT):
+                this.sprite = this.boltSprites[0]
+                break;
+            case(DOUBLE):
+                this.sprite = this.doubleSprites[0]
+                break;
+            case(SHIELD):
+                this.sprite = this.shieldSprites[0]
         }
     }
 
-    flashingTurbo() {
+    flashingPowerUps() {
         let MAX_SPRITES = 1;
         let MAX_FRAMES = 1;
         this.frame++;
@@ -196,10 +229,18 @@ class PowerUps extends RoadObjects{
             if (this.currentSprite > MAX_SPRITES) {
                 this.currentSprite = 0;
             }
-            if (this.type === TURBO){
-                this.sprite = this.turboSprites[this.currentSprite]
-            } else if (this.type === TRANSPARENT){
-                this.sprite = this.transparentSprites[this.currentSprite]
+            switch (this.type){
+                case (TURBO):
+                    this.sprite = this.turboSprites[this.currentSprite]
+                    break;
+                case (BOLT):
+                    this.sprite = this.boltSprites[this.currentSprite]
+                    break;
+                case(DOUBLE):
+                    this.sprite = this.doubleSprites[this.currentSprite]
+                    break;
+                case(SHIELD):
+                    this.sprite = this.shieldSprites[this.currentSprite]
             }
 
         }
@@ -208,15 +249,15 @@ class PowerUps extends RoadObjects{
     update(dt) {
         this.segment = this.road.findSegment(this.z)
         this.setMask()
-        this.flashingTurbo()
+        this.flashingPowerUps()
     }
 }
 
 // Classe com os atributos de cada segmento da estrada a serem renderizados
 class Obstacles extends RoadObjects{
 
-    constructor(sprite, x, y, z, spriteSize, road, camera) {
-        super(sprite, x, y, z, spriteSize, road, camera);
+    constructor(sprite, x, y, z, spriteSize, road) {
+        super(sprite, x, y, z, spriteSize, road);
     }
 
     update(dt) {
@@ -229,53 +270,59 @@ class Obstacles extends RoadObjects{
 // Classe com os atributos de cada segmento da estrada a serem renderizados
 class Animals extends RoadObjects{
 
-    guaraSpritesLeft = [guara1Left, guara2Left, guara3Left, guara4Left, guara5Left]
-    jaguarSpritesLeft = [jaguar1Left, jaguar2Left, jaguar3Left, jaguar4Left, jaguar5Left]
-    guaraSpritesRight = [guara1Right, guara2Right, guara3Right, guara4Right, guara5Right]
-    jaguarSpritesRight = [jaguar1Right, jaguar2Right, jaguar3Right, jaguar4Right, jaguar5Right]
+    guaraSpritesLeft = [guara1Left, guara2Left, guara3Left, guara4Left]
+    guaraSpritesRight = [guara1Right, guara2Right, guara3Right, guara4Right]
+    jaguarSpritesLeft = [jaguar1Left, jaguar2Left, jaguar3Left, jaguar4Left]
+    jaguarSpritesRight = [jaguar1Right, jaguar2Right, jaguar3Right, jaguar4Right]
+    turtleSpritesLeft = [turtle1Left, turtle2Left, turtle3Left, turtle4Left]
+    turtleSpritesRight = [turtle1Right, turtle2Right, turtle3Right, turtle4Right]
+    beachDogSpritesLeft = [beachDog1Left, beachDog2Left, beachDog3Left, beachDog4Left]
+    beachDogSpritesRight = [beachDog1Right, beachDog2Right, beachDog3Right, beachDog4Right]
+    suburbDogSpritesLeft = [suburbDog1Left, suburbDog2Left, suburbDog3Left, suburbDog4Left]
+    suburbDogSpritesRight = [suburbDog1Right, suburbDog2Right, suburbDog3Right, suburbDog4Right]
+    catSpritesLeft = [cat1Left, cat2Left, cat3Left, cat4Left]
+    catSpritesRight = [cat1Right, cat2Right, cat3Right, cat4Right]
+    bullSpritesLeft = [bull1Left, bull2Left, bull3Left, bull4Left]
+    bullSpritesRight = [bull1Right, bull2Right, bull3Right, bull4Right]
+    horseSpritesLeft = [horse1Left, horse2Left, horse3Left, horse4Left]
+    horseSpritesRight = [horse1Right, horse2Right, horse3Right, horse4Right]
+    cityDogSpritesLeft = [cityDog1Left, cityDog2Left, cityDog3Left, cityDog4Left]
+    cityDogSpritesRight = [cityDog1Right, cityDog2Right, cityDog3Right, cityDog4Right]
+    capivaraSpritesLeft = [capivara1Left, capivara2Left, capivara3Left, capivara4Left]
+    capivaraSpritesRight = [capivara1Right, capivara2Right, capivara3Right, capivara4Right]
     frame = 0;
     currentSprite = 0;
+    hit = false
+    slowSpeed = 0.01
+    fastSpeed = 0.03
 
-    constructor(sprite, x, y, z, spriteSize, road, camera, type) {
-        super(sprite, x, y, z, spriteSize, road, camera);
+    constructor(sprite, x, y, z, spriteSize, road, type) {
+        super(sprite, x, y, z, spriteSize, road);
         this.type = type
-        this.sprites = this.type === GUARA? this.guaraSpritesLeft:this.jaguarSpritesRight
-        this.sprite = this.type === GUARA? this.guaraSpritesLeft[0]:this.jaguarSpritesRight[0]
-        this.speed = this.x === 1? -0.01: 0.01
-        if (this.type === GUARA){
-            if (this.speed < 0) {
-                this.sprites = this.guaraSpritesLeft
-            } else {
-                this.sprites = this.guaraSpritesRight
-            }
-        } else if (this.type === JAGUAR){
-            if (this.speed < 0) {
-                this.sprites = this.jaguarSpritesLeft
-            } else {
-                this.sprites = this.jaguarSpritesRight
-            }
-        }
-
+        console.log(type)
+        this.sprites = this.setAnimalType(type)
+        this.sprite = this.sprites[0]
+        this.speed = this.setSpeed()
     }
 
     walkAndReturn(){
         this.x += this.speed
         if (this.x > 1){
-            this.speed = -0.01
-            if (this.type === GUARA){
-                this.sprites = this.guaraSpritesLeft
-            } else if (this.type === JAGUAR){
-                this.sprites = this.jaguarSpritesLeft
+            if (this.type === 0){
+                this.speed = -this.slowSpeed
+            } else if (this.type ===1){
+                this.speed = -this.fastSpeed
+            }
+
+        } else if (this.x < -1){
+            if (this.type === 0){
+                this.speed = this.slowSpeed
+            } else if (this.type ===1){
+                this.speed = this.fastSpeed
             }
         }
-        if (this.x < -1){
-            this.speed = 0.01
-            if (this.type === GUARA){
-                this.sprites = this.guaraSpritesRight
-            } else if (this.type === JAGUAR){
-                this.sprites = this.jaguarSpritesRight
-            }
-        }
+
+        this.sprites = this.setAnimalType()
     }
 
     animateWalking() {
@@ -297,46 +344,105 @@ class Animals extends RoadObjects{
         this.walkAndReturn()
         this.animateWalking()
     }
-}
 
-// Classe com os atributos de cada segmento da estrada a serem renderizados
-class Background {
-
-    constructor(game){
-        this.game = game
-        this.sky = images.background_sky
-        this.mountains = images.background_mountain
-        this.forest = images.background_trees
-        this.offSetX = 0
-        this.offSetY = 0
+    setSpeed(){
+        if (this.x === 1){
+            if (this.type === 0){
+                return -this.slowSpeed
+            } else if (this.type === 1){
+                return  -this.fastSpeed
+            }
+        } else {
+            if (this.type === 0){
+                return this.slowSpeed
+            } else if (this.type === 1){
+                return this.fastSpeed
+            }
+        }
 
     }
 
-    render(ctx){
-        let skyCorrection = 0.00002
-        let mountainCorrection = 0.00004
-        let forestCorrection = 0.00006
-        let skyX = setMaxMin(this.offSetX*skyCorrection*this.game.player.speed, CANVAS_WIDTH, 0)
-        let skyY = setMaxMin(-20 + this.offSetY*skyCorrection, 0, -50)
-        let mountainX = setMaxMin(this.offSetX*mountainCorrection*this.game.player.speed, CANVAS_WIDTH, 0)
-        let mountainY = setMaxMin(-20 + this.offSetY*mountainCorrection, 0, -50)
-        let forestX = setMaxMin(this.offSetX*forestCorrection*this.game.player.speed, CANVAS_WIDTH, 0)
-        let forestY = setMaxMin(-20 + this.offSetY*forestCorrection, 0, -50)
-        ctx.fillStyle = COLORS.SKY
-        ctx.fillRect(0,0, CANVAS_WIDTH, 100)
-        ctx.fillStyle = COLORS.GRASS
-        ctx.fillRect(0, 100, CANVAS_WIDTH, CANVAS_HEIGHT-100)
-        ctx.drawImage(this.sky, CANVAS_CENTER_X - skyX,skyY )
-        ctx.drawImage(this.sky, CANVAS_CENTER_X- this.sky.width - skyX,skyY )
-        ctx.drawImage(this.mountains, CANVAS_CENTER_X-mountainX, mountainY)
-        ctx.drawImage(this.mountains, CANVAS_CENTER_X - this.sky.width-mountainX, mountainY)
-        ctx.drawImage(this.forest, CANVAS_CENTER_X-forestX, forestY)
-        ctx.drawImage(this.forest, CANVAS_CENTER_X-this.sky.width-forestX, forestY)
-    }
+    setAnimalType(){
+        console.log(this.type)
+        console.log(this.road.game.currentStage)
+        switch (this.road.game.currentStage) {
+            case (SUBURB):
+                if (this.type === 0 ){
+                    if (this.speed > 0){
+                        return this.suburbDogSpritesRight
+                    } else{
+                        return this.suburbDogSpritesLeft
+                    }
+                } else if (this.type === 1){
+                    if (this.speed > 0){
+                        return this.catSpritesRight
+                    } else{
+                        return this.catSpritesLeft
+                    }
+                }
+                break
+            case (CITY):
+                if (this.type === 0 ){
+                    if (this.speed > 0){
+                        return this.cityDogSpritesRight
+                    } else{
+                        return this.cityDogSpritesLeft
+                    }
+                } else if (this.type === 1){
+                    if (this.speed > 0){
+                        return this.capivaraSpritesRight
+                    } else{
+                        return this.capivaraSpritesLeft
+                    }
+                }
+                break
+            case (BEACH):
+                if (this.type === 0 ){
+                    if (this.speed > 0){
+                        return this.turtleSpritesRight
+                    } else{
+                        return this.turtleSpritesLeft
+                    }
+                } else if (this.type === 1){
+                    if (this.speed > 0){
+                        return this.beachDogSpritesRight
+                    } else{
+                        return this.beachDogSpritesLeft
+                    }
+                }
+                break
+            case (FOREST):
+                if (this.type === 0 ){
+                    if (this.speed > 0){
+                        return this.guaraSpritesRight
+                    } else{
+                        return this.guaraSpritesLeft
+                    }
+                } else if (this.type === 1){
+                    if (this.speed > 0){
+                        return this.jaguarSpritesRight
+                    } else{
+                        return this.jaguarSpritesLeft
+                    }
+                }
+                break
+            case (FARM):
+                if (this.type === 0 ){
+                    if (this.speed > 0){
+                        return this.bullSpritesRight
+                    } else{
+                        return this.bullSpritesLeft
+                    }
+                } else if (this.type === 1){
+                    if (this.speed > 0){
+                        return this.horseSpritesRight
+                    } else{
+                        return this.horseSpritesLeft
+                    }
+                }
+                break
+        }
 
-    update(dt){
-        this.offSetX+= this.game.road.findSegment(this.game.player.z).curve + this.game.player.x/2
-        this.offSetY+= this.game.road.findSegment(this.game.player.z).worldPoints.y
-    }
 
+    }
 }

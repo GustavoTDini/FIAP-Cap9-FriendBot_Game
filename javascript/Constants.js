@@ -7,7 +7,6 @@ const CANVAS_WIDTH = 1280;
 const CANVAS_HEIGHT = 720;
 const SPRITE_SIZE = 128;
 const LARGE_SPRITE_SIZE = 4*SPRITE_SIZE
-const UI_SPRITE_SIZE = 50
 const CANVAS_CENTER_X = CANVAS_WIDTH/2;
 const CANVAS_CENTER_Y = CANVAS_HEIGHT/2;
 const FPS = 60;
@@ -24,17 +23,25 @@ const LOADING_STATE = 0;
 const SET_STATE = 1;
 const PLAY_STATE = 2;
 const PAUSE_STATE = 3;
-const GAME_OVER_STATE = 4;
+const CONFIG_STATE = 4;
+const GAME_OVER_STATE = 5;
 
 //Player Colors
 const GREEN = "GREEN";
 const BLUE = "BLUE";
-const RED = "RED";
+const PINK = "PINK";
 
 //Player Difficulties
 const EASY = "EASY";
 const MEDIUM = "MEDIUM";
 const HARD = "HARD";
+
+//Stages
+const SUBURB = "SUBURB";
+const CITY = "CITY";
+const FARM = "FARM";
+const FOREST = "FOREST";
+const BEACH = "BEACH";
 
 //Player Difficulties
 const DIFFICULTIES_SETS = {
@@ -81,23 +88,23 @@ const ROAD = {
 const ROAD_LANES = [-0.65, -0.2, 0.2, 0.65]
 
 // Power Ups
-const TURBO = 8
-const TRANSPARENT = 9
-const DOUBLE = 10
-const SHIELD = 11
+const TURBO = 6
+const BOLT = 7
+const DOUBLE = 8
+const SHIELD = 9
 
 
 // animals
-const GUARA = 12
-const JAGUAR = 13
-const DOG_SUB = 14
-const CAT = 15
-const COW = 16
-const HORSE = 17
-const DOG_CITY = 18
-const CAPIVARA = 19
-const TURTLE = 20
-const DOG_BEACH = 21
+const GUARA = 10
+const JAGUAR = 11
+const DOG_SUB = 12
+const CAT = 13
+const BULL = 14
+const HORSE = 15
+const DOG_CITY = 16
+const CAPIVARA = 17
+const TURTLE = 18
+const DOG_BEACH = 19
 
 
 // ---------------------------------------------------------------------------------
@@ -184,44 +191,8 @@ let images = {
     scenario_forest_spritesheet: new Image(),
     suburb_spritesheet: new Image(),
     scenario_sub_spritesheet: new Image(),
+    get_ready_spritesheet: new Image(),
 }
-
-let beachRoadTextures = [images.beach_road_sprite_1, images.beach_road_sprite_2, images.beach_road_sprite_3, images.beach_road_sprite_4, images.beach_road_sprite_5]
-let cityRoadTextures = [images.city_road_sprite_1, images.city_road_sprite_2, images.city_road_sprite_3, images.city_road_sprite_4, images.city_road_sprite_5]
-let farmRoadTextures = [images.farm_road_sprite_1, images.farm_road_sprite_2, images.farm_road_sprite_3, images.farm_road_sprite_4, images.farm_road_sprite_5]
-let forestRoadTextures = [images.forest_road_sprite_1, images.forest_road_sprite_2, images.forest_road_sprite_3, images.forest_road_sprite_4, images.forest_road_sprite_5]
-let subRoadTextures = [images.sub_road_sprite_1, images.sub_road_sprite_2, images.sub_road_sprite_3, images.sub_road_sprite_4, images.sub_road_sprite_5]
-let beachSideTextures = [images.beach_texture_1, images.beach_texture_2, images.beach_texture_3]
-let citySideTextures = [images.city_texture_1, images.city_texture_2, images.city_texture_3]
-let farmSideTextures = [images.farm_texture_1, images.farm_texture_2, images.farm_texture_3]
-let forestSideTextures = [images.forest_texture_1, images.forest_texture_2, images.forest_texture_3]
-let subSideTextures = [images.sub_texture_1, images.sub_texture_2, images.sub_texture_3]
-
-const BEACH_COLORS = {
-    LIGHT:	{road: '#F5D890', grass: '#F5D890', grassTextures: 0, shoulder: '#F5D890', lane: '#4b3702'},
-    DARK:	{road: '#a89263', grass: '#e1cfad', grassTextures: 1, shoulder: '#4b3702'},
-    DARKER:	{road: '#947c3b', grass: '#a9a18a', grassTextures: 2, shoulder: '#F5D890'},
-};
-const CITY_COLORS = {
-    LIGHT:	{road: '#888888', grass: '#5e5e5e', grassTextures: 0, shoulder: '#BCBCBC', lane: '#FFFFFF'},
-    DARK:	{road: '#666666', grass: '#a2a2a2', grassTextures: 1, shoulder: '#FF0000'},
-    DARKER:	{road: '#444444', grass: '#e5e5e5', grassTextures: 2, shoulder: '#BCBCBC'},
-};
-const FARM_COLORS = {
-    LIGHT:	{road: '#888888', grass: '#48a15a', grassTextures: 0, shoulder: '#BCBCBC', lane: '#FFFFFF'},
-    DARK:	{road: '#666666', grass: '#398246', grassTextures: 1, shoulder: '#FFFFFF'},
-    DARKER:	{road: '#444444', grass: '#398246', grassTextures: 2, shoulder: '#BCBCBC'},
-};
-const FOREST_COLORS = {
-    LIGHT:	{road: '#937545', grass: '#4C8924', grassTextures: 0, shoulder: '#725e2a', lane: '#261d01'},
-    DARK:	{road: '#564428', grass: '#70c735', grassTextures: 1, shoulder: '#56da3d'},
-    DARKER:	{road: '#3d311d', grass: '#2f5d18', grassTextures: 2, shoulder: '#725e2a'},
-};
-const SUB_COLORS = {
-    LIGHT:	{road: '#646466', grass: '#B36820', grassTextures: 0, shoulder: '#078116', lane: '#000000'},
-    DARK:	{road: '#484849', grass: '#e38b3a', grassTextures: 1, shoulder: '#ffcc00'},
-    DARKER:	{road: '#333333', grass: '#8d5313', grassTextures: 2, shoulder: '#078116'},
-};
 
 // ---------------------------------------------------------------------------------
 // Player Sprites
@@ -407,7 +378,41 @@ const game_over25 = [images.game_over_spritesheet, 0 , 400, 450, 100]
 const game_over26 = [images.game_over_spritesheet, 450, 400, 450, 100]
 const game_over27 = [images.game_over_spritesheet, 900, 400, 450, 100]
 const game_over28 = [images.game_over_spritesheet, 1350, 400, 450, 100]
-
+const get_ready1 = [images.get_ready_spritesheet, 0 , 0, 450, 100]
+const get_ready2 = [images.get_ready_spritesheet, 450, 0, 450, 100]
+const get_ready3 = [images.get_ready_spritesheet, 900, 0, 450, 100]
+const get_ready4 = [images.get_ready_spritesheet, 1350, 0, 450, 100]
+const get_ready5 = [images.get_ready_spritesheet, 1800, 0, 450, 100]
+const get_ready6 = [images.get_ready_spritesheet, 2250, 0, 450, 100]
+const get_ready7 = [images.get_ready_spritesheet, 0 , 100, 450, 100]
+const get_ready8 = [images.get_ready_spritesheet, 450, 100, 450, 100]
+const get_ready9 = [images.get_ready_spritesheet, 900, 100, 450, 100]
+const get_ready10 = [images.get_ready_spritesheet, 1350, 100, 450, 100]
+const get_ready11 = [images.get_ready_spritesheet, 1800, 100, 450, 100]
+const get_ready12 = [images.get_ready_spritesheet, 2250, 100, 450, 100]
+const get_ready13 = [images.get_ready_spritesheet, 0 , 200, 450, 100]
+const get_ready14 = [images.get_ready_spritesheet, 450, 200, 450, 100]
+const get_ready15 = [images.get_ready_spritesheet, 900, 200, 450, 100]
+const get_ready16 = [images.get_ready_spritesheet, 1350, 200, 450, 100]
+const get_ready17 = [images.get_ready_spritesheet, 1800, 200, 450, 100]
+const get_ready18 = [images.get_ready_spritesheet, 2250, 200, 450, 100]
+const get_ready19 = [images.get_ready_spritesheet, 0 , 300, 450, 100]
+const get_ready20 = [images.get_ready_spritesheet, 450, 300, 450, 100]
+const get_ready21 = [images.get_ready_spritesheet, 900, 300, 450, 100]
+const get_ready22 = [images.get_ready_spritesheet, 1350, 300, 450, 100]
+const get_ready23 = [images.get_ready_spritesheet, 1800, 300, 450, 100]
+const get_ready24 = [images.get_ready_spritesheet, 2250, 300, 450, 100]
+const get_ready25 = [images.get_ready_spritesheet, 0 , 400, 450, 100]
+const get_ready26 = [images.get_ready_spritesheet, 450, 400, 450, 100]
+const get_ready27 = [images.get_ready_spritesheet, 900, 400, 450, 100]
+const get_ready28 = [images.get_ready_spritesheet, 1350, 400, 450, 100]
+const get_ready29 = [images.get_ready_spritesheet, 1800, 400, 450, 100]
+const get_ready30 = [images.get_ready_spritesheet, 2250, 400, 450, 100]
+const get_ready31 = [images.get_ready_spritesheet, 0 , 500, 450, 100]
+const get_ready32 = [images.get_ready_spritesheet, 450, 500, 450, 100]
+const get_ready33 = [images.get_ready_spritesheet, 900, 500, 450, 100]
+const get_ready34 = [images.get_ready_spritesheet, 1350, 500, 450, 100]
+const get_ready35 = [images.get_ready_spritesheet, 1800, 500, 450, 100]
 // ---------------------------------------------------------------------------------
 // Forest Sprites Inroad
 // ---------------------------------------------------------------------------------
@@ -445,11 +450,11 @@ const forestScenarioHouse2 = [images.scenario_forest_spritesheet, 512, 0, LARGE_
 const forestScenarioHouse3 = [images.scenario_forest_spritesheet, 1024, 0, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
 const forestScenarioRock1 = [images.scenario_forest_spritesheet, 1536, 0, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
 const forestScenarioRock2 = [images.scenario_forest_spritesheet, 0, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const forestScenarioRock3 = [images.scenario_forest_spritesheet, 512, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const forestScenarioTree1 = [images.scenario_forest_spritesheet, 1024, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const forestScenarioTree2 = [images.scenario_forest_spritesheet, 1536, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const forestScenarioTree3 = [images.scenario_forest_spritesheet, 0, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const forestScenarioTree4 = [images.scenario_forest_spritesheet, 512, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const forestScenarioTree1 = [images.scenario_forest_spritesheet, 512, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const forestScenarioTree2 = [images.scenario_forest_spritesheet, 1024, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const forestScenarioTree3 = [images.scenario_forest_spritesheet, 1536, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const forestScenarioTree4 = [images.scenario_forest_spritesheet, 0, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const forestScenarioRock3 = [images.scenario_forest_spritesheet, 512, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
 const forestScenarioTree5 = [images.scenario_forest_spritesheet, 1024, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
 const forestScenarioTree6 = [images.scenario_forest_spritesheet, 1536, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
 
@@ -488,13 +493,13 @@ const pickup5 = [images.farm_spritesheet        , 512,  512, SPRITE_SIZE, SPRITE
 const farmScenarioBush = [images.scenario_farm_spritesheet, 0, 0, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
 const farmScenarioCorn = [images.scenario_farm_spritesheet, 512, 0, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
 const farmScenarioFences = [images.scenario_farm_spritesheet, 1024, 0, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const farmScenarioRock1 = [images.scenario_farm_spritesheet, 1536, 0, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const farmScenarioRock2 = [images.scenario_farm_spritesheet, 0, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const farmScenarioShed = [images.scenario_farm_spritesheet, 1536, 0, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const farmScenarioWindmill = [images.scenario_farm_spritesheet, 0, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
 const farmScenarioScarecrow = [images.scenario_farm_spritesheet, 512, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
 const farmScenarioHay = [images.scenario_farm_spritesheet, 1024, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
 const farmScenarioWell = [images.scenario_farm_spritesheet, 1536, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const farmScenarioShed = [images.scenario_farm_spritesheet, 0, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const farmScenarioWindmill = [images.scenario_farm_spritesheet, 512, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const farmScenarioRock1 = [images.scenario_farm_spritesheet, 0, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const farmScenarioRock2 = [images.scenario_farm_spritesheet, 512, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
 const farmScenarioTree1 = [images.scenario_farm_spritesheet, 1024, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
 const farmScenarioTree2 = [images.scenario_farm_spritesheet, 1536, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
 
@@ -636,18 +641,18 @@ const subScenarioTree3 = [images.scenario_sub_spritesheet, 1536, 1024, LARGE_SPR
 // ---------------------------------------------------------------------------------
 // Common Side Road Sprites
 // ---------------------------------------------------------------------------------
-const commomScenarioBillboardFiap = [images.scenario_commom_spritesheet, 0, 0, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const commomScenarioBillboardTuring = [images.scenario_commom_spritesheet, 512, 0, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const commomScenarioBillboardVacina = [images.scenario_commom_spritesheet, 1024, 0, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const commomScenarioAnimalCrossingSign = [images.scenario_commom_spritesheet, 1536, 0, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const commomScenarioCityLeft = [images.scenario_commom_spritesheet, 0, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const commomScenarioFarmLeft = [images.scenario_commom_spritesheet, 512, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const commomScenarioBeachLeft = [images.scenario_commom_spritesheet, 1024, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const commomScenarioForestLeft = [images.scenario_commom_spritesheet, 1536, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const commomScenarioCityRight = [images.scenario_commom_spritesheet, 0, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const commomScenarioFarmRight = [images.scenario_commom_spritesheet, 512, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const commomScenarioBeachRight = [images.scenario_commom_spritesheet, 1024, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
-const commomScenarioForestRight= [images.scenario_commom_spritesheet, 1536, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const commomScenarioBillboardFiap = [images.scenario_common_spritesheet, 0, 0, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const commomScenarioBillboardTuring = [images.scenario_common_spritesheet, 512, 0, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const commomScenarioBillboardVacina = [images.scenario_common_spritesheet, 1024, 0, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const commomScenarioAnimalCrossingSign = [images.scenario_common_spritesheet, 1536, 0, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const commomScenarioCityLeft = [images.scenario_common_spritesheet, 0, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const commomScenarioFarmLeft = [images.scenario_common_spritesheet, 512, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const commomScenarioBeachLeft = [images.scenario_common_spritesheet, 1024, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const commomScenarioForestLeft = [images.scenario_common_spritesheet, 1536, 512, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const commomScenarioCityRight = [images.scenario_common_spritesheet, 0, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const commomScenarioFarmRight = [images.scenario_common_spritesheet, 512, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const commomScenarioBeachRight = [images.scenario_common_spritesheet, 1024, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const commomScenarioForestRight= [images.scenario_common_spritesheet, 1536, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
 
 // ---------------------------------------------------------------------------------
 // GUI Sprites
@@ -669,7 +674,7 @@ const UIPause = [images.menu_spritesheet, 0, 300, 700, 400]
 const UIMusic = [images.menu_spritesheet, 700, 0, 100, 100]
 const UIControl = [images.menu_spritesheet, 800, 0, 100, 100]
 const UISound = [images.menu_spritesheet, 700, 100, 100, 100]
-const UI3d = [images.menu_spritesheet, 800, 250, 100, 100]
+const UI3d = [images.menu_spritesheet, 800, 100, 100, 100]
 const UISelectorOff = [images.menu_spritesheet, 900, 0, 100, 100]
 const UISelectorOn = [images.menu_spritesheet, 900, 100, 100, 100]
 const UIResume = [images.menu_spritesheet, 700, 200, 200, 200]
@@ -678,6 +683,8 @@ const UIHomeOff = [images.menu_spritesheet, 900, 200, 100, 100]
 const UIHomeOn = [images.menu_spritesheet, 900, 300, 100, 100]
 const UIConfigOff = [images.menu_spritesheet, 900, 400, 100, 100]
 const UIConfigOn = [images.menu_spritesheet, 900, 500, 100, 100]
+const UIReturnOff = [images.menu_spritesheet, 700, 600, 100, 100]
+const UIReturnOn = [images.menu_spritesheet, 800, 600, 100, 100]
 
 // ---------------------------------------------------------------------------------
 // PowerUp Icons Sprites
@@ -742,11 +749,96 @@ const pinkPlayerSprites = {maxLeft: [pinkCarMaxSteerLeft_1, pinkCarMaxSteerLeft_
 
 const bluePlayerSprites = {maxLeft: [blueCarMaxSteerLeft_1, blueCarMaxSteerLeft_2, blueCarMaxSteerLeft_3],
                            left: [blueCarSteerLeft_1, blueCarSteerLeft_2, blueCarSteerLeft_3],
-                           center: [blueCarCenter_1, blueCarCenter_2, blueCarCenter_3],                          
+                           center: [blueCarCenter_1, blueCarCenter_2, blueCarCenter_3],
                            right: [blueCarSteerRight_1, blueCarSteerRight_2, blueCarSteerRight_3],
                            maxRight: [blueCarMaxSteerRight_1, blueCarMaxSteerRight_2, blueCarMaxSteerRight_3]}
 
+const stageObjects = {
+    SUBURB:{
+        ROAD_TEXTURES: [images.sub_road_sprite_1, images.sub_road_sprite_2, images.sub_road_sprite_3, images.sub_road_sprite_4, images.sub_road_sprite_5],
+        SIDE_TEXTURES: [images.sub_texture_1, images.sub_texture_2, images.sub_texture_3],
+        SCENARIOS:[subScenarioBuilding1, subScenarioBuilding2, subScenarioBuilding3, subScenarioBuilding4, subScenarioBuilding5, subScenarioBuilding6, subScenarioBuilding7, subScenarioRock],
+        SIDE_SCENARIOS:[subScenarioBush, subScenarioTree1, subScenarioTree2, subScenarioTree3],
+        TRAFFIC:[motorcycle1, motorcycle2, motorcycle3, motorcycle4, motorcycle5],
+        OBSTACLES:[hotDogCart, stairs],
+        ANIMALS:[CAT, DOG_SUB],
+        COLORS:{
+            LIGHT:	{road: '#646466', grass: '#B36820', grassTextures: 0, shoulder: '#078116', lane: '#000000'},
+            DARK:	{road: '#484849', grass: '#e38b3a', grassTextures: 1, shoulder: '#ffcc00'},
+            DARKER:	{road: '#333333', grass: '#8d5313', grassTextures: 2, shoulder: '#078116'},
+        }
+    },
+    CITY:{
+        ROAD_TEXTURES: [images.city_road_sprite_1, images.city_road_sprite_2, images.city_road_sprite_3, images.city_road_sprite_4, images.city_road_sprite_5],
+        SIDE_TEXTURES: [images.city_texture_1, images.city_texture_2, images.city_texture_3],
+        SCENARIOS:[cityScenarioBuilding1, cityScenarioBuilding2,cityScenarioBuilding3,cityScenarioBuilding4,cityScenarioBuilding5,cityScenarioBuilding6,cityScenarioBuilding7,cityScenarioLamp],
+        SIDE_SCENARIOS:[cityScenarioTree1,cityScenarioTree2,cityScenarioTree3,cityScenarioTree4],
+        TRAFFIC:[car1, car2, car3, car4, car5],
+        OBSTACLES:[construction, trash],
+        ANIMALS:[DOG_CITY, CAPIVARA],
+        COLORS:{
+            LIGHT:	{road: '#888888', grass: '#5e5e5e', grassTextures: 0, shoulder: '#BCBCBC', lane: '#FFFFFF'},
+            DARK:	{road: '#666666', grass: '#a2a2a2', grassTextures: 1, shoulder: '#FF0000'},
+            DARKER:	{road: '#444444', grass: '#e5e5e5', grassTextures: 2, shoulder: '#BCBCBC'},
+        }
+    },
+    FARM:{
+        ROAD_TEXTURES: [images.farm_road_sprite_1, images.farm_road_sprite_2, images.farm_road_sprite_3, images.farm_road_sprite_4, images.farm_road_sprite_5],
+        SIDE_TEXTURES: [images.farm_texture_1, images.farm_texture_2, images.farm_texture_3],
+        SCENARIOS:[farmScenarioBush, farmScenarioCorn, farmScenarioFences, farmScenarioShed, farmScenarioWindmill, farmScenarioScarecrow, farmScenarioHay, farmScenarioWell],
+        SIDE_SCENARIOS:[farmScenarioRock1, farmScenarioRock2, farmScenarioTree1, farmScenarioTree2],
+        TRAFFIC:[pickup1, pickup2, pickup3, pickup4, pickup5],
+        OBSTACLES:[truck, log],
+        ANIMALS:[BULL, HORSE],
+        COLORS:{
+            LIGHT:	{road: '#888888', grass: '#48a15a', grassTextures: 0, shoulder: '#BCBCBC', lane: '#FFFFFF'},
+            DARK:	{road: '#666666', grass: '#398246', grassTextures: 1, shoulder: '#0344ce'},
+            DARKER:	{road: '#444444', grass: '#398246', grassTextures: 2, shoulder: '#BCBCBC'},
+        }
+    },
+    FOREST:{
+        ROAD_TEXTURES: [images.forest_road_sprite_1, images.forest_road_sprite_2, images.forest_road_sprite_3, images.forest_road_sprite_4, images.forest_road_sprite_5],
+        SIDE_TEXTURES: [images.forest_texture_1, images.forest_texture_2, images.forest_texture_3],
+        SCENARIOS:[forestScenarioHouse1, forestScenarioHouse2, forestScenarioHouse3, forestScenarioRock1, forestScenarioRock2, forestScenarioTree1, forestScenarioTree2, forestScenarioTree3],
+        SIDE_SCENARIOS:[forestScenarioTree4, forestScenarioRock3, forestScenarioTree5, forestScenarioTree6],
+        TRAFFIC:[jeep1, jeep2, jeep3, jeep4, jeep5],
+        OBSTACLES:[rock, tree],
+        ANIMALS:[GUARA, JAGUAR],
+        COLORS:{
+            LIGHT:	{road: '#937545', grass: '#4C8924', grassTextures: 0, shoulder: '#725e2a', lane: '#261d01'},
+            DARK:	{road: '#564428', grass: '#70c735', grassTextures: 1, shoulder: '#56da3d'},
+            DARKER:	{road: '#3d311d', grass: '#2f5d18', grassTextures: 2, shoulder: '#725e2a'},
+        }
+    },
+    BEACH:{
+        ROAD_TEXTURES: [images.beach_road_sprite_1, images.beach_road_sprite_2, images.beach_road_sprite_3, images.beach_road_sprite_4, images.beach_road_sprite_5],
+        SIDE_TEXTURES: [images.beach_texture_1, images.beach_texture_2, images.beach_texture_3],
+        SCENARIOS:[beachScenarioBar, beachScenarioBoards1, beachScenarioBoards2, beachScenarioCoral, beachScenarioParasol1, beachScenarioParasol2, beachScenarioRock1, beachScenarioRock2],
+        SIDE_SCENARIOS:[beachScenarioTree1, beachScenarioTree2, beachScenarioTree3, beachScenarioTree4],
+        TRAFFIC:[beetle1, beetle2, beetle3, beetle4, beetle5],
+        OBSTACLES:[sandCastle, iceCreamCart],
+        ANIMALS:[TURTLE, DOG_BEACH],
+        COLORS:{
+            LIGHT:	{road: '#F5D890', grass: '#F5D890', grassTextures: 0, shoulder: '#F5D890', lane: '#4b3702'},
+            DARK:	{road: '#a89263', grass: '#e1cfad', grassTextures: 1, shoulder: '#4b3702'},
+            DARKER:	{road: '#947c3b', grass: '#a9a18a', grassTextures: 2, shoulder: '#F5D890'},
+        }
+    },
+}
+
+const subBackgrounds = [images.sub_sky, images.sub_bc_1, images.sub_bc_2, images.sub_bc_3]
+const cityBackgrounds = [images.city_sky, images.city_bc_1, images.city_bc_2, images.city_bc_3]
+const farmBackgrounds = [images.farm_sky, images.farm_bc_1, images.farm_bc_2, images.farm_bc_3]
+const forestBackgrounds = [images.forest_sky, images.forest_bc_1, images.forest_bc_2, images.forest_bc_3]
+const beachBackgrounds = [images.beach_sky, images.beach_bc_1, images.beach_bc_2, images.beach_bc_3]
+
+const turboIcons = [turboIcon0, turboIcon1,turboIcon2,turboIcon3,turboIcon4,turboIcon5,turboIcon6,turboIcon7,turboIcon8,turboIcon9]
+const boltIcons = [boltIcon0, boltIcon1,boltIcon2,boltIcon3,boltIcon4,boltIcon5,boltIcon6,boltIcon7,boltIcon8,boltIcon9]
+const doubleIcons = [doubleIcon0, doubleIcon1,doubleIcon2,doubleIcon3,doubleIcon4,doubleIcon5,doubleIcon6,doubleIcon7,doubleIcon8,doubleIcon9]
+const shieldIcons = [shieldIcon0, shieldIcon1,shieldIcon2,shieldIcon3,shieldIcon4,shieldIcon5,shieldIcon6,shieldIcon7,shieldIcon8,shieldIcon9]
+
 const racers = [racerShark, racerGiraffe, racerBear, racerPolarBear, racerMonkey, racerPanda1, racerPanda2, racerPanda3]
+const billboards = [commomScenarioBillboardFiap, commomScenarioBillboardTuring, commomScenarioBillboardVacina]
 
 
 // ---------------------------------------------------------------------------------
@@ -766,3 +858,163 @@ let sounds = [
 let contextSounds = {
 }
 
+// ---------------------------------------------------------------------------------
+// Coins Patterns
+// ---------------------------------------------------------------------------------
+
+const coinPattern1 =
+        [true, false, false, false,
+        true, false, false, false,
+        true, false, false, false,
+        true, false, false, false,
+        true, false, false, false,
+        true, false, false, false,
+        true, false, false, false,
+        true, false, false, false,
+        true, false, false, false,
+        true, false, false, false,
+        true, false, false, false,
+        true, false, false, false]
+
+const coinPattern2 =
+        [false, true, false, false,
+         false, true, false, false,
+         false, true, false, false,
+         false, true, false, false,
+         false, true, false, false,
+         false, true, false, false,
+         false, true, false, false,
+         false, true, false, false,
+         false, true, false, false,
+         false, true, false, false,
+         false, true, false, false,
+         false, true, false, false]
+
+const coinPattern3 =
+        [false, false, true, false,
+         false, false, true, false,
+         false, false, true, false,
+         false, false, true, false,
+         false, false, true, false,
+         false, false, true, false,
+         false, false, true, false,
+         false, false, true, false,
+         false, false, true, false,
+         false, false, true, false,
+         false, false, true, false,
+         false, false, true, false]
+
+const coinPattern4 =
+        [false, false, false, true,
+         false, false, false, true,
+         false, false, false, true,
+         false, false, false, true,
+         false, false, false, true,
+         false, false, false, true,
+         false, false, false, true,
+         false, false, false, true,
+         false, false, false, true,
+         false, false, false, true,
+         false, false, false, true,
+         false, false, false, true]
+
+const coinPattern5 =
+        [true, false, false, false,
+         false, true, false, false,
+         false, false, true, false,
+         false, false, false, true,
+         false, false, true, false,
+         false, true, false, false,
+         true, false, false, false,
+         false, true, false, false,
+         false, false, true, false,
+         false, false, false, true,
+         false, false, true, false,
+         false, true, false, false]
+
+const coinPattern6 =
+        [true, false, false, false,
+         true, false, false, false,
+         true, false, false, false,
+         false, true, false, false,
+         false, true, false, false,
+         false, true, false, false,
+         false, false, true, false,
+         false, false, true, false,
+         false, false, true, false,
+         false, false, false, true,
+         false, false, false, true,
+         false, false, false, true]
+
+const coinPattern7 =
+        [false, false, false, true,
+         false, false, false, true,
+         false, false, false, true,
+         false, false, true, false,
+         false, false, true, false,
+         false, false, true, false,
+         false, true, false, false,
+         false, true, false, false,
+         false, true, false, false,
+         true, false, false, false,
+         true, false, false, false,
+         true, false, false, false]
+
+const coinPattern8 =
+        [false, true, true, false,
+        true, false, false, true,
+        true, false, false, true,
+        false, true, true, false,
+        false, true, true, false,
+        true, false, false, true,
+        true, false, false, true,
+        false, true, true, false,
+        false, true, true, false,
+        true, false, false, true,
+        true, false, false, true,
+        false, true, true, false]
+
+const coinPattern9 =
+        [true, false, false, true,
+        false, true, true, false,
+        false, true, true, false,
+        true, false, false, true,
+        false, true, true, false,
+        false, true, true, false,
+        true, false, false, true,
+        false, true, true, false,
+        false, true, true, false,
+        true, false, false, true,
+        false, true, true, false,
+        false, true, true, false]
+
+const coinPattern10 =
+        [true, true, true, true,
+        true, true, true, true,
+        true, true, true, true,
+        true, true, true, true,
+        true, true, true, true,
+        true, true, true, true,
+        true, true, true, true,
+        true, true, true, true,
+        true, true, true, true,
+        true, true, true, true,
+        true, true, true, true,
+        true, true, true, true]
+
+const coinPattern11 =
+    [false, false, false, false,
+        false, false, false, false,
+        false, false, false, false,
+        false, false, false, false,
+        false, false, false, false,
+        false, false, false, false,
+        false, false, false, false,
+        false, false, false, false,
+        false, false, false, false,
+        false, false, false, false,
+        false, false, false, false,
+        false, false, false, false]
+
+const coinPatterns = [coinPattern1, coinPattern2, coinPattern3, coinPattern4, coinPattern5,
+    coinPattern6, coinPattern7, coinPattern8, coinPattern9, coinPattern10, coinPattern11]

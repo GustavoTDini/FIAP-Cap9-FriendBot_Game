@@ -2,157 +2,168 @@ class UI {
 
     constructor(game){
         this.game = game
+        this.timer = 0
+        this.ticker = 0
+        this.score = new CanvasText( 160, 100, game.player.score, 45 , "#00712f")
+        this.coins = new CanvasText( CANVAS_WIDTH - 165, 100, game.player.coins, 45 , "#fd6601")
     }
 
     renderGameUI(ctx){
         let player = this.game.player
-        let separatedScore = extractDigits(Math.floor(player.score))
-        ctx.drawImage(...UIPanel, 10, 50, 300, 100)
-        ctx.drawImage(...UIScore, 80, 10, 160, UI_SPRITE_SIZE)
-        this.drawScore(separatedScore, 240, 70, ctx)
-        let separatedCoins = extractDigits(player.coins)
-        ctx.drawImage(...UIPanel, 970, 50, 300, 100)
-        ctx.drawImage(...UIStar, 1095, 10, UI_SPRITE_SIZE, UI_SPRITE_SIZE)
-        this.drawScore(separatedCoins, 1200, 70, ctx)
+        ctx.drawImage(...UIScore, 0, 10, 180, 100)
+        this.score.render(ctx)
+        ctx.drawImage(...UIStar, CANVAS_WIDTH-180, 10, 180, 100)
+        this.coins.render(ctx)
+        this.drawFuel(ctx)
+        if (this.game.settings.controls){
+            ctx.drawImage(...UIPauseButton, 200, 10, 100, 100)
+            ctx.drawImage(...UILeftButton, 10, CANVAS_HEIGHT-130, 120, 120)
+            ctx.drawImage(...UIRightButton, CANVAS_WIDTH-130, CANVAS_HEIGHT-130, 120, 120)
+            ctx.drawImage(...UIJumpButton, CANVAS_WIDTH-130, CANVAS_HEIGHT-260, 120, 120)
+        }
+        this.renderPowerUpIcons(player, TURBO, ctx)
+        this.renderPowerUpIcons(player, BOLT, ctx)
+        this.renderPowerUpIcons(player, DOUBLE, ctx)
+        this.renderPowerUpIcons(player, SHIELD, ctx)
     }
 
     renderPauseUI(ctx){
-        ctx.drawImage(...UIPause, CANVAS_CENTER_X - UI_SPRITE_SIZE, CANVAS_CENTER_Y - UI_SPRITE_SIZE, 2*UI_SPRITE_SIZE, 2*UI_SPRITE_SIZE)
+        ctx.drawImage(...UIPause, CANVAS_CENTER_X - 350, CANVAS_CENTER_Y - 200, 700, 400)
+        ctx.drawImage(...UIResume, CANVAS_CENTER_X - 100, CANVAS_CENTER_Y - 80, 200, 200)
+        ctx.drawImage(...UIHomeOff, CANVAS_CENTER_X - 250, CANVAS_CENTER_Y -20, 100, 100)
+        ctx.drawImage(...UIConfigOff, CANVAS_CENTER_X + 150, CANVAS_CENTER_Y-20, 100, 100)
+    }
+
+    renderConfigUI(ctx){
+        ctx.drawImage(...UIPause, CANVAS_CENTER_X - 350, CANVAS_CENTER_Y - 200, 700, 400)
+        ctx.drawImage(...UIMusic, CANVAS_CENTER_X - 260, CANVAS_CENTER_Y - 60, 100, 100)
+        ctx.drawImage(...this.game.settings.music? UISelectorOn: UISelectorOff, CANVAS_CENTER_X - 270, CANVAS_CENTER_Y, 100, 100)
+        ctx.drawImage(...UISound, CANVAS_CENTER_X - 120, CANVAS_CENTER_Y - 60, 100, 100)
+        ctx.drawImage(...this.game.settings.sounds? UISelectorOn: UISelectorOff, CANVAS_CENTER_X - 130, CANVAS_CENTER_Y, 100, 100)
+        ctx.drawImage(...UIControl, CANVAS_CENTER_X + 20, CANVAS_CENTER_Y - 60, 100, 100)
+        ctx.drawImage(...this.game.settings.controls? UISelectorOn: UISelectorOff, CANVAS_CENTER_X + 10, CANVAS_CENTER_Y, 100, 100)
+        ctx.drawImage(...UI3d, CANVAS_CENTER_X + 160, CANVAS_CENTER_Y - 60, 100, 100)
+        ctx.drawImage(...this.game.settings.threeD? UISelectorOn: UISelectorOff, CANVAS_CENTER_X + 150, CANVAS_CENTER_Y, 100, 100)
+        ctx.drawImage(...UIReturnOff, CANVAS_CENTER_X - 70, CANVAS_CENTER_Y + 75, 100, 100)
     }
 
     renderGameOverUI(ctx){
-        let player = this.game.player
-        ctx.drawImage(...UIWindow, CANVAS_CENTER_X - 150, CANVAS_CENTER_Y - 168, 300, 336)
-        ctx.drawImage(...UIScore, CANVAS_CENTER_X-110, CANVAS_CENTER_Y - 160, 220, UI_SPRITE_SIZE)
-        failSound.play()
-        this.drawStars(Math.floor(player.score), ctx)
-
-
+        ctx.drawImage(...UIGameOver, CANVAS_CENTER_X - 350, CANVAS_CENTER_Y - 150, 700, 300)
+        ctx.drawImage(...UIReturn, CANVAS_CENTER_X - 100, CANVAS_CENTER_Y-55, 200, 200)
     }
 
-    drawScore(score, initialX, initialY, ctx){
-        for (let i = 0; i < score.length; i++){
-            let sprite = numbers[score[i]]
-            ctx.drawImage(...sprite, initialX-UI_SPRITE_SIZE*i, initialY, UI_SPRITE_SIZE, UI_SPRITE_SIZE)
+    drawFuel(ctx){
+        let fuel = this.game.player.fuel
+        ctx.fillStyle = "#ff5a0a"
+        let height = fuel*1.95
+
+        ctx.fillRect(CANVAS_WIDTH - 70, 220, 40, height)
+        ctx.drawImage(...UIFuel, CANVAS_WIDTH-110, 120, 100, 300)
+        if (fuel < 20){
+            if (this.ticker%2 === 0){
+                ctx.drawImage(...UIRedFuel, CANVAS_WIDTH-92, 134, 63, 69)
+            }
         }
     }
 
-    drawStars(score, ctx){
-        let player = this.game.player
-        let starScore = DIFFICULTIES_SETS[player.difficulty].STARS_SCORES
-        let stars = starScore.map(x => score > x)
-        ctx.drawImage(...(stars[0] === true? UIFullStar:UIEmptyStar), CANVAS_CENTER_X - 120 , CANVAS_CENTER_Y-50, UI_SPRITE_SIZE*1.6, UI_SPRITE_SIZE*1.6)
-        ctx.drawImage(...(stars[1] === true? UIFullStar:UIEmptyStar), CANVAS_CENTER_X - 40, CANVAS_CENTER_Y-75, UI_SPRITE_SIZE*1.6, UI_SPRITE_SIZE*1.6)
-        ctx.drawImage(...(stars[2] === true? UIFullStar:UIEmptyStar), CANVAS_CENTER_X + 40 , CANVAS_CENTER_Y-50, UI_SPRITE_SIZE*1.6, UI_SPRITE_SIZE*1.6)
-        ctx.drawImage(...UIReturnButton, CANVAS_CENTER_X - 120, CANVAS_CENTER_Y +103, UI_SPRITE_SIZE, UI_SPRITE_SIZE)
-        ctx.drawImage(...UICloseButton, CANVAS_CENTER_X + 70, CANVAS_CENTER_Y +103, UI_SPRITE_SIZE, UI_SPRITE_SIZE)
+    update(){
+        this.timer++
+        if (this.timer > 15){
+            this.ticker++
+            this.timer = 0
+        }
+        this.score.update(Math.floor(this.game.player.score), true)
+        this.coins.update(Math.floor(this.game.player.coins), false)
     }
 
-
+    renderPowerUpIcons(player, type, ctx){
+        let icons = null
+        let powerUpCounter = null
+        let height = null
+        switch (type){
+            case (TURBO):
+                icons = turboIcons
+                powerUpCounter = player.turbo
+                height = 100
+                break;
+            case (BOLT):
+                icons = boltIcons
+                powerUpCounter = player.transparent
+                height = 210
+                break;
+            case (DOUBLE):
+                icons = doubleIcons
+                powerUpCounter = player.double
+                height = 320
+                break;
+            case (SHIELD):
+                icons = shieldIcons
+                powerUpCounter = player.shield
+                height = 430
+                break;
+        }
+        if (powerUpCounter > 0){
+            if (powerUpCounter >= 270){
+                ctx.drawImage(...icons[0], 10, height, 100, 100)
+            }
+            if (powerUpCounter >= 240 && powerUpCounter < 270){
+                ctx.drawImage(...icons[1], 10, height, 100, 100)
+            }
+            if (powerUpCounter >= 210 && powerUpCounter < 240){
+                ctx.drawImage(...icons[2], 10, height, 100, 100)
+            }
+            if (powerUpCounter >= 180 && powerUpCounter < 210){
+                ctx.drawImage(...icons[3], 10, height, 100, 100)
+            }
+            if (powerUpCounter >= 150 && powerUpCounter < 180){
+                ctx.drawImage(...icons[4], 10, height, 100, 100)
+            }
+            if (powerUpCounter >= 120 && powerUpCounter < 150){
+                ctx.drawImage(...icons[5], 10, height, 100, 100)
+            }
+            if (powerUpCounter >= 90 && powerUpCounter < 120){
+                ctx.drawImage(...icons[6], 10, height, 100, 100)
+            }
+            if (powerUpCounter >= 60 && powerUpCounter < 90){
+                ctx.drawImage(...icons[7], 10, height, 100, 100)
+            }
+            if (powerUpCounter >= 30 && powerUpCounter < 60){
+                ctx.drawImage(...icons[8], 10, height, 100, 100)
+            }
+            if (powerUpCounter < 30){
+                ctx.drawImage(...icons[9], 10, height, 100, 100)
+            }
+        }
 
 }
 
 
 
+}
 
+//Classe com o texto para os Escores e Moedas
+class CanvasText {
+    constructor(x, y, text, size, color) {
+        this.x = x;
+        this.y = y;
+        this.text = text;
+        this.size = size
+        this.color = color
+    }
 
+    render(ctx) {
+        ctx.font = this.size + "px trebuchet MS";
+        ctx.fillStyle = "black"
+        ctx.strokeStyle = this.color
+        ctx.fillText(this.text, this.x, this.y);
+        ctx.strokeText(this.text, this.x, this.y);
+    }
 
-// Se For utilizar texto no jogo, já tem uma classe pronta
-// class CanvasText {
-//     constructor(x, y, text, type) {
-//         this.x = x;
-//         this.y = y;
-//         this.text = text;
-//         this.time = TEXT_TIME_START;
-//         this.type = type
-//         this.textChanger = 5
-//         this.xText = 0
-//         this.yText = 0;
-//         this.fontSize = 15;
-//         this.currentChar = 1;
-//     }
-//
-//     // de acordo com o tipo de texto é definido uma renderização e um update
-//     render(ctx) {
-//         switch (this.type) {
-//             case(PLAIN_TEXT):
-//                 ctx.font = "25px verdana";
-//                 ctx.fillStyle = "red"
-//                 ctx.strokeStyle = "white"
-//                 this.x = 20;
-//                 this.y = 40;
-//                 ctx.fillText(this.text, this.x, this.y);
-//                 ctx.strokeText(this.text, this.x, this.y);
-//                 break;
-//             case (PENALTY_TEXT):
-//                 ctx.font = "35px verdana";
-//                 if (this.textChanger % 2 === 0) {
-//                     ctx.fillStyle = "black"
-//                 } else {
-//                     ctx.fillStyle = "white"
-//                 }
-//                 ctx.strokeStyle = "red"
-//                 ctx.lineWidth = 2;
-//                 this.xText = this.x + (ctx.measureText(this.text).width / 3);
-//                 this.yText = this.y + (SPRITE_SIZE * 1.2);
-//                 ctx.fillText(this.text, this.xText, this.yText);
-//                 ctx.strokeText(this.text, this.xText, this.yText);
-//                 break;
-//             case (STAGE_TEXT):
-//                 ctx.font = this.fontSize + "px verdana";
-//                 ctx.lineWidth = 2;
-//                 ctx.fillStyle = "white"
-//                 ctx.strokeStyle = "white"
-//                 ctx.textBaseline = "top"
-//                 this.xText = this.x - (ctx.measureText(this.text).width / 2);
-//                 this.yText = this.y - (ctx.measureText('M').width / 8);
-//                 ctx.fillText(this.text, this.xText, this.yText);
-//                 ctx.strokeText(this.text, this.xText, this.yText);
-//                 break;
-//             case (FULL_TEXT):
-//                 ctx.font = "70px verdana";
-//                 ctx.lineWidth = 1;
-//                 ctx.fillStyle = "black"
-//                 ctx.strokeStyle = "white"
-//                 ctx.textBaseline = "top"
-//                 this.xText = this.x - (ctx.measureText(this.text).width / 2);
-//                 this.yText = this.y - (ctx.measureText('M').width / 8);
-//                 ctx.fillText(this.text.substring(0, this.currentChar), this.xText, this.yText);
-//                 ctx.strokeText(this.text.substring(0, this.currentChar), this.xText, this.yText);
-//                 break;
-//         }
-//     }
-//
-//     update() {
-//         switch (this.type) {
-//             case(PLAIN_TEXT):
-//                 this.text = "Score: " + score
-//                 break;
-//             case (PENALTY_TEXT):
-//                 this.y--;
-//                 this.time -= 2;
-//                 if (this.time % 10 === 0) {
-//                     this.textChanger--;
-//                 }
-//                 break;
-//             case (STAGE_TEXT):
-//                 this.time--;
-//                 if (this.time % 2 === 0) {
-//                     this.fontSize++;
-//                 }
-//                 break;
-//             case (FULL_TEXT):
-//                 if (this.time > 1) {
-//                     this.time--
-//                     if (this.time % 10 === 0 && this.currentChar < this.text.length) {
-//                         this.currentChar++;
-//                     }
-//                 }
-//                 break;
-//
-//         }
-//         if (this.time < 0) {
-//             this.time = 0
-//         }
-//     }
-// }
+    update(newText, correction) {
+        this.text = newText
+        if (correction){
+            this.x = 160 - (newText.toString().length*22)
+        }
+
+    }
+}

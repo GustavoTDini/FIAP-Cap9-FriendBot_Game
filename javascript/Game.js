@@ -7,7 +7,10 @@ class Game {
         this.road = null;
         this.UI = null
         this.background = null;
+        this.settings = null
         this.playingMusic = false;
+        this.currentStage = FOREST
+        this.nextStage = BEACH
 
     }
 
@@ -28,6 +31,9 @@ class Game {
             case PAUSE_STATE:
                 game.UI.renderPauseUI(ctx)
                 break;
+            case CONFIG_STATE:
+                game.UI.renderConfigUI(ctx)
+                break;
             case GAME_OVER_STATE:
                 //TODO - programar o gameOver e Start
                 game.UI.renderGameOverUI(ctx)
@@ -39,6 +45,7 @@ class Game {
     update(game, dt, difficulty, playerColor, audioCtx) {
         switch(game.gameState){
             case LOADING_STATE:
+                game.settings = new Settings()
                 game.gameCamera = new Camera(game);
                 game.road = new Road(game)
                 game.player = new Player(game, playerColor, difficulty)
@@ -49,7 +56,7 @@ class Game {
                 game.gameState = SET_STATE;
                 break;
             case SET_STATE:
-                game.road.createRoad()
+                game.road.roadConstructor.createRoad()
                 game.player.reset()
                 game.gameState = PLAY_STATE;
                 break;
@@ -58,11 +65,14 @@ class Game {
                 game.road.update(dt)
                 game.gameCamera.update(dt)
                 game.background.update(dt)
-                if (game.playingMusic === false){
+                game.UI.update()
+                if (game.playingMusic === false && game.settings.music){
                     game.playingMusic = playMusic(contextSounds["passing_breeze"], audioCtx)
                 }
                 break;
             case PAUSE_STATE:
+                break;
+            case CONFIG_STATE:
                 break;
             case GAME_OVER_STATE:
                 break;
