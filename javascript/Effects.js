@@ -14,8 +14,116 @@ class Effects{
         get_ready9, get_ready10,get_ready11, get_ready12, get_ready13, get_ready14, get_ready15, get_ready16, get_ready17,
         get_ready18, get_ready19, get_ready20, get_ready21, get_ready22, get_ready23, get_ready24, get_ready25, get_ready26,
         get_ready27, get_ready28, get_ready29, get_ready30, get_ready31,get_ready32, get_ready33, get_ready34, get_ready35]
+    frame = 0
 
 
-    constructor() {
+    constructor(effectType, x, y) {
+        this.effectType = effectType
+        this.x = x
+        this.y = y
+        this.sprites = null
+        this.spritesSize = null
+        this.sprite = 0
+        this.loop = null
+        this.play = false
+        this.width = 64
+        this.height = 64
+        this.setEffects()
     }
+
+    update(dt){
+        this.setSprite()
+    }
+
+    render(ctx){
+        if (this.sprite < this.spritesSize){
+            ctx.drawImage(...this.sprites[this.sprite], this.x, this.y, this.width, this.height)
+        }
+    }
+
+    setPlay(){
+        this.play = true
+        this.sprite = 0
+    }
+
+    setStop(){
+        this.play = false
+    }
+
+    setXY(x, y){
+        this.x = x
+        this.y = y
+    }
+
+    setSprite() {
+        if (this.play){
+            let MAX_FRAMES = 1;
+            this.frame++;
+            if (this.frame > MAX_FRAMES) {
+                this.frame = 0;
+                if (this.sprite === this.spritesSize - 1 && !this.loop) {
+                    return
+                } else {
+                    this.sprite++;
+                }
+                if (this.sprite > this.spritesSize && this.loop) {
+                    this.sprite = 0;
+                }
+
+            }
+        }
+    }
+
+    setEffects(){
+        switch (this.effectType){
+            case (STAR):
+                this.sprites = this.starSprites
+                this.loop = true
+                this.width = 64
+                this.height = 32
+                break
+            case (EXPLOSION):
+                this.sprites = this.explosionSprites
+                this.loop = false
+                this.width = 256
+                this.height = 256
+                break
+            case (TURBO_EFFECT):
+                this.sprites = this.turboSprites
+                this.loop = true
+                break
+            case (FIRE):
+                this.sprites = this.fireSprites
+                this.loop = true
+                break
+            case (SHIELD_EFFECT):
+                this.sprites = this.shieldSprites
+                this.loop = true
+                this.width = 180
+                this.height = 180
+                break
+            case (GLITTER):
+                this.sprites = this.glitterSprites
+                this.loop = true
+                this.width = 128
+                this.height = 128
+                break
+            case (GAME_OVER):
+                this.sprites = this.gameOverSprites
+                this.loop = false
+                this.width = 675
+                this.height = 150
+                break
+            case (GET_READY):
+                this.sprites = this.getReadySprites
+                this.loop = false
+                this.width = 675
+                this.height = 150
+                break
+
+        }
+        this.spritesSize = this.sprites.length
+    }
+
+
 }

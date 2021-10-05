@@ -33,7 +33,7 @@ class Segment {
     }
 
     addScenarios(){
-        const sidePlaces = [-6, -4.5, -3, 3 , 4.5, 6]
+        const sidePlaces = [-9, -6, -4.5, -3, 3 , 4.5, 6, 9]
         const sideRoad = [-1.5, 1.5]
         let objects = []
         for (let places in sidePlaces){

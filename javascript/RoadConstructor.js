@@ -233,7 +233,7 @@ class RoadConstructor {
             let roadLane = ROAD_LANES[randomIntFromInterval(0,3)]
             let trafficColor = Math.floor(Math.random() * 5)
             let sprite = stageObjects[startSegment.stage].TRAFFIC[trafficColor]
-            this.road.totalTraffic.push(new Traffic(sprite, roadLane, y,  z, SPRITE_SIZE*2, this.road))
+            this.road.totalTraffic.push(new Traffic(sprite, roadLane, y,  z, SPRITE_SIZE, this.road))
         }
     }
 
@@ -248,7 +248,7 @@ class RoadConstructor {
                 let z = this.road.segments[segment].worldPoints.z
                 let y = this.road.segments[segment].worldPoints.y+100
                 let roadLaneX = ROAD_LANES[roadLane]
-                currentPattern[i] && this.road.totalCoins.push(new Coins(coin1, roadLaneX, y, z, SPRITE_SIZE*0.7, this.road))
+                currentPattern[i] && this.road.totalCoins.push(new Coins(coin1, roadLaneX, y, z, SPRITE_SIZE, this.road))
                 roadLane++
                 if (roadLane > 3){
                     roadLane = 0
@@ -270,7 +270,7 @@ class RoadConstructor {
     }
 
     addPowerUps(start, finish){
-        for (let n = 0; n < 10 ; n++){
+        for (let n = 0; n < 50 ; n++){
             let startSegment = this.road.segments[randomIntFromInterval(start, finish)]
             let z = startSegment.worldPoints.z
             let roadLane = ROAD_LANES[randomIntFromInterval(0,3)]

@@ -270,26 +270,26 @@ class Obstacles extends RoadObjects{
 // Classe com os atributos de cada segmento da estrada a serem renderizados
 class Animals extends RoadObjects{
 
-    guaraSpritesLeft = [guara1Left, guara2Left, guara3Left, guara4Left]
-    guaraSpritesRight = [guara1Right, guara2Right, guara3Right, guara4Right]
-    jaguarSpritesLeft = [jaguar1Left, jaguar2Left, jaguar3Left, jaguar4Left]
-    jaguarSpritesRight = [jaguar1Right, jaguar2Right, jaguar3Right, jaguar4Right]
-    turtleSpritesLeft = [turtle1Left, turtle2Left, turtle3Left, turtle4Left]
-    turtleSpritesRight = [turtle1Right, turtle2Right, turtle3Right, turtle4Right]
-    beachDogSpritesLeft = [beachDog1Left, beachDog2Left, beachDog3Left, beachDog4Left]
-    beachDogSpritesRight = [beachDog1Right, beachDog2Right, beachDog3Right, beachDog4Right]
-    suburbDogSpritesLeft = [suburbDog1Left, suburbDog2Left, suburbDog3Left, suburbDog4Left]
-    suburbDogSpritesRight = [suburbDog1Right, suburbDog2Right, suburbDog3Right, suburbDog4Right]
-    catSpritesLeft = [cat1Left, cat2Left, cat3Left, cat4Left]
-    catSpritesRight = [cat1Right, cat2Right, cat3Right, cat4Right]
-    bullSpritesLeft = [bull1Left, bull2Left, bull3Left, bull4Left]
-    bullSpritesRight = [bull1Right, bull2Right, bull3Right, bull4Right]
-    horseSpritesLeft = [horse1Left, horse2Left, horse3Left, horse4Left]
-    horseSpritesRight = [horse1Right, horse2Right, horse3Right, horse4Right]
-    cityDogSpritesLeft = [cityDog1Left, cityDog2Left, cityDog3Left, cityDog4Left]
-    cityDogSpritesRight = [cityDog1Right, cityDog2Right, cityDog3Right, cityDog4Right]
-    capivaraSpritesLeft = [capivara1Left, capivara2Left, capivara3Left, capivara4Left]
-    capivaraSpritesRight = [capivara1Right, capivara2Right, capivara3Right, capivara4Right]
+    guaraSpritesLeft = [guara1Left, guara2Left, guara3Left, guara4Left, guaraStopped]
+    guaraSpritesRight = [guara1Right, guara2Right, guara3Right, guara4Right, guaraStopped]
+    jaguarSpritesLeft = [jaguar1Left, jaguar2Left, jaguar3Left, jaguar4Left, jaguarStopped]
+    jaguarSpritesRight = [jaguar1Right, jaguar2Right, jaguar3Right, jaguar4Right, jaguarStopped]
+    turtleSpritesLeft = [turtle1Left, turtle2Left, turtle3Left, turtle4Left, turtleStopped]
+    turtleSpritesRight = [turtle1Right, turtle2Right, turtle3Right, turtle4Right, turtleStopped]
+    beachDogSpritesLeft = [beachDog1Left, beachDog2Left, beachDog3Left, beachDog4Left, beachDogStopped]
+    beachDogSpritesRight = [beachDog1Right, beachDog2Right, beachDog3Right, beachDog4Right, beachDogStopped]
+    suburbDogSpritesLeft = [suburbDog1Left, suburbDog2Left, suburbDog3Left, suburbDog4Left, suburbDogStopped]
+    suburbDogSpritesRight = [suburbDog1Right, suburbDog2Right, suburbDog3Right, suburbDog4Right, suburbDogStopped]
+    catSpritesLeft = [cat1Left, cat2Left, cat3Left, cat4Left, catStopped]
+    catSpritesRight = [cat1Right, cat2Right, cat3Right, cat4Right, catStopped]
+    bullSpritesLeft = [bull1Left, bull2Left, bull3Left, bull4Left, bullStopped]
+    bullSpritesRight = [bull1Right, bull2Right, bull3Right, bull4Right, bullStopped]
+    horseSpritesLeft = [horse1Left, horse2Left, horse3Left, horse4Left, horseStopped]
+    horseSpritesRight = [horse1Right, horse2Right, horse3Right, horse4Right, horseStopped]
+    cityDogSpritesLeft = [cityDog1Left, cityDog2Left, cityDog3Left, cityDog4Left, cityDogStopped]
+    cityDogSpritesRight = [cityDog1Right, cityDog2Right, cityDog3Right, cityDog4Right, cityDogStopped]
+    capivaraSpritesLeft = [capivara1Left, capivara2Left, capivara3Left, capivara4Left, capivaraStopped]
+    capivaraSpritesRight = [capivara1Right, capivara2Right, capivara3Right, capivara4Right, capivaraStopped]
     frame = 0;
     currentSprite = 0;
     hit = false
@@ -299,7 +299,6 @@ class Animals extends RoadObjects{
     constructor(sprite, x, y, z, spriteSize, road, type) {
         super(sprite, x, y, z, spriteSize, road);
         this.type = type
-        console.log(type)
         this.sprites = this.setAnimalType(type)
         this.sprite = this.sprites[0]
         this.speed = this.setSpeed()
@@ -341,8 +340,13 @@ class Animals extends RoadObjects{
 
     update(dt) {
         super.update(dt);
-        this.walkAndReturn()
-        this.animateWalking()
+        if (!this.hit){
+            this.walkAndReturn()
+            this.animateWalking()
+        } else if (this.hit){
+            this.speed = 0
+            this.sprite = this.sprites[4]
+        }
     }
 
     setSpeed(){
@@ -363,8 +367,6 @@ class Animals extends RoadObjects{
     }
 
     setAnimalType(){
-        console.log(this.type)
-        console.log(this.road.game.currentStage)
         switch (this.road.game.currentStage) {
             case (SUBURB):
                 if (this.type === 0 ){

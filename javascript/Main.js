@@ -21,7 +21,7 @@ window.onload = async function () {
             playerColor: GREEN,
             difficulty: HARD
         })
-    }, 2000)
+    }, 3000)
 
 }
 
