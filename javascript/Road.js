@@ -25,7 +25,7 @@ class Road {
         let basePercent   = percentageLeft(gameCamera.z, SEGMENT_LENGTH);
         let x  = 0;
         let dx = - (baseSegment.curve * basePercent);
-        let maxBottomLine        = CANVAS_HEIGHT;
+        let maxBottomLine  = CANVAS_HEIGHT;
 
         for (let n=0; n<gameCamera.drawDistance; n++){
             // get the current segment
@@ -66,7 +66,11 @@ class Road {
             let maxBottomLine = CANVAS_HEIGHT;
             for (let j=0; j<n; j++){
                 let maxLineIndex = (baseSegmentIndex + n) % this.totalSegments;
-                maxBottomLine = Math.min(maxBottomLine, this.segments[maxLineIndex].maxHeight)
+                let maxHeight = this.segments[maxLineIndex].maxHeight
+                if (maxHeight > 0){
+                    maxBottomLine = Math.min(maxBottomLine, maxHeight)
+                }
+
             }
             for(let i = 0 ; i < currSegment.roadSideObjects.length ; i++) {
                 currSegment.roadSideObjects[i].render(ctx, maxBottomLine)
@@ -74,9 +78,7 @@ class Road {
             for(let j = 0 ; j < currSegment.inRoadObjects.length ; j++) {
                 currSegment.inRoadObjects[j].render(ctx, maxBottomLine)
             }
-
         }
-
     }
 
     update(dt) {
@@ -130,7 +132,21 @@ class Road {
             fuelSegment.inRoadObjects.push(this.totalFuel[i])
             this.totalFuel[i].update(dt)
         }
-        this.roadConstructor.addMoreRoad()
+        if (player.currentSegment.index > this.game.decideSegment && !player.changingStage){
+            player.changingStage = true
+            if (player.currentLane === 0 || player.currentLane === 1){
+                this.game.nextStage = this.game.nextLeft
+            } else if (player.currentLane === 2 || player.currentLane === 3){
+                this.game.nextStage = this.game.nextRight
+            }
+            this.roadConstructor.yRoadSegment()
+        }
+        if (player.currentSegment.index > this.game.newStageSegment && player.changingStage){
+            player.changingStage = false
+            this.game.currentStage = this.game.nextStage
+            this.roadConstructor.newStageSegment()
+        }
+
     }
 
     findSegment(z) {

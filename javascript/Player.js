@@ -9,7 +9,6 @@ class Player {
     MAX_EVENTS_COUNTER = 180;
     MAX_FUEL = 100;
     currentSprite = 0
-    frame = 0
 
     constructor(game, color, difficulty) {
         this.game = game;
@@ -19,7 +18,7 @@ class Player {
         this.z = 0;
         this.w = 0.3;
         this.color = color
-        this.fuel = 10;
+        this.fuel = this.MAX_FUEL;
         this.sprites = null
         this.screen = {x:0, y:0, w:0, h:0}
         this.speed = 0;
@@ -53,7 +52,9 @@ class Player {
         this.explosionEffect = new Effects(EXPLOSION, this.screen.x, this.screen.y)
         this.shieldEffect = new Effects(SHIELD_EFFECT, this.screen.x, this.screen.y)
         this.starEffect = new Effects(STAR, this.screen.x, this.screen.y)
+        this.gotEffect = new Effects(GOT_ITEM, this.screen.x, this.screen.y)
         this.turboEffectCorrector = 0
+        this.changingStage = false
 
     }
 
@@ -89,6 +90,7 @@ class Player {
         this.gameOverEffect.update()
         this.shieldEffect.update()
         this.starEffect.update()
+        this.gotEffect.update()
     }
 
     startCountDown(){
@@ -141,9 +143,9 @@ class Player {
             }
             if (this.startCounter < 20 && this.startCounter > 0){
                 if (this.startCounter %2 === 0){
-                    ctx.drawImage(...go1, CANVAS_CENTER_X - 350, CANVAS_CENTER_Y - 300, 700, 100)
+                    ctx.drawImage(...go1, CANVAS_CENTER_X - 350, CANVAS_CENTER_Y - 220, 700, 100)
                 } else {
-                    ctx.drawImage(...go2, CANVAS_CENTER_X - 350, CANVAS_CENTER_Y - 300, 700, 100)
+                    ctx.drawImage(...go2, CANVAS_CENTER_X - 350, CANVAS_CENTER_Y - 220, 700, 100)
                 }
             }
         }
@@ -153,7 +155,15 @@ class Player {
     gameOverCountDown(){
         if (this.gameOver){
             this.gameOverCounter--
-            console.log(this.gameOverCounter)
+            if (this.gameOverCounter === 179){
+                this.ySpeed = -18
+            }
+            this.screen.y += this.ySpeed
+            this.ySpeed += this.gravity
+            if (this.screen.y < CANVAS_HEIGHT - this.screen.h){
+                this.ySpeed = 0;
+                this.y = this.currentSegment.worldPoints.y
+            }
             if (!this.gameOverEffect.play){
                 this.gameOverEffect.setPlay()
             }
@@ -174,13 +184,11 @@ class Player {
     gameOverRender(ctx){
         if (this.gameOver){
             this.gameOverEffect.render(ctx)
-            if (this.fuel !== 0){
+            if (this.fuel > 0){
                 this.explosionEffect.render(ctx)
             }
-
         }
     }
-
 
     setSpritesColor(color){
         switch (color){
@@ -201,19 +209,28 @@ class Player {
         }
     }
 
-    // função para definir uma colisão entre o jogador e outro elemento
-    isColliding(entity) {
-        return (((this.mask.x + this.mask.w) > entity.mask.x
-                && (this.mask.x) < (entity.mask.x + entity.mask.w))
-            && ((this.mask.z + this.mask.s) > entity.mask.z
-                && (this.mask.z) < (entity.mask.z + entity.mask.s)
-            ) && !this.over)
+    //função para definir uma colisão entre o jogador e outro elemento
+    isColliding(object) {
+        let thisX = this.mask.x
+        let objectX = object.mask.x
+        let thisZ = this.mask.z
+        let objectZ = object.mask.z
+        let thisWidth = this.mask.w
+        let objectWidth = object.mask.w
+        let thisSize = this.mask.s
+        let objectSize = object.mask.s
+        return ((thisX < objectX + objectWidth) &&
+            (thisX + thisWidth > objectX) &&
+            (thisZ < objectZ + objectSize) &&
+            (thisZ + thisSize > objectZ) && !this.over)
     }
 
     checkCollidingCoins(audioCtx){
         for (let n = 0; n < this.game.road.totalCoins.length; n++){
             if (this.isColliding(this.game.road.totalCoins[n])){
                 this.game.road.totalCoins.splice(n, 1)
+                this.gotEffect.setXY(this.screen.x, this.screen.y - 64)
+                this.gotEffect.setPlay()
                 this.coins++
                 this.score++
                 if (this.double > 0){
@@ -229,6 +246,8 @@ class Player {
         for (let n = 0; n < this.game.road.totalFuel.length; n++){
             if (this.isColliding(this.game.road.totalFuel[n])){
                 this.game.road.totalFuel.splice(n, 1)
+                this.gotEffect.setXY(this.screen.x, this.screen.y -64)
+                this.gotEffect.setPlay()
                 this.fuel = this.MAX_FUEL
                 playTrack(contextSounds["coin"], audioCtx)
             }
@@ -239,6 +258,8 @@ class Player {
         //TODO - Falta a funcionalidade do escudo
         for (let n = 0; n < this.game.road.powerUps.length; n++){
             if (this.isColliding(this.game.road.powerUps[n])){
+                this.gotEffect.setXY(this.screen.x, this.screen.y -64)
+                this.gotEffect.setPlay()
                 switch (this.game.road.powerUps[n].type){
                     case (TURBO):
                         this.turbo = this.MAX_POWER_UP_COUNTER
@@ -265,6 +286,7 @@ class Player {
                         this.shieldEffect.setPlay()
                         break;
                 }
+                this.game.road.powerUps.splice(n, 1)
             }
         }
     }
@@ -284,26 +306,26 @@ class Player {
     checkCollidingGameOver(audioCtx){
         for (let n = 0; n < this.game.road.totalTraffic.length; n++){
             if (this.isColliding(this.game.road.totalTraffic[n]) && this.transparent  === 0 && !this.gameOver){
-                this.setGameOverStatus()
+                this.setGameOverStatus(this.game.road.totalTraffic[n].z)
                 playTrack(contextSounds["hit"], audioCtx)
             }
         }
         for (let n = 0; n < this.game.road.totalCars.length; n++){
             if (this.isColliding(this.game.road.totalCars[n]) && this.transparent  === 0 && !this.gameOver){
-                this.setGameOverStatus()
+                this.setGameOverStatus(this.game.road.totalCars[n].z)
                 playTrack(contextSounds["hit"], audioCtx)
             }
         }
         for (let n = 0; n < this.game.road.obstacles.length; n++){
             if (this.isColliding(this.game.road.obstacles[n]) && this.transparent === 0 && !this.gameOver){
-                this.setGameOverStatus()
+                this.setGameOverStatus(this.game.road.obstacles[n].z)
                 playTrack(contextSounds["hit"], audioCtx)
             }
         }
         for (let n = 0; n < this.game.road.animals.length; n++){
             if (this.isColliding(this.game.road.animals[n]) && this.transparent === 0 && !this.gameOver){
                 this.game.road.animals[n].hit = true
-                this.setGameOverStatus()
+                this.setGameOverStatus(this.game.road.animals[n].z)
                 playTrack(contextSounds["hit"], audioCtx)
 
             }
@@ -312,25 +334,24 @@ class Player {
 
 
     update(dt, audioCtx) {
-        let road = this.game.road
+        let MAX_SPRITES = 2;
+        this.setMask(dt)
+
         this.z += this.speed*dt
-        if (this.speed > 0){
-            this.fuel -= dt*15
-        }
-        if (this.fuel === 0 && !this.gameOver){
+        // if (this.speed > 0 && this.turbo === 0 && !this.changingStage){
+        //     this.fuel -= dt*this.speed/(1000*this.difficulty.GAS_CORRECTION)
+        // }
+        if (this.fuel < 0 && !this.gameOver){
             this.setGameOverStatus()
-
-        }
-        if (this.speed < this.currentSpeed && this.turbo === 0){
-            this.speed += this.acceleration
         }
 
-        if (this.z >= road.roadLength){
-            this.z -= road.roadLength
-        }
         if (this.game.road.findSegment(this.z) !== this.currentSegment){
             this.segmentCounter++
             this.currentSegment = this.game.road.findSegment(Math.floor(this.z))
+            this.currentSprite++;
+            if (this.currentSprite > MAX_SPRITES) {
+                this.currentSprite = 0;
+            }
         }
         if (this.segmentCounter === 1000){
             this.speed +=MAX_SPEED/20
@@ -338,7 +359,6 @@ class Player {
                 this.speed = this.difficulty.MAX_SPEED
             }
             this.segmentCounter = 0;
-
         }
         if (!this.start && !this.gameOver){
             this.score +=(dt*24)
@@ -347,16 +367,14 @@ class Player {
         this.updateEffects()
         this.startCountDown()
         this.gameOverCountDown()
-        this.setMask()
+
         this.setLanes()
         this.countPowerUps()
         this.SettingJumpingY(dt)
-        this.checkCollidingGameOver(audioCtx)
+        //this.checkCollidingGameOver(audioCtx)
         this.checkCollidingCoins(audioCtx)
         this.checkCollidingPowerUp(audioCtx)
         this.checkCollidingFuel(audioCtx)
-        this.setSprite()
-
     }
 
     countPowerUps(){
@@ -396,27 +414,13 @@ class Player {
                 this.shieldEffect.setStop()
             }
         }
-    }
-
-    setMask(){
-        this.mask = {x:this.x, z:this.z, w:this.w, s: 200}
-    }
-
-    setSprite() {
-        if (this.speed > 0){
-            let MAX_SPRITES = 2;
-            let MAX_FRAMES = 0;
-            this.frame++;
-            if (this.frame > MAX_FRAMES) {
-                this.frame = 0;
-                this.currentSprite++;
-                if (this.currentSprite > MAX_SPRITES) {
-                    this.currentSprite = 0;
-                }
-            }
-        } else{
-            this.currentSprite = 0
+        if (this.speed < this.currentSpeed && this.turbo === 0){
+            this.speed += this.acceleration
         }
+    }
+
+    setMask(dt){
+        this.mask = {x:this.x, z:this.z, w:this.w, s: this.speed*dt}
     }
 
     render(ctx) {
@@ -424,11 +428,14 @@ class Player {
         let shadowScale = SPRITE_SIZE*this.screen.y/586
         drawShadow(this.screen.x,  CANVAS_HEIGHT - this.screen.h, shadowScale, ctx)
         let playerSegmentCurve = road.findSegment(this.z).curve;
+        this.gotEffect.render(ctx)
+        this.startRender( ctx)
+        this.gameOverRender(ctx)
         if (this.transparent > 0 && this.transparent %2 === 0){
             return
         }
-        this.startRender( ctx)
-        this.gameOverRender(ctx)
+
+
         if (playerSegmentCurve >= 4 ){
             if (this.movingLane){
                 if (this.nextLane > this.currentLane){
@@ -550,11 +557,13 @@ class Player {
                     this.jumping = false
                 }
             }
-            this.over = this.screen.y < 450;
+            this.over = this.screen.y < 500;
+            // console.log(this.screen.y)
+            // console.log(this.over)
         }
     }
 
-    // TODO = colocar a interatividade mobile
+    // TODO = colocar a interatividade mobile & Mouse
     handleInputUp(keys, audioCtx) {
         switch (keys) {
             case ('right'):

@@ -7,8 +7,7 @@ class Camera {
         this.z = 0;
         this.distToPlayer = 1000;
         this.distToPlane = null;
-        this.drawDistance = 200;
-        this.fogDensity    = 5;
+        this.drawDistance = 250;
         this.game = game
     }
 

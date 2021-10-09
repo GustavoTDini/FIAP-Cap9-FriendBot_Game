@@ -9,9 +9,12 @@ class Game {
         this.background = null;
         this.settings = null
         this.playingMusic = false;
-        this.currentStage = FOREST
-        this.nextStage = BEACH
-
+        this.currentStage = SUBURB
+        this.nextRight = null
+        this.nextLeft = null
+        this.nextStage = null
+        this.decideSegment = null
+        this.newStageSegment = null
     }
 
     // Função principal para renderizar os elementos do canvas
@@ -35,7 +38,6 @@ class Game {
                 game.UI.renderConfigUI(ctx)
                 break;
             case GAME_OVER_STATE:
-                //TODO - programar o gameOver e Start
                 game.UI.renderGameOverUI(ctx)
                 break;
         }

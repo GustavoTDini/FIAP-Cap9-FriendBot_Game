@@ -1,7 +1,7 @@
 class Effects{
 
     starSprites = [star1, star2, star3, star4, star5, star6, star7, star8, star9, star10, star11, star12, star13, star14, star15, star16]
-    explosionSprites = [explosion1, explosion2, explosion3, explosion4, explosion5, explosion6, explosion7, explosion8, explosion9]
+    explosionSprites = [explosion1, explosion2, explosion3, explosion4, explosion5, explosion6, explosion7, explosion8, explosion9, explosion10]
     turboSprites = [turbo1, turbo2, turbo3, turbo4, turbo5, turbo6, turbo7, turbo8, turbo9]
     fireSprites = [fire1, fire2, fire3, fire4, fire5, fire6, fire7, fire8, fire9]
     shieldSprites = [shield1, shield2, shield3, shield4, shield5, shield6, shield7, shield8]
@@ -14,6 +14,7 @@ class Effects{
         get_ready9, get_ready10,get_ready11, get_ready12, get_ready13, get_ready14, get_ready15, get_ready16, get_ready17,
         get_ready18, get_ready19, get_ready20, get_ready21, get_ready22, get_ready23, get_ready24, get_ready25, get_ready26,
         get_ready27, get_ready28, get_ready29, get_ready30, get_ready31,get_ready32, get_ready33, get_ready34, get_ready35]
+    gotItemSprites = [gotItem1, gotItem2, gotItem3, gotItem4]
     frame = 0
 
 
@@ -119,6 +120,12 @@ class Effects{
                 this.loop = false
                 this.width = 675
                 this.height = 150
+                break
+            case (GOT_ITEM):
+                this.sprites = this.gotItemSprites
+                this.loop = false
+                this.width = 128
+                this.height = 128
                 break
 
         }

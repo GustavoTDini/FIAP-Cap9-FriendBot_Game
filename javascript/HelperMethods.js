@@ -6,6 +6,11 @@ function percentageLeft(n, total) {
     return (n % total) / total;
 }
 
+function interpolate(y, y1, y2, x1, x2) {
+    return x1 + ((y-y1)*(x2-x1)/(y2-y1))
+}
+
+
 function extractDigits(num){
     let digits = num.toString().split('');
     digits.reverse()

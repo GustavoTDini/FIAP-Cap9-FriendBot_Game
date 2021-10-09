@@ -18,7 +18,7 @@ window.onload = async function () {
             render: game.render,
             game: game,
             update: game.update,
-            playerColor: GREEN,
+            playerColor: PINK,
             difficulty: HARD
         })
     }, 3000)

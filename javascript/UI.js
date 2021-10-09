@@ -25,6 +25,7 @@ class UI {
         this.renderPowerUpIcons(player, BOLT, ctx)
         this.renderPowerUpIcons(player, DOUBLE, ctx)
         this.renderPowerUpIcons(player, SHIELD, ctx)
+        this.renderMiniMap(ctx)
     }
 
     renderPauseUI(ctx){
@@ -32,6 +33,13 @@ class UI {
         ctx.drawImage(...UIResume, CANVAS_CENTER_X - 100, CANVAS_CENTER_Y - 80, 200, 200)
         ctx.drawImage(...UIHomeOff, CANVAS_CENTER_X - 250, CANVAS_CENTER_Y -20, 100, 100)
         ctx.drawImage(...UIConfigOff, CANVAS_CENTER_X + 150, CANVAS_CENTER_Y-20, 100, 100)
+    }
+    renderMiniMap(ctx){
+        let spriteWidth = 20
+        let spriteLenght = 4
+        ctx.fillStyle = "rgba(47,47,47,0.58)"
+        ctx.fillRect(CANVAS_WIDTH - 120, 140 , 100, 300 )
+        ctx.fillStyle = this.setMapCarColor()
     }
 
     renderConfigUI(ctx){
@@ -55,14 +63,27 @@ class UI {
     drawFuel(ctx){
         let fuel = this.game.player.fuel
         ctx.fillStyle = "#ff5a0a"
-        let height = fuel*1.95
+        let width = fuel*2.6
 
-        ctx.fillRect(CANVAS_WIDTH - 70, 220, 40, height)
-        ctx.drawImage(...UIFuel, CANVAS_WIDTH-110, 120, 100, 300)
+        ctx.fillRect(CANVAS_CENTER_X - 85, 32, width, 52)
+        ctx.drawImage(...UIFuel, CANVAS_CENTER_X - 180, 10, 360, 100)
         if (fuel < 20){
             if (this.ticker%2 === 0){
-                ctx.drawImage(...UIRedFuel, CANVAS_WIDTH-92, 134, 63, 69)
+                ctx.drawImage(...UIRedFuel, CANVAS_CENTER_X-162, 24, 65, 70)
             }
+        }
+    }
+
+    setMapCarColor(){
+        switch (this.game.player.color){
+            case (PINK):
+                return "#b300b3"
+            case (BLUE):
+                return "#0021c4"
+            case (GREEN):
+                return "#008000"
+            default:
+                return "rgba(47,47,47,0.58)"
         }
     }
 
