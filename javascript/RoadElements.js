@@ -12,6 +12,7 @@ class RoadObjects {
         this.mask = {x:this.x, z:this.z, w:0.2, s: 100}
         this.segment = null
         this.dir = 1;
+        this.tunnel = null
     }
 
     render(ctx, maxDrawLine) {
@@ -20,13 +21,59 @@ class RoadObjects {
             let spriteHeight = Math.min((maxDrawLine - this.screen.y), this.screen.spriteSize)
             let drawSprite = this.sprite.map((x) => x);
             drawSprite[4]= Math.min(drawSprite[4], (drawSprite[4] * spriteHeight) / this.screen.spriteSize)
-            ctx.drawImage(...drawSprite, this.screen.x - this.screen.spriteSize/2, this.screen.y, this.screen.spriteSize, spriteHeight);
+            if (this.tunnel){
+                ctx.drawImage(...drawSprite, this.screen.x + this.screen.spriteSize/5, this.screen.y, this.screen.spriteSize*2, spriteHeight);
+            } else{
+                ctx.drawImage(...drawSprite, this.screen.x - this.screen.spriteSize/2, this.screen.y, this.screen.spriteSize, spriteHeight);
+            }
+
         }
     }
 
     update(dt){
         this.segment = this.road.findSegment(this.z)
         this.setMask()
+    }
+
+    hitByShield(){
+        if (this.road.game.player.currentLane === 0){
+            if (this instanceof Cars){
+                this.nextX = ROAD_LANES[1]
+            }
+            this.x = ROAD_LANES[1]
+        }
+        if (this.road.game.player.currentLane === 1){
+            if (Math.random() < 0.5){
+                if (this instanceof Cars){
+                    this.nextX = ROAD_LANES[0]
+                }
+                this.x = ROAD_LANES[0]
+            } else{
+                if (this instanceof Cars){
+                    this.nextX = ROAD_LANES[2]
+                }
+                this.x = ROAD_LANES[2]
+            }
+        }
+        if (this.road.game.player.currentLane === 2){
+            if (Math.random() < 0.5){
+                if (this instanceof Cars){
+                    this.nextX = ROAD_LANES[1]
+                }
+                this.x = ROAD_LANES[1]
+            } else{
+                if (this instanceof Cars){
+                    this.nextX = ROAD_LANES[3]
+                }
+                this.x = ROAD_LANES[3]
+            }
+        }
+        if (this.road.game.player.currentLane === 3){
+            if (this instanceof Cars){
+                this.nextX = ROAD_LANES[2]
+            }
+            this.x = ROAD_LANES[2]
+        }
     }
 
     setMask(){
@@ -52,6 +99,7 @@ class RoadObjects {
         let spriteSize = projectedSize * CANVAS_WIDTH
         let y = (1-projectedY) * CANVAS_CENTER_Y - spriteSize
         let x = this.segment.screenPoints.x
+
         return {x:x + w, y:y, spriteSize:spriteSize}
     }
 }

@@ -12,9 +12,13 @@ class Road {
         this.totalTraffic = [];
         this.totalCoins = [];
         this.totalFuel = []
-        this.powerUps = [];
-        this.obstacles = []
-        this.animals = []
+        this.totalPowerUps = [];
+        this.totalObstacles = []
+        this.totalAnimals = []
+    }
+
+    findSegment(z) {
+        return this.segments[Math.floor(z/SEGMENT_LENGTH) % this.segments.length];
     }
 
     render(ctx) {
@@ -25,7 +29,7 @@ class Road {
         let basePercent   = percentageLeft(gameCamera.z, SEGMENT_LENGTH);
         let x  = 0;
         let dx = - (baseSegment.curve * basePercent);
-        let maxBottomLine  = CANVAS_HEIGHT;
+        let maxBottomLine = CANVAS_HEIGHT;
 
         for (let n=0; n<gameCamera.drawDistance; n++){
             // get the current segment
@@ -42,19 +46,29 @@ class Road {
             dx = dx + currSegment.curve;
 
             if ((currSegment.screenPoints.z <= gameCamera.distToPlayer) ||
-                (currSegment.screenPoints.y >= maxBottomLine))
+                (currSegment.screenPoints.y >= maxBottomLine)){
                 continue;
+            }
 
             if (n>0 && currBottomLine < maxBottomLine){
-
                 let screenPoints = currSegment.screenPoints;
                 let lastScreenPoints = currSegment.lastScreenPoints
+                this.renderGrass(ctx, currSegment.stage, currSegment.color, screenPoints.y, lastScreenPoints.y);
 
-                    this.renderSegment(
-                        lastScreenPoints.x, lastScreenPoints.y, lastScreenPoints.w,
-                        screenPoints.x, screenPoints.y, screenPoints.w,
-                        currSegment.color, ctx, currSegment.stage, currSegment.texture
-                    );
+                // if (currSegment.YRoad){
+                //     let dir = currSegment.curve > 0? -1:1
+                //     let lastX = lastScreenPoints.x + lastScreenPoints.w*currSegment.YRoadCounter*dir
+                //     let currX = screenPoints.x + screenPoints.w*currSegment.YRoadCounter*dir
+                //     this.renderSegment(
+                //         lastX, lastScreenPoints.y, lastScreenPoints.w,
+                //         currX, screenPoints.y, screenPoints.w,
+                //         currSegment.color, ctx, currSegment.stage, currSegment.texture, currSegment.index);
+                // }
+
+                this.renderSegment(
+                    lastScreenPoints.x, lastScreenPoints.y, lastScreenPoints.w,
+                    screenPoints.x, screenPoints.y, screenPoints.w,
+                    currSegment.color, ctx, currSegment.stage, currSegment.texture, currSegment.index);
                 // move the clipping bottom line up
                 maxBottomLine = currBottomLine;
             }
@@ -70,7 +84,6 @@ class Road {
                 if (maxHeight > 0){
                     maxBottomLine = Math.min(maxBottomLine, maxHeight)
                 }
-
             }
             for(let i = 0 ; i < currSegment.roadSideObjects.length ; i++) {
                 currSegment.roadSideObjects[i].render(ctx, maxBottomLine)
@@ -83,75 +96,87 @@ class Road {
 
     update(dt) {
         let player = this.game.player
+        this.setPlayerXScreen(player);
+        this.updateObjects(dt);
+        this.removeObjects()
+        this.defineNewStage(player);
+    }
 
+    setPlayerXScreen(player) {
         let playerSegment = this.findSegment(player.z);
-
         let centrifugal = 30;
         let currentCurve = playerSegment.curve
-        if (currentCurve){
-            this.game.player.screen.x =  CANVAS_CENTER_X - SPRITE_SIZE/2 + currentCurve*centrifugal
+        if (currentCurve) {
+            player.screen.x = CANVAS_CENTER_X - SPRITE_SIZE / 2 + currentCurve * centrifugal
         } else {
-            this.game.player.screen.x =  CANVAS_CENTER_X - SPRITE_SIZE/2
+            player.screen.x = CANVAS_CENTER_X - SPRITE_SIZE / 2
         }
-        for (let j = 0; j< this.segments.length; j++){
+    }
+
+    defineNewStage(player) {
+        if (player.currentSegment.index > this.game.decideSegment && !player.changingStage) {
+            player.changingStage = true
+            let dir = 1
+            if (player.currentLane === 0 || player.currentLane === 1) {
+                this.game.nextStage = this.game.nextLeft
+                dir = -1
+            } else if (player.currentLane === 2 || player.currentLane === 3) {
+                this.game.nextStage = this.game.nextRight
+            }
+            this.roadConstructor.yRoadSegment(dir)
+        }
+        if (player.currentSegment.index > this.game.newStageSegment && player.changingStage) {
+            player.changingStage = false
+            this.game.background.nextAlpha = 0
+            this.game.background.changeBackground(this.game.nextStage, true)
+            this.game.currentStage = this.game.nextStage
+            this.game.nextStage = null
+            this.roadConstructor.newStageSegment()
+        }
+    }
+
+    updateObjects(dt) {
+        for (let j = 0; j < this.segments.length; j++) {
             this.segments[j].inRoadObjects = []
         }
-        for (let i = 0; i < this.totalCars.length; i++){
+        for (let i = 0; i < this.totalCars.length; i++) {
             let carSegment = this.findSegment(this.totalCars[i].z)
             carSegment.inRoadObjects.push(this.totalCars[i])
             this.totalCars[i].update(dt)
         }
-        for (let i = 0; i < this.totalTraffic.length; i++){
+        for (let i = 0; i < this.totalTraffic.length; i++) {
             let trafficSegment = this.findSegment(this.totalTraffic[i].z)
             trafficSegment.inRoadObjects.push(this.totalTraffic[i])
             this.totalTraffic[i].update(dt)
         }
-        for (let i = 0; i < this.totalCoins.length; i++){
+        for (let i = 0; i < this.totalCoins.length; i++) {
             let coinSegment = this.findSegment(this.totalCoins[i].z)
             coinSegment.inRoadObjects.push(this.totalCoins[i])
             this.totalCoins[i].update(dt)
         }
-        for (let i = 0; i < this.powerUps.length; i++){
-            let upSegment = this.findSegment(this.powerUps[i].z)
-            upSegment.inRoadObjects.push(this.powerUps[i])
-            this.powerUps[i].update(dt)
+        for (let i = 0; i < this.totalPowerUps.length; i++) {
+            let upSegment = this.findSegment(this.totalPowerUps[i].z)
+            upSegment.inRoadObjects.push(this.totalPowerUps[i])
+            this.totalPowerUps[i].update(dt)
         }
-        for (let i = 0; i < this.obstacles.length; i++){
-            let obstaclesSegment = this.findSegment(this.obstacles[i].z)
-            obstaclesSegment.inRoadObjects.push(this.obstacles[i])
-            this.obstacles[i].update(dt)
+        for (let i = 0; i < this.totalObstacles.length; i++) {
+            let obstaclesSegment = this.findSegment(this.totalObstacles[i].z)
+            obstaclesSegment.inRoadObjects.push(this.totalObstacles[i])
+            this.totalObstacles[i].update(dt)
         }
-        for (let i = 0; i < this.animals.length; i++){
-            let animalSegment = this.findSegment(this.animals[i].z)
-            animalSegment.inRoadObjects.push(this.animals[i])
-            this.animals[i].update(dt)
+        for (let i = 0; i < this.totalAnimals.length; i++) {
+            let animalSegment = this.findSegment(this.totalAnimals[i].z)
+            animalSegment.inRoadObjects.push(this.totalAnimals[i])
+            this.totalAnimals[i].update(dt)
         }
-
-        for (let i = 0; i < this.totalFuel.length; i++){
+        for (let i = 0; i < this.totalFuel.length; i++) {
             let fuelSegment = this.findSegment(this.totalFuel[i].z)
             fuelSegment.inRoadObjects.push(this.totalFuel[i])
             this.totalFuel[i].update(dt)
         }
-        if (player.currentSegment.index > this.game.decideSegment && !player.changingStage){
-            player.changingStage = true
-            if (player.currentLane === 0 || player.currentLane === 1){
-                this.game.nextStage = this.game.nextLeft
-            } else if (player.currentLane === 2 || player.currentLane === 3){
-                this.game.nextStage = this.game.nextRight
-            }
-            this.roadConstructor.yRoadSegment()
-        }
-        if (player.currentSegment.index > this.game.newStageSegment && player.changingStage){
-            player.changingStage = false
-            this.game.currentStage = this.game.nextStage
-            this.roadConstructor.newStageSegment()
-        }
-
     }
 
-    findSegment(z) {
-        return this.segments[Math.floor(z/SEGMENT_LENGTH) % this.segments.length];
-    }
+
 
     // Função para fazer a projeção dos pontos em 3D - usa a regra dos triangulos iguais
     project3D(segment, camera, offSetZ, xCurve){
@@ -175,29 +200,91 @@ class Road {
         return {x:x, y:y, w:w}
     }
 
+
     correctedLastPoints(currIndex){
         return (currIndex === 0) ? {x: 0, y: 0, w: 0} : this.segments[currIndex - 1].screenPoints;
     }
 
-    renderSegment(x1, y1, w1, x2, y2, w2, color, ctx, stage, texture){
-        let linesWidth1 = w1/20
-        let linesWidth2 = w2/20
+    removeObjects(){
+        let removeSegment = this.game.player.currentSegment.index - 50
+        for (let i = 0; i < this.totalCars.length; i++){
+            if (this.findSegment(this.totalCars[i].z).index < removeSegment){
+                this.totalCars.splice(i,1)
+            }
+        }
+        for (let i = 0; i < this.totalTraffic.length; i++){
+            if (this.findSegment(this.totalTraffic[i].z).index < removeSegment){
+                this.totalTraffic.splice(i,1)
+            }
+        }
+        for (let i = 0; i < this.totalCoins.length; i++){
+            if (this.findSegment(this.totalCoins[i].z).index < removeSegment){
+                this.totalCoins.splice(i,1)
+            }
+        }
+        for (let i = 0; i < this.totalFuel.length; i++){
+            if (this.findSegment(this.totalFuel[i].z).index < removeSegment){
+                this.totalFuel.splice(i,1)
+            }
+        }
+        for (let i = 0; i < this.totalPowerUps.length; i++){
+            if (this.findSegment(this.totalPowerUps[i].z).index < removeSegment){
+                this.totalPowerUps.splice(i,1)
+            }
+        }
+        for (let i = 0; i < this.totalObstacles.length; i++){
+            if (this.findSegment(this.totalObstacles[i].z).index < removeSegment){
+                this.totalObstacles.splice(i,1)
+            }
+        }
+        for (let i = 0; i < this.totalAnimals.length; i++){
+            if (this.findSegment(this.totalAnimals[i].z).index < removeSegment){
+                this.totalAnimals.splice(i,1)
+            }
+        }
+    }
+
+    renderSegment(x1, y1, w1, x2, y2, w2, color, ctx, stage, texture, index){
+        let linesWidth1 = w1/12
+        let linesWidth2 = w2/12
         let lineDistance1 = w1/2.5
         let lineDistance2 = w2/2.5
-        //ctx.fillStyle = color.grass
-        ctx.fillStyle = ctx.createPattern(stageObjects[stage].SIDE_TEXTURES[color.grassTextures], "repeat")
-        ctx.fillRect(0, y2-1, CANVAS_WIDTH, y1 - y2);
-        // draw road
-        ctx.restore()
+        let squareWidth1 = w1/4
+        let squareWidth2 = w2/4
+        let roadTexture = stageObjects[stage].ROAD_TEXTURES[texture]
+        if (index <= 25) {
+            if (index % 2 === 0) {
+                roadTexture = START_COLORS.DARK.roadTexture
+                color = START_COLORS.DARK
+            } else {
+                roadTexture = START_COLORS.LIGHT.roadTexture
+                color = START_COLORS.LIGHT
+            }
+        }
         drawPolygon(x1-w1, y1,	x1+w1, y1, x2+w2, y2, x2-w2, y2, color.road, ctx);
-        this.game.settings.threeD && create3dRoad(stageObjects[stage].ROAD_TEXTURES[texture], x1, y1, w1, x2, y2, w2, ctx);
+        if (color.oppositeRoad){
+            drawPolygon(x1-w1 + 0.5*squareWidth1, y1,	x1+w1 - 0.5*squareWidth1, y1, x2+w2 - 0.5*squareWidth2, y2, x2-w2 + 0.5*squareWidth2, y2, color.oppositeRoad, ctx);
+            drawPolygon(x1-w1 + squareWidth1, y1,	x1+w1 - squareWidth1, y1, x2+w2 - squareWidth2, y2, x2-w2 + squareWidth2, y2, color.road, ctx);
+            drawPolygon(x1-w1 + 1.5*squareWidth1, y1,	x1+w1 - 1.5*squareWidth1, y1, x2+w2 - 1.5*squareWidth2, y2, x2-w2 + 1.5*squareWidth2, y2, color.oppositeRoad, ctx);
+            drawPolygon(x1-w1 + 2*squareWidth1, y1,	x1+w1 - 2*squareWidth1, y1, x2+w2 - 2*squareWidth2, y2, x2-w2 + 2*squareWidth2, y2, color.road, ctx);
+            drawPolygon(x1-w1 + 2.5*squareWidth1, y1,	x1+w1 - 2.5*squareWidth1, y1, x2+w2 - 2.5*squareWidth2, y2, x2-w2 + 2.5*squareWidth2, y2, color.oppositeRoad, ctx);
+            drawPolygon(x1-w1 + 3*squareWidth1, y1,	x1+w1 - 3*squareWidth1, y1, x2+w2 - 3*squareWidth2, y2, x2-w2 + 3*squareWidth2, y2, color.road, ctx);
+            drawPolygon(x1-w1 + 3.5*squareWidth1, y1,	x1+w1 - 3.5*squareWidth1, y1, x2+w2 - 3.5*squareWidth2, y2, x2-w2 + 3.5*squareWidth2, y2, color.oppositeRoad, ctx);
+            drawPolygon(x1-w1 + 3.85*squareWidth1, y1,	x1+w1 - 3.85*squareWidth1, y1, x2+w2 - 3.85*squareWidth2, y2, x2-w2 + 3.85*squareWidth2, y2, color.road, ctx);
+        }
+        this.game.settings.threeD && create3dRoad(roadTexture, x1, y1, w1, x2, y2, w2, ctx);
         drawPolygon(x1-w1, y1,	x1-w1+linesWidth1, y1, x2-w2+linesWidth2, y2, x2-w2, y2, color.shoulder, ctx);
-        drawPolygon(x1+w1-linesWidth1, y1,	x1+w1, y1, x2+w2, y2, x2+w2-linesWidth2, y2, color.shoulder, ctx);
-        if (color.lane){
+        drawPolygon(x1+w1+linesWidth1, y1,	x1+w1, y1, x2+w2, y2, x2+w2+linesWidth2, y2, color.shoulder, ctx);
+        if (color.lane && index > 10){
             drawPolygon(x1+(linesWidth1/2), y1,	x1-(linesWidth1/2), y1, x2-(linesWidth2/2), y2, x2+(linesWidth2/2), y2, color.lane, ctx);
             drawPolygon(x1+lineDistance1, y1,	x1+lineDistance1+linesWidth1, y1, x2+lineDistance2+linesWidth2, y2, x2+lineDistance2, y2, color.lane, ctx);
             drawPolygon(x1-lineDistance1, y1,	x1-lineDistance1-linesWidth1, y1, x2-lineDistance2-linesWidth2, y2, x2-lineDistance2, y2, color.lane, ctx);
         }
+    }
+
+    renderGrass(ctx, stage, color, y2, y1) {
+        ctx.fillStyle = ctx.createPattern(stageObjects[stage].SIDE_TEXTURES[color.grassTextures], "repeat")
+        ctx.fillRect(0, y2 - 1, CANVAS_WIDTH, y1 - y2);
     }
 }
 

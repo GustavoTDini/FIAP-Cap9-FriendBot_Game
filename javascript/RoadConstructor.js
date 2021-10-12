@@ -68,7 +68,6 @@ class RoadConstructor {
         this.game = game
     }
 
-//TODO - fazer um editor de pista melhor e transição de Fases
 
     // ---------------------------------------------------------------------------------
     // Road Constructor
@@ -76,21 +75,7 @@ class RoadConstructor {
 
     createRoad() {
         this.StartSegment()
-        this.curvesSegment()
-        this.straightSegment()
-        this.animalSegment()
         this.addMoreRoad()
-        // this.addHill()
-        // this.hillsSegment()
-        // this.curvesSegment()
-        // this.animalSegment()
-        // this.addSCurves();
-        // this.addDownhillToEnd();
-        // this.crazySegment()
-        this.road.totalSegments = this.road.segments.length
-        this.road.roadLength = this.road.totalSegments * SEGMENT_LENGTH;
-        this.addObstacles(500, this.road.totalSegments-100, this.CARS)
-        this.addItems(100, this.road.totalSegments-100)
     }
 
     addMoreRoad(){
@@ -118,26 +103,35 @@ class RoadConstructor {
                         this.straightSegment()
                         break
                 }
-                this.road.totalSegments = this.road.segments.length
-                this.roadLength = this.road.totalSegments * SEGMENT_LENGTH;
-                this.addItems(startSegment + 500, this.road.totalSegments- 500)
-            }
-            this.selectSegment()
 
+            }
+            this.addObstacles(startSegment + 500, this.road.totalSegments-500, this.CARS)
+            this.addItems(startSegment + 500, this.road.totalSegments - 500)
+            this.selectSegment()
+            this.updateRoadSize()
     }
 
     getLastY() { return (this.road.segments.length === 0) ? 0 : this.road.segments[this.road.segments.length-1].worldPoints.y; }
 
-    addMoreSegments(enter, hold, leave, curve, y, stage, type) {
+    addMoreSegments(enter, hold, leave, curve, y, stage, type, YRoad) {
         let lastY   = this.getLastY();
         let endY     = lastY + (toInt(y, 0) * SEGMENT_LENGTH);
         let n, total = enter + hold + leave;
-        for(n = 0 ; n < enter ; n++)
-            this.road.segments.push( new Segment(this.road.segments, smoothIn(0, curve, n/enter), smoothInOut(lastY, endY, n/total), this.road, stage, type));
-        for(n = 0 ; n < hold  ; n++)
-            this.road.segments.push( new Segment(this.road.segments, curve, smoothInOut(lastY, endY, (enter+n)/total), this.road, stage, type));
-        for(n = 0 ; n < leave ; n++)
-            this.road.segments.push( new Segment(this.road.segments, smoothInOut(curve, 0, n/leave), smoothInOut(lastY, endY, (enter+hold+n)/total), this.road, stage, type));
+        for(n = 0 ; n < enter ; n++){
+            this.road.segments.push( new Segment(this.road.segments, smoothIn(0, curve, n/enter), smoothInOut(lastY, endY, n/total), this.road, stage, type, YRoad, n));
+        }
+        for(n = 0 ; n < hold  ; n++){
+            this.road.segments.push( new Segment(this.road.segments, curve, smoothInOut(lastY, endY, (enter+n)/total), this.road, stage, type, YRoad, n+enter));
+        }
+        for(n = 0 ; n < leave ; n++){
+            this.road.segments.push( new Segment(this.road.segments, smoothInOut(curve, 0, n/leave), smoothInOut(lastY, endY, (enter+hold+n)/total), this.road, stage, type,YRoad, n+hold + enter));
+        }
+
+    }
+
+    updateRoadSize(){
+        this.road.totalSegments = this.road.segments.length
+        this.roadLength = this.road.totalSegments * SEGMENT_LENGTH;
     }
 
     // ---------------------------------------------------------------------------------
@@ -146,39 +140,50 @@ class RoadConstructor {
 
     addStraight(num, type) {
         num = num || ROAD.LENGTH.MEDIUM;
-        this.addMoreSegments(num, num, num, 0, 0, this.game.currentStage, type);
+        this.addMoreSegments(num, num, num, 0, 0, this.game.currentStage, type, false);
+        this.updateRoadSize()
     }
 
     addHill(num, height, type) {
         num    = num    || ROAD.LENGTH.MEDIUM;
         height = height || ROAD.HILL.MEDIUM;
-        this.addMoreSegments(num, num, num, 0, height, this.game.currentStage, type);
+        this.addMoreSegments(num, num, num, 0, height, this.game.currentStage, type, false);
+        this.updateRoadSize()
     }
 
     addCurve(num, curve, height, type) {
         num    = num    || ROAD.LENGTH.MEDIUM;
         curve  = curve  || ROAD.CURVE.MEDIUM;
         height = height || ROAD.HILL.NONE;
-        this.addMoreSegments(num, num, num, curve, height, this.game.currentStage, type);
+        this.addMoreSegments(num, num, num, curve, height, this.game.currentStage, type, false);
+        this.updateRoadSize()
+    }
+
+    //TODO - arrumar a YRoad
+    addYCurve(dir) {
+        this.addMoreSegments(ROAD.LENGTH.LONG, ROAD.LENGTH.LONG, ROAD.LENGTH.LONG, dir*ROAD.CURVE.MEDIUM, ROAD.HILL.NONE, this.game.currentStage, Segment.EMPTY, true);
+        this.updateRoadSize()
     }
 
     addLowRollingHills(type) {
         let num = ROAD.LENGTH.SHORT;
         let height = ROAD.HILL.LOW;
-        this.addMoreSegments(num, num, num,  0,  height/2, this.game.currentStage, type);
-        this.addMoreSegments(num, num, num,  0, -height, this.game.currentStage, type);
-        this.addMoreSegments(num, num, num,  0,  height, this.game.currentStage, type);
-        this.addMoreSegments(num, num, num,  0,  0, this.game.currentStage, type);
-        this.addMoreSegments(num, num, num,  0,  height/2, this.game.currentStage, type);
-        this.addMoreSegments(num, num, num,  0,  0, this.game.currentStage, type);
+        this.addMoreSegments(num, num, num,  0,  height/2, this.game.currentStage, type, false);
+        this.addMoreSegments(num, num, num,  0, -height, this.game.currentStage, type, false);
+        this.addMoreSegments(num, num, num,  0,  height, this.game.currentStage, type, false);
+        this.addMoreSegments(num, num, num,  0,  0, this.game.currentStage, type, false);
+        this.addMoreSegments(num, num, num,  0,  height/2, this.game.currentStage, type, false);
+        this.addMoreSegments(num, num, num,  0,  0, this.game.currentStage, type, false);
+        this.updateRoadSize()
     }
 
     addSCurves(type) {
-        this.addMoreSegments(ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM,  -ROAD.CURVE.EASY,    ROAD.HILL.NONE, this.game.currentStage, type);
-        this.addMoreSegments(ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM,   ROAD.CURVE.MEDIUM,  ROAD.HILL.MEDIUM, this.game.currentStage, type);
-        this.addMoreSegments(ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM,   ROAD.CURVE.EASY,   -ROAD.HILL.LOW, this.game.currentStage, type);
-        this.addMoreSegments(ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM,  -ROAD.CURVE.EASY,    ROAD.HILL.MEDIUM, this.game.currentStage, type);
-        this.addMoreSegments(ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM,  -ROAD.CURVE.MEDIUM, -ROAD.HILL.MEDIUM, this.game.currentStage, type);
+        this.addMoreSegments(ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM,  -ROAD.CURVE.EASY,    ROAD.HILL.NONE, this.game.currentStage, type, false);
+        this.addMoreSegments(ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM,   ROAD.CURVE.MEDIUM,  ROAD.HILL.MEDIUM, this.game.currentStage, type, false);
+        this.addMoreSegments(ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM,   ROAD.CURVE.EASY,   -ROAD.HILL.LOW, this.game.currentStage, type, false);
+        this.addMoreSegments(ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM,  -ROAD.CURVE.EASY,    ROAD.HILL.MEDIUM, this.game.currentStage, type, false);
+        this.addMoreSegments(ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM, ROAD.LENGTH.MEDIUM,  -ROAD.CURVE.MEDIUM, -ROAD.HILL.MEDIUM, this.game.currentStage, type, false);
+        this.updateRoadSize()
     }
 
     // ---------------------------------------------------------------------------------
@@ -186,8 +191,8 @@ class RoadConstructor {
     // ---------------------------------------------------------------------------------
 
     StartSegment(){
-        this.addStraight(ROAD.LENGTH.MEDIUM, Segment.BILLBOARDS)
-        this.addStraight(ROAD.LENGTH.LONG, Segment.REGULAR)
+        this.addStraight(ROAD.LENGTH.LONG, Segment.BILLBOARDS)
+        this.addStraight(ROAD.LENGTH.LONG*2, Segment.REGULAR)
     }
 
     hillsSegment(){
@@ -196,16 +201,16 @@ class RoadConstructor {
         this.addLowRollingHills(Segment.REGULAR);
         this.addCurve(ROAD.LENGTH.MEDIUM, ROAD.CURVE.MEDIUM, ROAD.HILL.LOW, Segment.REGULAR);
         this.addLowRollingHills(Segment.REGULAR);
-        let finalSegment = this.road.segments.length
-        //this.addObstacles(startSegment, finalSegment)
+        let finalSegment = this.road.segments.length - 500
+        this.addObstacles(startSegment, finalSegment, this.OBSTACLES)
     }
     curvesSegment(){
         let startSegment = this.road.segments.length
         this.addCurve(ROAD.LENGTH.LONG, ROAD.CURVE.MEDIUM, ROAD.HILL.MEDIUM, Segment.REGULAR);
         this.addStraight(null, Segment.REGULAR);
         this.addCurve(ROAD.LENGTH.LONG, -ROAD.CURVE.MEDIUM, ROAD.HILL.MEDIUM, Segment.REGULAR);
-        let finalSegment = this.road.segments.length
-        //this.addTraffic(startSegment, finalSegment)
+        let finalSegment = this.road.segments.length- 500
+        this.addObstacles(startSegment, finalSegment, this.TRAFFIC)
     }
 
     animalSegment() {
@@ -215,8 +220,8 @@ class RoadConstructor {
         this.addCurve(ROAD.LENGTH.LONG, ROAD.CURVE.MEDIUM, -ROAD.HILL.LOW, Segment.REGULAR);
         this.addHill(ROAD.LENGTH.LONG, -ROAD.HILL.MEDIUM, Segment.REGULAR);
         this.addStraight(ROAD.LENGTH.SHORT, Segment.ANIMALS);
-        let finalSegment = this.road.segments.length
-        //this.addAnimals(startSegment, finalSegment)
+        let finalSegment = this.road.segments.length - 500
+        this.addObstacles(startSegment, finalSegment, this.ANIMALS)
     }
 
     sCurveSegment(){
@@ -226,8 +231,8 @@ class RoadConstructor {
         this.addCurve(ROAD.LENGTH.LONG, ROAD.CURVE.MEDIUM, -ROAD.HILL.LOW, Segment.REGULAR);
         this.addCurve(ROAD.LENGTH.LONG, ROAD.CURVE.MEDIUM, ROAD.HILL.MEDIUM, Segment.REGULAR);
         this.addStraight(ROAD.LENGTH.SHORT, Segment.REGULAR);
-        let finalSegment = this.road.segments.length
-        //this.addObstacles(startSegment, finalSegment)
+        let finalSegment = this.road.segments.length - 500
+        this.addObstacles(startSegment, finalSegment, this.OBSTACLES)
     }
 
     crazySegment(){
@@ -239,15 +244,16 @@ class RoadConstructor {
         this.addHill(ROAD.LENGTH.LONG, -ROAD.HILL.HIGH, Segment.REGULAR);
         this.addSCurves(Segment.REGULAR)
         this.addCurve(ROAD.LENGTH.MEDIUM, -ROAD.CURVE.MEDIUM, -ROAD.HILL.HIGH, Segment.REGULAR);
-        let finalSegment = this.road.segments.length
-        //this.addObstacles(startSegment, finalSegment)
-        //this.addTraffic(startSegment, finalSegment)
+        let finalSegment = this.road.segments.length-500
+        this.addObstacles(startSegment, finalSegment, this.OBSTACLES)
+        this.addObstacles(startSegment, finalSegment, this.TRAFFIC)
     }
 
     straightSegment(){
         let startSegment = this.road.segments.length
-        this.addStraight(ROAD.LENGTH.LONG*3, Segment.REGULAR);
-        let finalSegment = this.road.segments.length
+        this.addStraight(ROAD.LENGTH.LONG*7, Segment.REGULAR);
+        let finalSegment = this.road.segments.length-500
+        this.addObstacles(startSegment, finalSegment, this.TRAFFIC)
     }
 
     // ---------------------------------------------------------------------------------
@@ -257,7 +263,8 @@ class RoadConstructor {
     addObstacles(start, finish, type){
         let max = type === this.CARS? this.game.player.difficulty.MAX_CARS : this.game.player.difficulty.MAX_OBSTACLES
         for (let n = 0; n < max; n++){
-            let startSegment = this.road.segments[randomIntFromInterval(start, finish)]
+            let random = randomIntFromInterval(start, Math.min(finish, this.road.segments.length - 100))
+            let startSegment = this.road.segments[random]
             let z = startSegment.worldPoints.z
             let y = startSegment.worldPoints.y
             let roadLane = ROAD_LANES[randomIntFromInterval(0,3)]
@@ -271,11 +278,11 @@ class RoadConstructor {
                     sprite = null
                     let animalType = Math.floor(Math.random() * 2)
                     let x = Math.random()-2
-                    this.road.animals.push(new Animals(null, x, y, z, SPRITE_SIZE, this.road,animalType))
+                    this.road.totalAnimals.push(new Animals(null, x, y, z, SPRITE_SIZE, this.road,animalType))
                     break;
                 case this.OBSTACLES:
                     sprite = stageObjects[startSegment.stage].OBSTACLES[Math.floor(Math.random() * 2)]
-                    this.road.totalCars.push(new Cars(sprite, roadLane, y,  z, SPRITE_SIZE, this.road))
+                    this.road.totalObstacles.push(new Obstacles(sprite, roadLane, y,  z, SPRITE_SIZE*2, this.road))
                     break;
                 case this.TRAFFIC:
                     sprite = stageObjects[startSegment.stage].TRAFFIC[Math.floor(Math.random() * 5)]
@@ -304,7 +311,7 @@ class RoadConstructor {
                             this.road.totalFuel.push(new Fuel(gas1, roadLaneX, y, z, SPRITE_SIZE, this.road))
                         } else {
                             let powerUpType = randomIntFromInterval(6,9)
-                            this.road.powerUps.push(new PowerUps(null,roadLaneX, y, z, SPRITE_SIZE, this.road, powerUpType))
+                            this.road.totalPowerUps.push(new PowerUps(null,roadLaneX, y, z, SPRITE_SIZE, this.road, powerUpType))
                         }
                     }
                 }
@@ -325,14 +332,14 @@ class RoadConstructor {
     selectSegment(){
         this.addStraight(ROAD.LENGTH.MEDIUM, Segment.YROAD);
         this.game.decideSegment = this.road.segments.length
-        console.log(this.game.decideSegment)
-        this.addStraight(ROAD.LENGTH.LONG*3, Segment.BILLBOARDS)
+        this.addStraight(ROAD.LENGTH.LONG*3, Segment.TUNNEL)
+        this.game.yRoadStartSegment = this.road.segments.length
     }
 
     selectStage(){
         let stages = [FOREST, BEACH, CITY, FARM]
-        if (stages.includes(this.game.stage)){
-            stages = stages.filter(x => x!== this.game.stage)
+        if (stages.includes(this.game.currentStage)){
+            stages = stages.filter(x => x!== this.game.currentStage)
         }
         let stageRight = stages[randomIntFromInterval(0,stages.length-1)]
         stages = stages.filter(x => x!== stageRight)
@@ -341,17 +348,16 @@ class RoadConstructor {
         this.game.nextLeft = stageLeft
     }
 
-    yRoadSegment(){
-        console.log("YRoad")
-        this.addStraight(ROAD.LENGTH.LONG, Segment.EMPTY);
-        this.addCurve(ROAD.LENGTH.LONG, ROAD.CURVE.MEDIUM, ROAD.HILL.NONE, Segment.EMPTY);
+    yRoadSegment(dir){
+        this.addStraight(ROAD.LENGTH.LONG, Segment.TUNNEL);
+        this.addYCurve(dir)
         this.game.newStageSegment = this.road.segments.length
-        this.addStraight(ROAD.LENGTH.MEDIUM, Segment.EMPTY)
+        this.addStraight(ROAD.LENGTH.LONG*2, Segment.EMPTY)
+        this.updateRoadSize()
     }
 
     newStageSegment(){
-        console.log("NewStage")
-        this.addStraight(ROAD.LENGTH.MEDIUM, Segment.BILLBOARDS);
+        this.addStraight(ROAD.LENGTH.LONG, Segment.BILLBOARDS);
         this.addStraight(ROAD.LENGTH.LONG*4, Segment.REGULAR);
         this.addMoreRoad()
     }

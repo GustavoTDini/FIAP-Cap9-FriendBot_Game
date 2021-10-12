@@ -11,9 +11,5 @@ class Traffic extends RoadObjects{
         this.segment = this.road.findSegment(this.z)
         this.y = this.segment.worldPoints.y + 128
         this.setMask()
-
-        if (this.z <= this.road.game.player.currentSegment.worldPoints.z -100){
-            this.speed = 0
-        }
     }
 }

@@ -13,6 +13,9 @@ class Background {
         this.nextBC3 = null
         this.offSetX = 0
         this.offSetY = 0
+        this.nextAlpha = 1
+        this.currentAlpha = 1
+
     }
 
     render(ctx){
@@ -25,58 +28,95 @@ class Background {
         let BC2Y = setMaxMin(-20 + this.offSetY*BC2Correction, 0, -50)
         let BC3X = setMaxMin(this.offSetX*BC3Correction*this.game.player.speed, CANVAS_WIDTH, 0)
         let BC3Y = setMaxMin(-20 + this.offSetY*BC3Correction, 0, -50)
-        this.sky !== null && ctx.drawImage(this.sky, 0,0, CANVAS_WIDTH, CANVAS_HEIGHT )
-        this.nextSky !== null && ctx.drawImage(this.sky, 0,0, CANVAS_WIDTH, CANVAS_HEIGHT )
-        this.BC1 !== null && ctx.drawImage(this.BC1, CANVAS_CENTER_X - BC1X,BC1Y )
-        this.nextBC1 !== null && ctx.drawImage(this.BC1, CANVAS_CENTER_X - BC1X,BC1Y )
-        this.BC1 !== null && ctx.drawImage(this.BC1, CANVAS_CENTER_X- this.sky.width - BC1X,BC1Y )
-        this.nextBC1 !== null && ctx.drawImage(this.BC1, CANVAS_CENTER_X- this.sky.width - BC1X,BC1Y )
-        this.BC2 !== null && ctx.drawImage(this.BC2, CANVAS_CENTER_X-BC2X, BC2Y)
-        this.nextBC2 !== null && ctx.drawImage(this.BC2, CANVAS_CENTER_X-BC2X, BC2Y)
-        this.BC2 !== null && ctx.drawImage(this.BC2, CANVAS_CENTER_X - this.sky.width-BC2X, BC2Y)
-        this.nextBC2 !== null && ctx.drawImage(this.BC2, CANVAS_CENTER_X - this.sky.width-BC2X, BC2Y)
-        this.BC3 !== null && ctx.drawImage(this.BC3, CANVAS_CENTER_X-BC3X, BC3Y)
-        this.nextBC3 !== null && ctx.drawImage(this.BC3, CANVAS_CENTER_X-BC3X, BC3Y)
-        this.BC3 !== null && ctx.drawImage(this.BC3, CANVAS_CENTER_X-this.sky.width-BC3X, BC3Y)
-        this.nextBC3 !== null && ctx.drawImage(this.BC3, CANVAS_CENTER_X-this.sky.width-BC3X, BC3Y)
+        this.sky !== null && drawSpriteWithAlpha(ctx, this.sky, 0, 0,CANVAS_WIDTH, CANVAS_HEIGHT, this.currentAlpha)
+        this.nextSky !== null && drawSpriteWithAlpha(ctx, this.nextSky, 0, 0,CANVAS_WIDTH, CANVAS_HEIGHT, this.nextAlpha)
+        this.BC1 !== null && drawSpriteWithAlpha(ctx, this.BC1, CANVAS_CENTER_X - BC1X, BC1Y,this.BC1.width, this.BC1.height, this.currentAlpha)
+        this.BC1 !== null && drawSpriteWithAlpha(ctx, this.BC1, CANVAS_CENTER_X- this.sky.width - BC1X, BC1Y,this.BC1.width, this.BC1.height, this.currentAlpha)
+        this.nextBC1 !== null && drawSpriteWithAlpha(ctx, this.nextBC1, CANVAS_CENTER_X - BC1X, BC1Y,this.nextBC1.width, this.nextBC1.height, this.nextAlpha)
+        this.nextBC1 !== null && drawSpriteWithAlpha(ctx, this.nextBC1, CANVAS_CENTER_X- this.sky.width - BC1X, BC1Y,this.nextBC1.width, this.nextBC1.height, this.nextAlpha)
+        this.BC2 !== null && drawSpriteWithAlpha(ctx, this.BC2, CANVAS_CENTER_X- this.sky.width - BC2X, BC2Y,this.BC2.width, this.BC2.height, this.currentAlpha)
+        this.BC2 !== null && drawSpriteWithAlpha(ctx, this.BC2, CANVAS_CENTER_X - BC2X, BC2Y,this.BC2.width, this.BC2.height, this.currentAlpha)
+        this.nextBC2 !== null && drawSpriteWithAlpha(ctx, this.nextBC2, CANVAS_CENTER_X- this.sky.width - BC2X, BC2Y,this.nextBC2.width, this.nextBC2.height, this.nextAlpha)
+        this.nextBC2 !== null && drawSpriteWithAlpha(ctx, this.nextBC2, CANVAS_CENTER_X - BC2X, BC2Y,this.nextBC2.width, this.nextBC2.height, this.nextAlpha)
+        this.BC3 !== null && drawSpriteWithAlpha(ctx, this.BC3, CANVAS_CENTER_X - BC3X, BC3Y,this.BC3.width, this.BC3.height, this.currentAlpha)
+        this.BC3 !== null && drawSpriteWithAlpha(ctx, this.BC3, CANVAS_CENTER_X- this.sky.width - BC3X, BC3Y,this.BC3.width, this.BC3.height, this.currentAlpha)
+        this.nextBC3 !== null && drawSpriteWithAlpha(ctx, this.nextBC3, CANVAS_CENTER_X - BC3X, BC3Y,this.nextBC3.width, this.nextBC3.height, this.nextAlpha)
+        this.nextBC3 !== null && drawSpriteWithAlpha(ctx, this.nextBC3, CANVAS_CENTER_X- this.sky.width - BC3X, BC3Y,this.nextBC3.width, this.nextBC3.height, this.nextAlpha)
+
     }
 
     update(dt){
         if (this.sky === null || this.BC1 === null || this.BC2 === null || this.BC3 === null){
-            switch (this.game.currentStage){
-                case SUBURB:
-                    this.sky = subBackgrounds[0]
-                    this.BC1 = subBackgrounds[1]
-                    this.BC2 = subBackgrounds[2]
-                    this.BC3 = subBackgrounds[3]
-                    break
-                case CITY:
-                    this.sky = cityBackgrounds[0]
-                    this.BC1 = cityBackgrounds[1]
-                    this.BC2 = cityBackgrounds[2]
-                    this.BC3 = cityBackgrounds[3]
-                    break
-                case FARM:
-                    this.sky = farmBackgrounds[0]
-                    this.BC1 = farmBackgrounds[1]
-                    this.BC2 = farmBackgrounds[2]
-                    this.BC3 = farmBackgrounds[3]
-                    break
-                case FOREST:
-                    this.sky = forestBackgrounds[0]
-                    this.BC1 = forestBackgrounds[1]
-                    this.BC2 = forestBackgrounds[2]
-                    this.BC3 = forestBackgrounds[3]
-                    break
-                case BEACH:
-                    this.sky = beachBackgrounds[0]
-                    this.BC1 = beachBackgrounds[1]
-                    this.BC2 = beachBackgrounds[2]
-                    this.BC3 = beachBackgrounds[3]
-                    break
+            this.changeBackground(this.game.currentStage, false);
+        }
+        if (this.nextAlpha < 1 ){
+            if (this.game.road.findSegment(this.game.player.z - SEGMENT_LENGTH) !== this.game.player.currentSegment){
+                this.currentAlpha -= 0.025
+                this.nextAlpha += 0.025
+            }
+
+            if (this.nextAlpha > 1){
+                this.nextSky = null
+                this.nextBC1 = null
+                this.nextBC2 = null
+                this.nextBC3 = null
+                this.currentAlpha = 1
+                this.changeBackground(this.game.currentStage, false)
             }
         }
         this.offSetX+= this.game.road.findSegment(this.game.player.z).curve + this.game.player.x/2
         this.offSetY+= this.game.road.findSegment(this.game.player.z).worldPoints.y
+    }
+
+    changeBackground(stage, next) {
+        let sky, BC1, BC2, BC3
+        switch (stage) {
+            case SUBURB:
+                sky = subBackgrounds[0]
+                BC1 = subBackgrounds[1]
+                BC2 = subBackgrounds[2]
+                BC3 = subBackgrounds[3]
+                break
+            case CITY:
+                sky = cityBackgrounds[0]
+                BC1 = cityBackgrounds[1]
+                BC2 = cityBackgrounds[2]
+                BC3 = cityBackgrounds[3]
+                break
+            case FARM:
+                sky = farmBackgrounds[0]
+                BC1 = farmBackgrounds[1]
+                BC2 = farmBackgrounds[2]
+                BC3 = farmBackgrounds[3]
+                break
+            case FOREST:
+                sky = forestBackgrounds[0]
+                BC1 = forestBackgrounds[1]
+                BC2 = forestBackgrounds[2]
+                BC3 = forestBackgrounds[3]
+                break
+            case BEACH:
+                sky = beachBackgrounds[0]
+                BC1 = beachBackgrounds[1]
+                BC2 = beachBackgrounds[2]
+                BC3 = beachBackgrounds[3]
+                break
+            default:
+                sky = null
+                BC1 = null
+                BC2 = null
+                BC3 = null
+        }
+        if (next){
+            this.nextSky = sky
+            this.nextBC1 = BC1
+            this.nextBC2 = BC2
+            this.nextBC3 = BC3
+        } else{
+            this.sky = sky
+            this.BC1 = BC1
+            this.BC2 = BC2
+            this.BC3 = BC3
+        }
     }
 }

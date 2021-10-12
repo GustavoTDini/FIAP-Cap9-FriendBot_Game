@@ -258,6 +258,15 @@ function setSpriteDirection(ctx, sprite, x, y, dir, spriteSize) {
     ctx.drawImage(...sprite, (-spriteSize / 2), (-spriteSize / 2), spriteSize, spriteSize);
     ctx.restore();
 }
+// para mudar a opacidade do desenho
+function drawSpriteWithAlpha(ctx, sprite, x, y, width, height, alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(sprite, x, y, width, height);
+    ctx.globalAlpha = 1
+    ctx.restore();
+}
+
 // ---------------------------------------------------------------------------------
 // Sound Helpers
 // ---------------------------------------------------------------------------------

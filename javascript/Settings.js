@@ -3,7 +3,7 @@ class Settings{
     constructor() {
         this.music = false
         this.sounds = true
-        this.threeD = false
+        this.threeD = true
         this.controls = true
     }
 }

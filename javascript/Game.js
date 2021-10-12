@@ -15,6 +15,7 @@ class Game {
         this.nextStage = null
         this.decideSegment = null
         this.newStageSegment = null
+        this.yRoadStartSegment = null
     }
 
     // Função principal para renderizar os elementos do canvas
@@ -56,6 +57,7 @@ class Game {
                 game.gameCamera.init()
                 game.player.init()
                 game.gameState = SET_STATE;
+                game.currentStage = SUBURB
                 break;
             case SET_STATE:
                 game.road.roadConstructor.createRoad()

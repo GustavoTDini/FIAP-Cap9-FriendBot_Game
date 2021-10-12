@@ -219,15 +219,20 @@ class Player {
         let objectWidth = object.mask.w
         let thisSize = this.mask.s
         let objectSize = object.mask.s
-        return ((thisX < objectX + objectWidth) &&
-            (thisX + thisWidth > objectX) &&
-            (thisZ < objectZ + objectSize) &&
-            (thisZ + thisSize > objectZ) && !this.over)
+        if (object.z > thisZ - 500 && object.z < thisZ + this.game.gameCamera.drawDistance * SEGMENT_LENGTH){
+            return ((thisX < objectX + objectWidth) &&
+                (thisX + thisWidth > objectX) &&
+                (thisZ < objectZ + objectSize) &&
+                (thisZ + thisSize > objectZ))
+        } else{
+            return false
+        }
+
     }
 
     checkCollidingCoins(audioCtx){
         for (let n = 0; n < this.game.road.totalCoins.length; n++){
-            if (this.isColliding(this.game.road.totalCoins[n])){
+            if (this.isColliding(this.game.road.totalCoins[n]) && !this.over){
                 this.game.road.totalCoins.splice(n, 1)
                 this.gotEffect.setXY(this.screen.x, this.screen.y - 64)
                 this.gotEffect.setPlay()
@@ -244,7 +249,7 @@ class Player {
 
     checkCollidingFuel(audioCtx){
         for (let n = 0; n < this.game.road.totalFuel.length; n++){
-            if (this.isColliding(this.game.road.totalFuel[n])){
+            if (this.isColliding(this.game.road.totalFuel[n]) && !this.over){
                 this.game.road.totalFuel.splice(n, 1)
                 this.gotEffect.setXY(this.screen.x, this.screen.y -64)
                 this.gotEffect.setPlay()
@@ -255,12 +260,11 @@ class Player {
     }
 
     checkCollidingPowerUp(audioCtx){
-        //TODO - Falta a funcionalidade do escudo
-        for (let n = 0; n < this.game.road.powerUps.length; n++){
-            if (this.isColliding(this.game.road.powerUps[n])){
+        for (let n = 0; n < this.game.road.totalPowerUps.length; n++){
+            if (this.isColliding(this.game.road.totalPowerUps[n]) && !this.over){
                 this.gotEffect.setXY(this.screen.x, this.screen.y -64)
                 this.gotEffect.setPlay()
-                switch (this.game.road.powerUps[n].type){
+                switch (this.game.road.totalPowerUps[n].type){
                     case (TURBO):
                         this.turbo = this.MAX_POWER_UP_COUNTER
                         playTrack(contextSounds["turbo"], audioCtx)
@@ -286,7 +290,7 @@ class Player {
                         this.shieldEffect.setPlay()
                         break;
                 }
-                this.game.road.powerUps.splice(n, 1)
+                this.game.road.totalPowerUps.splice(n, 1)
             }
         }
     }
@@ -305,28 +309,32 @@ class Player {
 
     checkCollidingGameOver(audioCtx){
         for (let n = 0; n < this.game.road.totalTraffic.length; n++){
-            if (this.isColliding(this.game.road.totalTraffic[n]) && this.transparent  === 0 && !this.gameOver){
-                this.setGameOverStatus(this.game.road.totalTraffic[n].z)
-                playTrack(contextSounds["hit"], audioCtx)
+            if (this.isColliding(this.game.road.totalTraffic[n]) && this.transparent  === 0 && !this.gameOver  && !this.over){
+                this.game.road.totalTraffic[n].hitByShield()
+                // this.setGameOverStatus(this.game.road.totalTraffic[n].z)
+                // playTrack(contextSounds["hit"], audioCtx)
             }
         }
         for (let n = 0; n < this.game.road.totalCars.length; n++){
-            if (this.isColliding(this.game.road.totalCars[n]) && this.transparent  === 0 && !this.gameOver){
-                this.setGameOverStatus(this.game.road.totalCars[n].z)
-                playTrack(contextSounds["hit"], audioCtx)
+            if (this.isColliding(this.game.road.totalCars[n]) && this.transparent  === 0 && !this.gameOver  && !this.over){
+                this.game.road.totalCars[n].hitByShield()
+                // this.setGameOverStatus(this.game.road.totalCars[n].z)
+                // playTrack(contextSounds["hit"], audioCtx)
             }
         }
-        for (let n = 0; n < this.game.road.obstacles.length; n++){
-            if (this.isColliding(this.game.road.obstacles[n]) && this.transparent === 0 && !this.gameOver){
-                this.setGameOverStatus(this.game.road.obstacles[n].z)
-                playTrack(contextSounds["hit"], audioCtx)
+        for (let n = 0; n < this.game.road.totalObstacles.length; n++){
+            if (this.isColliding(this.game.road.totalObstacles[n]) && this.transparent === 0 && !this.gameOver){
+                this.game.road.totalObstacles[n].hitByShield()
+                // this.setGameOverStatus(this.game.road.totalObstacles[n].z)
+                // playTrack(contextSounds["hit"], audioCtx)
             }
         }
-        for (let n = 0; n < this.game.road.animals.length; n++){
-            if (this.isColliding(this.game.road.animals[n]) && this.transparent === 0 && !this.gameOver){
-                this.game.road.animals[n].hit = true
-                this.setGameOverStatus(this.game.road.animals[n].z)
-                playTrack(contextSounds["hit"], audioCtx)
+        for (let n = 0; n < this.game.road.totalAnimals.length; n++){
+            if (this.isColliding(this.game.road.totalAnimals[n]) && this.transparent === 0 && !this.gameOver  && !this.over){
+                this.game.road.totalAnimals[n].hitByShield()
+                this.game.road.totalAnimals[n].hit = true
+                // this.setGameOverStatus(this.game.road.totalAnimals[n].z)
+                // playTrack(contextSounds["hit"], audioCtx)
 
             }
         }
@@ -348,6 +356,9 @@ class Player {
         if (this.game.road.findSegment(this.z) !== this.currentSegment){
             this.segmentCounter++
             this.currentSegment = this.game.road.findSegment(Math.floor(this.z))
+            if (this.currentSegment.YRoad){
+                console.log(this.currentSegment)
+            }
             this.currentSprite++;
             if (this.currentSprite > MAX_SPRITES) {
                 this.currentSprite = 0;
@@ -371,7 +382,7 @@ class Player {
         this.setLanes()
         this.countPowerUps()
         this.SettingJumpingY(dt)
-        //this.checkCollidingGameOver(audioCtx)
+        this.checkCollidingGameOver(audioCtx)
         this.checkCollidingCoins(audioCtx)
         this.checkCollidingPowerUp(audioCtx)
         this.checkCollidingFuel(audioCtx)
@@ -558,8 +569,6 @@ class Player {
                 }
             }
             this.over = this.screen.y < 500;
-            // console.log(this.screen.y)
-            // console.log(this.over)
         }
     }
 

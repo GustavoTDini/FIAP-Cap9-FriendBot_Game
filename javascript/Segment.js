@@ -1,5 +1,3 @@
-
-
 // Classe com os atributos de cada segmento da estrada a serem renderizados
 class Segment {
 
@@ -7,15 +5,18 @@ class Segment {
     static REGULAR = "REGULAR"
     static EMPTY = "EMPTY"
     static ANIMALS = "ANIMALS"
+    static TUNNEL = "TUNNEL"
     static YROAD = "YROAD"
 
-    constructor(segments, curve, y, road, stage, type){
+    constructor(segments, curve, y, road, stage, type, YRoad, YRoadCounter){
         this.road = road
         this.index = segments.length;
         this.texture = randomIntFromInterval(0,4)
-        this.worldPoints = {x: 0, y:y, z: this.index*SEGMENT_LENGTH}
+        this.worldPoints =  {x: 0, y:y, z: this.index*SEGMENT_LENGTH}
         this.screenPoints = {x:0, y:0, w:0}
         this.lastScreenPoints = {x:0, y:0, w:0}
+        this.YRoad = YRoad
+        this.YRoadCounter = YRoadCounter
         this.maxHeight = CANVAS_HEIGHT
         this.scale = -1;
         this.curve = curve
@@ -23,7 +24,6 @@ class Segment {
         this.color = this.getColors(this.index)
         this.roadSideObjects = this.addScenarios(type)
         this.inRoadObjects = []
-
     }
 
     getColors(index) {
@@ -46,11 +46,11 @@ class Segment {
             return []
         }
         let thisSprite = null
-        if (type === Segment.REGULAR){
+        if (type === Segment.REGULAR || type === Segment.ANIMALS){
             for (let places in sidePlaces){
-                if (Math.random() > 0.8) {
+                if (Math.random() > 0.85) {
                     thisSprite = randomIntFromInterval(0,7)
-                    objects.push(new SideObjects(stageObjects[this.stage].SCENARIOS[thisSprite], sidePlaces[places], this.worldPoints.y, this.worldPoints.z, LARGE_SPRITE_SIZE, this.road, this.road.game.gameCamera))
+                    objects.push(new SideObjects(stageObjects[this.stage].SCENARIOS[thisSprite], sidePlaces[places], this.worldPoints.y, this.worldPoints.z, LARGE_SPRITE_SIZE, this.road, false))
                 }
         }
 
@@ -59,28 +59,35 @@ class Segment {
         switch (type){
             case (Segment.REGULAR):
                 for (let places in sideRoad){
-                    if (Math.random() > 0.8) {
+                    if (Math.random() > 0.9) {
                         if (Math.random() > 0.1){
                             thisSprite = stageObjects[this.stage].SIDE_SCENARIOS[randomIntFromInterval(0, 3)]
                         } else{
                             thisSprite = billboards[randomIntFromInterval(0, 2)]
                         }
-                        objects.push(new SideObjects(thisSprite, sideRoad[places], this.worldPoints.y, this.worldPoints.z, LARGE_SPRITE_SIZE, this.road, this.road.game.gameCamera))
+                        objects.push(new SideObjects(thisSprite, sideRoad[places], this.worldPoints.y, this.worldPoints.z, LARGE_SPRITE_SIZE, this.road,  false))
                     }
                 }
                 break
             case (Segment.BILLBOARDS):
                 thisSprite = billboards[randomIntFromInterval(0,2)]
-                this.twoSidesObject(objects, thisSprite, sideRoad, thisSprite,0.90)
+                this.twoSidesObject(objects, thisSprite, sideRoad, thisSprite,12)
                 break
             case (Segment.ANIMALS):
                 thisSprite = commonScenarioAnimalCrossingSign
-                this.twoSidesObject(objects, thisSprite, sideRoad, thisSprite,0.95)
+                this.twoSidesObject(objects, thisSprite, sideRoad, thisSprite,20)
                 break
             case (Segment.YROAD):
                 let leftSprite = stageObjects[this.road.game.nextLeft].LEFT_SIGN
                 let rightSprite = stageObjects[this.road.game.nextRight].RIGHT_SIGN
-                this.twoSidesObject(objects, leftSprite, sideRoad, rightSprite, 0.9);
+                this.twoSidesObject(objects, leftSprite, sideRoad, rightSprite, 15);
+                break
+            case (Segment.TUNNEL):
+                thisSprite = stageObjects[this.stage].TUNNEL
+                if(this.index % 3 === 0){
+                    objects.push(new SideObjects(thisSprite, sideRoad[0], this.worldPoints.y, this.worldPoints.z, 640, this.road,  true))
+                }
+
                 break
 
         }
@@ -88,9 +95,9 @@ class Segment {
     }
 
     twoSidesObject(objects, leftSprite, sideRoad, rightSprite, chance) {
-        if (Math.random() > chance) {
-            objects.push(new SideObjects(leftSprite, sideRoad[0], this.worldPoints.y, this.worldPoints.z, LARGE_SPRITE_SIZE, this.road, this.road.game.gameCamera))
-            objects.push(new SideObjects(rightSprite, sideRoad[1], this.worldPoints.y, this.worldPoints.z, LARGE_SPRITE_SIZE, this.road, this.road.game.gameCamera))
+        if (this.index % chance === 0) {
+            objects.push(new SideObjects(leftSprite, sideRoad[0], this.worldPoints.y, this.worldPoints.z, LARGE_SPRITE_SIZE, this.road,  false))
+            objects.push(new SideObjects(rightSprite, sideRoad[1], this.worldPoints.y, this.worldPoints.z, LARGE_SPRITE_SIZE, this.road,  false))
         }
     }
 }

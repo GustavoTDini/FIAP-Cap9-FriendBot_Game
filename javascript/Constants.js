@@ -47,17 +47,17 @@ const DIFFICULTIES_SETS = {
   EASY: {
       START_SPEED: MAX_SPEED/10,
       MAX_SPEED:  MAX_SPEED/2,
-      MAX_CARS: 20,
-      MAX_OBSTACLES: 10,
+      MAX_CARS: 25,
+      MAX_OBSTACLES: 5,
       MAX_POWER_UPS: 20,
       GAS_CORRECTION: 4,
-      MAX_CARS_SPEEDS: MAX_SPEED/10
+      MAX_CARS_SPEEDS: MAX_SPEED/4
   } ,
     MEDIUM: {
-        START_SPEED: MAX_SPEED/8,
+        START_SPEED: MAX_SPEED/7,
         MAX_SPEED:  MAX_SPEED*0.75,
         MAX_CARS: 50,
-        MAX_OBSTACLES: 20,
+        MAX_OBSTACLES: 10,
         MAX_POWER_UPS: 20,
         GAS_CORRECTION: 3,
         MAX_CARS_SPEEDS: MAX_SPEED/3
@@ -65,11 +65,11 @@ const DIFFICULTIES_SETS = {
     HARD: {
         START_SPEED: MAX_SPEED,
         MAX_SPEED:  MAX_SPEED,
-        MAX_CARS: 100,
-        MAX_OBSTACLES: 10,
+        MAX_CARS: 75,
+        MAX_OBSTACLES: 15,
         MAX_POWER_UPS: 20,
         GAS_CORRECTION: 2,
-        MAX_CARS_SPEEDS: MAX_SPEED*0.75
+        MAX_CARS_SPEEDS: MAX_SPEED/2
     },
 }
 
@@ -206,7 +206,10 @@ let images = {
     suburb_spritesheet: new Image(),
     scenario_sub_spritesheet: new Image(),
     get_ready_spritesheet: new Image(),
-    start_road_sprite: new Image()
+    start_road_sprite_1: new Image(),
+    start_road_sprite_2: new Image(),
+    y_road_screen_signs: new Image(),
+    scenario_tunnel_spritesheet: new Image()
 }
 
 // ---------------------------------------------------------------------------------
@@ -673,6 +676,8 @@ const commonScenarioCityRight = [images.scenario_common_spritesheet, 0, 1024, LA
 const commonScenarioFarmRight = [images.scenario_common_spritesheet, 512, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
 const commonScenarioBeachRight = [images.scenario_common_spritesheet, 1024, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
 const commonScenarioForestRight= [images.scenario_common_spritesheet, 1536, 1024, LARGE_SPRITE_SIZE, LARGE_SPRITE_SIZE]
+const commonScenarioCityTunnel = [images.scenario_tunnel_spritesheet, 0, 0, 1280, 640]
+const commonScenarioGrassTunnel= [images.scenario_tunnel_spritesheet, 0, 640, 1280, 640]
 
 // ---------------------------------------------------------------------------------
 // GUI Sprites
@@ -801,7 +806,8 @@ const stageObjects = {
             LIGHT:	{road: '#646466', grass: '#B36820', grassTextures: 0, shoulder: '#078116', lane: '#000000'},
             DARK:	{road: '#484849', grass: '#e38b3a', grassTextures: 1, shoulder: '#ffcc00'},
             DARKER:	{road: '#333333', grass: '#8d5313', grassTextures: 2, shoulder: '#078116'},
-        }
+        },
+        TUNNEL: commonScenarioCityTunnel
     },
     CITY:{
         ROAD_TEXTURES: [images.city_road_sprite_1, images.city_road_sprite_2, images.city_road_sprite_3, images.city_road_sprite_4, images.city_road_sprite_5],
@@ -817,7 +823,8 @@ const stageObjects = {
             DARKER:	{road: '#444444', grass: '#e5e5e5', grassTextures: 2, shoulder: '#BCBCBC'},
         },
         LEFT_SIGN: commonScenarioCityLeft,
-        RIGHT_SIGN: commonScenarioCityRight
+        RIGHT_SIGN: commonScenarioCityRight,
+        TUNNEL: commonScenarioCityTunnel
     },
     FARM:{
         ROAD_TEXTURES: [images.farm_road_sprite_1, images.farm_road_sprite_2, images.farm_road_sprite_3, images.farm_road_sprite_4, images.farm_road_sprite_5],
@@ -833,7 +840,8 @@ const stageObjects = {
             DARKER:	{road: '#444444', grass: '#398246', grassTextures: 2, shoulder: '#BCBCBC'},
         },
         LEFT_SIGN: commonScenarioFarmLeft,
-        RIGHT_SIGN: commonScenarioFarmRight
+        RIGHT_SIGN: commonScenarioFarmRight,
+        TUNNEL: commonScenarioCityTunnel
     },
     FOREST:{
         ROAD_TEXTURES: [images.forest_road_sprite_1, images.forest_road_sprite_2, images.forest_road_sprite_3, images.forest_road_sprite_4, images.forest_road_sprite_5],
@@ -849,7 +857,8 @@ const stageObjects = {
             DARKER:	{road: '#3d311d', grass: '#2f5d18', grassTextures: 2, shoulder: '#725e2a'},
         },
         LEFT_SIGN: commonScenarioForestLeft,
-        RIGHT_SIGN: commonScenarioForestRight
+        RIGHT_SIGN: commonScenarioForestRight,
+        TUNNEL: commonScenarioGrassTunnel
     },
     BEACH:{
         ROAD_TEXTURES: [images.beach_road_sprite_1, images.beach_road_sprite_2, images.beach_road_sprite_3, images.beach_road_sprite_4, images.beach_road_sprite_5],
@@ -865,9 +874,16 @@ const stageObjects = {
             DARKER:	{road: '#947c3b', grass: '#a9a18a', grassTextures: 2, shoulder: '#F5D890'},
         },
         LEFT_SIGN: commonScenarioBeachLeft,
-        RIGHT_SIGN: commonScenarioBeachRight
+        RIGHT_SIGN: commonScenarioBeachRight,
+        TUNNEL: commonScenarioGrassTunnel
     },
 }
+
+const START_COLORS = {
+        LIGHT:	{road: '#d0d2d3',oppositeRoad: '#222a2c', roadTexture: images.start_road_sprite_1, shoulder: '#222a2c'},
+        DARK:	{road: '#222a2c',oppositeRoad: '#d0d2d3', roadTexture: images.start_road_sprite_2, shoulder: '#222a2c'},
+}
+
 
 
 

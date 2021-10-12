@@ -12,6 +12,9 @@ window.onload = async function () {
         document.addEventListener('keyup', function (e) {
             game.player.handleInputUp(ALLOWED_KEYS[e.code], audioContext);
         });
+        document.addEventListener('mousedown', function (e) {
+            game.player.handleInputUp(ALLOWED_KEYS[e.code], audioContext);
+        });
         GameEngine.run({
             canvas: GAME_CANVAS,
             audio: audioContext,
