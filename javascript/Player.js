@@ -242,7 +242,7 @@ class Player {
                     this.coins++
                     this.score++
                 }
-                playTrack(contextSounds["coin"], audioCtx)
+                playTrack(contextSounds["coin"], audioCtx, this.game.settings.sounds)
             }
         }
     }
@@ -254,7 +254,7 @@ class Player {
                 this.gotEffect.setXY(this.screen.x, this.screen.y -64)
                 this.gotEffect.setPlay()
                 this.fuel = this.MAX_FUEL
-                playTrack(contextSounds["coin"], audioCtx)
+                playTrack(contextSounds["coin"], audioCtx, this.game.settings.sounds)
             }
         }
     }
@@ -267,7 +267,7 @@ class Player {
                 switch (this.game.road.totalPowerUps[n].type){
                     case (TURBO):
                         this.turbo = this.MAX_POWER_UP_COUNTER
-                        playTrack(contextSounds["turbo"], audioCtx)
+                        playTrack(contextSounds["turbo"], audioCtx, this.game.settings.sounds)
                         this.turboEffect.setPlay()
                         if (this.turboEffect2 !== null){
                             this.turboEffect2.setPlay()
@@ -277,16 +277,16 @@ class Player {
                         break;
                     case (BOLT):
                         this.transparent = this.MAX_POWER_UP_COUNTER
-                        playTrack(contextSounds["turbo"], audioCtx)
+                        playTrack(contextSounds["turbo"], audioCtx, this.game.settings.sounds)
                         break;
                     case (DOUBLE):
                         this.double = this.MAX_POWER_UP_COUNTER
-                        playTrack(contextSounds["turbo"], audioCtx)
+                        playTrack(contextSounds["turbo"], audioCtx, this.game.settings.sounds)
                         this.glitterEffect.setPlay()
                         break;
                     case (SHIELD):
                         this.shield = this.MAX_POWER_UP_COUNTER
-                        playTrack(contextSounds["turbo"], audioCtx)
+                        playTrack(contextSounds["turbo"], audioCtx, this.game.settings.sounds)
                         this.shieldEffect.setPlay()
                         break;
                 }
@@ -572,47 +572,52 @@ class Player {
         }
     }
 
-    // TODO = colocar a interatividade mobile & Mouse
     handleInputUp(keys, audioCtx) {
         switch (keys) {
             case ('right'):
-                if (!this.jumping && this.game.gameState === PLAY_STATE && !this.gameOver && !this.start){
-                    this.nextLane = limitMaxMin(this.currentLane, this.currentLane+1, 3, 0)
-                    audioCtx.gain = 1
-                    playTrack(contextSounds["tire"], audioCtx)
-                    if (this.nextLane !== this.currentLane){
-                        this.movingLane = true
-                    }
-                }
+                this.moveLeftRight(audioCtx, 1);
                 break;
             case ('left'):
-                if (!this.jumping && this.game.gameState === PLAY_STATE && !this.gameOver && !this.start){
-                    this.nextLane = limitMaxMin(this.currentLane, this.currentLane-1, 3, 0)
-                    audioCtx.gain = 1
-                    playTrack(contextSounds["tire"], audioCtx)
-                    if (this.nextLane !== this.currentLane){
-                        this.movingLane = true
-                    }
-                }
+                this.moveLeftRight(audioCtx, -1);
                 break;
             case ('pause'):
-                if(this.game.gameState === PLAY_STATE && !this.gameOver && !this.start){
-                    playTrack(contextSounds["pause"], audioCtx)
-                    this.game.gameState = PAUSE_STATE
-                } else if (this.game.gameState === PAUSE_STATE){
-                    playTrack(contextSounds["pause"], audioCtx)
-                    this.game.gameState = PLAY_STATE
-                }
+                this.setPause(audioCtx);
                 break;
             case ('jump'):
-                if (!this.movingLane && !this.jumping && this.game.gameState === PLAY_STATE && !this.gameOver && !this.start){
-                    playTrack(contextSounds["jump"], audioCtx)
-                    this.jumping = true
-                    this.ySpeed = this.jumpSpeed
-                }
+                this.setJump(audioCtx);
                 break;
         }
     }
+
+    setPause(audioCtx) {
+        if (this.game.gameState === PLAY_STATE && !this.gameOver && !this.start) {
+            this.game.gameState = PAUSE_STATE
+        } else if (this.game.gameState === PAUSE_STATE) {
+            this.game.gameState = PLAY_STATE
+        }
+        playTrack(contextSounds["pause"], audioCtx, this.game.settings.sounds)
+    }
+
+    setJump(audioCtx) {
+        if (!this.movingLane && !this.jumping && this.game.gameState === PLAY_STATE && !this.gameOver && !this.start) {
+            playTrack(contextSounds["jump"], audioCtx, this.game.settings.sounds)
+            this.jumping = true
+            this.ySpeed = this.jumpSpeed
+        }
+    }
+
+    moveLeftRight(audioCtx, dir) {
+        if (!this.jumping && this.game.gameState === PLAY_STATE && !this.gameOver && !this.start) {
+            this.nextLane = limitMaxMin(this.currentLane, this.currentLane + dir, 3, 0)
+            audioCtx.gain = 1
+            playTrack(contextSounds["tire"], audioCtx, this.game.settings.sounds)
+            if (this.nextLane !== this.currentLane) {
+                this.movingLane = true
+            }
+        }
+    }
+
+
 }
 
 

@@ -1,5 +1,13 @@
 class UI {
 
+    UIHomeIcon = [UIHomeOff, UIHomeOn]
+    UIConfigIcon = [UIConfigOff, UIConfigOn]
+    UIReturnIcon = [UIReturnOff, UIReturnOn]
+
+    homeIcon = this.UIHomeIcon[0]
+    configIcon = this.UIConfigIcon[0]
+    returnIcon = this.UIReturnIcon[0]
+
     constructor(game){
         this.game = game
         this.timer = 0
@@ -31,8 +39,8 @@ class UI {
     renderPauseUI(ctx){
         ctx.drawImage(...UIPause, CANVAS_CENTER_X - 350, CANVAS_CENTER_Y - 200, 700, 400)
         ctx.drawImage(...UIResume, CANVAS_CENTER_X - 100, CANVAS_CENTER_Y - 80, 200, 200)
-        ctx.drawImage(...UIHomeOff, CANVAS_CENTER_X - 250, CANVAS_CENTER_Y -20, 100, 100)
-        ctx.drawImage(...UIConfigOff, CANVAS_CENTER_X + 150, CANVAS_CENTER_Y-20, 100, 100)
+        ctx.drawImage(...this.homeIcon, CANVAS_CENTER_X - 250, CANVAS_CENTER_Y -20, 100, 100)
+        ctx.drawImage(...this.configIcon, CANVAS_CENTER_X + 150, CANVAS_CENTER_Y-20, 100, 100)
     }
     renderMiniMap(ctx){
         let spriteWidth = 20
@@ -52,7 +60,7 @@ class UI {
         ctx.drawImage(...this.game.settings.controls? UISelectorOn: UISelectorOff, CANVAS_CENTER_X + 10, CANVAS_CENTER_Y, 100, 100)
         ctx.drawImage(...UI3d, CANVAS_CENTER_X + 160, CANVAS_CENTER_Y - 60, 100, 100)
         ctx.drawImage(...this.game.settings.threeD? UISelectorOn: UISelectorOff, CANVAS_CENTER_X + 150, CANVAS_CENTER_Y, 100, 100)
-        ctx.drawImage(...UIReturnOff, CANVAS_CENTER_X - 70, CANVAS_CENTER_Y + 75, 100, 100)
+        ctx.drawImage(...this.returnIcon, CANVAS_CENTER_X - 70, CANVAS_CENTER_Y + 75, 100, 100)
     }
 
     renderGameOverUI(ctx){
@@ -159,6 +167,84 @@ class UI {
 }
 
 
+    handleMouseDown(x, y, audioCtx) {
+        switch (this.game.gameState){
+            case (PLAY_STATE):
+                if (this.game.settings.controls){
+                    if (getMouseCanvasArea(x,y, 200, 10 ,100,100)){
+                        this.game.player.setPause(audioCtx)
+                    }
+                    if (getMouseCanvasArea(x,y, 10, CANVAS_HEIGHT-130 ,120,120)){
+                        this.game.player.moveLeftRight(audioCtx, -1)
+                    }
+                    if (getMouseCanvasArea(x,y, CANVAS_WIDTH-130, CANVAS_HEIGHT-130 ,120,120)){
+                        this.game.player.moveLeftRight(audioCtx, 1)
+                    }
+                    if (getMouseCanvasArea(x,y, CANVAS_WIDTH - 130, CANVAS_HEIGHT-260 ,120,120)){
+                        this.game.player.setJump(audioCtx)
+                    }
+                }
+
+                break
+            case (PAUSE_STATE):
+                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 100, CANVAS_CENTER_Y - 80 ,200,200)){
+                    this.game.player.setPause(audioCtx)
+                }
+                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 250, CANVAS_CENTER_Y - 80 ,100,100)){
+                    this.homeIcon = this.UIHomeIcon[1]
+                }
+                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X + 150, CANVAS_CENTER_Y-20 ,100,100)){
+                    this.configIcon = this.UIConfigIcon[1]
+                }
+                break
+            case (CONFIG_STATE):
+                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 260, CANVAS_CENTER_Y - 60 ,100,100)){
+                    this.game.settings.music = !this.game.settings.music
+                }
+                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 120, CANVAS_CENTER_Y - 60 ,100,100)){
+                    this.game.settings.sounds = !this.game.settings.sounds
+                }
+                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X + 20, CANVAS_CENTER_Y - 60 ,100,100)){
+                    this.game.settings.controls = !this.game.settings.controls
+                }
+                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X + 160, CANVAS_CENTER_Y - 60 ,100,100)){
+                    this.game.settings.threeD = !this.game.settings.threeD
+                }
+                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 70, CANVAS_CENTER_Y +75 ,100,100)){
+                    this.returnIcon = this.UIReturnIcon[1]
+                }
+                break
+            case (GAME_OVER_STATE):
+                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 100, CANVAS_CENTER_Y - 55 ,200,2020)){
+                    this.game.gameState = LOADING_STATE
+                }
+                break
+        }
+
+    }
+
+    handleMouseUp(x, y, audioCtx) {
+        this.homeIcon = this.UIHomeIcon[0]
+        this.configIcon = this.UIConfigIcon[0]
+        this.returnIcon = this.UIReturnIcon[0]
+
+        switch (this.game.gameState){
+            case (PAUSE_STATE):
+                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 250, CANVAS_CENTER_Y - 80 ,100,100)){
+                    this.game.gameState = LOADING_STATE
+                }
+                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X + 150, CANVAS_CENTER_Y-20 ,100,100)){
+                    this.game.gameState = CONFIG_STATE
+                }
+                break
+            case (CONFIG_STATE):
+                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 70, CANVAS_CENTER_Y +75 ,100,100)){
+                    this.game.gameState = PAUSE_STATE
+                }
+                break
+        }
+
+    }
 
 }
 

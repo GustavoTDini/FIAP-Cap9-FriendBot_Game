@@ -288,14 +288,17 @@ function preloadSounds(sounds, audioCtx) {
     }
 }
 
-function playTrack(audioBuffer, audioCtx) {
-    if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
+function playTrack(audioBuffer, audioCtx, soundSetting) {
+    if (soundSetting){
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        const trackSource = audioCtx.createBufferSource();
+        trackSource.buffer = audioBuffer;
+        trackSource.connect(audioCtx.destination)
+        trackSource.start();
     }
-    const trackSource = audioCtx.createBufferSource();
-    trackSource.buffer = audioBuffer;
-    trackSource.connect(audioCtx.destination)
-    trackSource.start();
+
 }
 
 function playMusic(audioBuffer, audioCtx) {
@@ -313,9 +316,14 @@ function playMusic(audioBuffer, audioCtx) {
     return false
 }
 
+// ---------------------------------------------------------------------------------
+// Mouse & Touch Helpers
+// ---------------------------------------------------------------------------------
 
-
-function stopSound(soundName, audioCtx){
-    sound.pause()
-    sound.currentTime = 0
+function getMouseCanvasArea(mouseX, mouseY, x, y, width, height){
+    console.log(mouseX)
+    console.log(mouseY)
+    console.log(x, x + width)
+    console.log(y, y + height)
+    return (mouseX > x && mouseX < x + width) && (mouseY > y && mouseY < y + height);
 }
