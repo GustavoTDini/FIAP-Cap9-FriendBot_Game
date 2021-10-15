@@ -63,8 +63,8 @@ const DIFFICULTIES_SETS = {
         MAX_CARS_SPEEDS: MAX_SPEED/3
     },
     HARD: {
-        START_SPEED: MAX_SPEED,
-        MAX_SPEED:  MAX_SPEED,
+        START_SPEED: MAX_SPEED*2,
+        MAX_SPEED:  MAX_SPEED*2,
         MAX_CARS: 75,
         MAX_OBSTACLES: 15,
         MAX_POWER_UPS: 20,
@@ -892,7 +892,20 @@ const START_COLORS = {
 // Music & Sounds
 // ---------------------------------------------------------------------------------
 
-let sounds = [
+let sounds =[
+    "car_pass",
+    "bell",
+    "click",
+    "crash",
+    "fuel_beep",
+    "game_over",
+    "get_shield",
+    "go",
+    "light_1",
+    "light_2",
+    "lose",
+    "shield_hit",
+    "start_your_engines",
     "passing_breeze",
     "coin",
     "hit",

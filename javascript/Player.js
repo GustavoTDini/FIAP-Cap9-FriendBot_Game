@@ -93,14 +93,25 @@ class Player {
         this.gotEffect.update()
     }
 
-    startCountDown(){
+    startCountDown(audioCtx){
         if (this.start){
             this.startCounter--
             if (!this.getReadyEffect.play){
                 this.getReadyEffect.setPlay()
             }
+            if (this.startCounter === 160){
+                playTrack(contextSounds["start_your_engines"], audioCtx, this.game.settings.sounds)
+            }
+            if (this.startCounter === 70 || this.startCounter === 55 || this.startCounter === 40 ){
+                playTrack(contextSounds["light_1"], audioCtx, this.game.settings.sounds)
+            }
+
             if (this.startCounter === 25){
                 this.currentSpeed = this.difficulty.START_SPEED
+                playTrack(contextSounds["light_2"], audioCtx, this.game.settings.sounds)
+            }
+            if (this.startCounter === 25 || this.startCounter === 18 || this.startCounter === 10){
+                playTrack(contextSounds["go"], audioCtx, this.game.settings.sounds)
             }
             if (this.startCounter === 0){
                 this.start = false
@@ -156,13 +167,16 @@ class Player {
         if (this.gameOver){
             this.gameOverCounter--
             if (this.gameOverCounter === 179){
-                this.ySpeed = -18
+                this.jumping = true
+                this.ySpeed = 10
+                this.speed = -200
             }
-            this.screen.y += this.ySpeed
-            this.ySpeed += this.gravity
-            if (this.screen.y < CANVAS_HEIGHT - this.screen.h){
-                this.ySpeed = 0;
-                this.y = this.currentSegment.worldPoints.y
+
+            if (this.speed < 0){
+                this.speed += 5
+                this.z +=this.speed
+            } else {
+                this.speed = 0
             }
             if (!this.gameOverEffect.play){
                 this.gameOverEffect.setPlay()
@@ -310,31 +324,46 @@ class Player {
     checkCollidingGameOver(audioCtx){
         for (let n = 0; n < this.game.road.totalTraffic.length; n++){
             if (this.isColliding(this.game.road.totalTraffic[n]) && this.transparent  === 0 && !this.gameOver  && !this.over){
-                this.game.road.totalTraffic[n].hitByShield()
-                // this.setGameOverStatus(this.game.road.totalTraffic[n].z)
-                // playTrack(contextSounds["hit"], audioCtx)
+                if (this.shield > 0){
+                    this.game.road.totalTraffic[n].hitByShield(audioCtx)
+                } else{
+                    this.setGameOverStatus(this.game.road.totalTraffic[n].z)
+                    playTrack(contextSounds["hit"], audioCtx)
+                }
             }
         }
         for (let n = 0; n < this.game.road.totalCars.length; n++){
             if (this.isColliding(this.game.road.totalCars[n]) && this.transparent  === 0 && !this.gameOver  && !this.over){
-                this.game.road.totalCars[n].hitByShield()
-                // this.setGameOverStatus(this.game.road.totalCars[n].z)
-                // playTrack(contextSounds["hit"], audioCtx)
+                if (this.shield > 0){
+                    this.game.road.totalCars[n].hitByShield()
+                } else{
+                    this.setGameOverStatus(this.game.road.totalCars[n].z)
+                    playTrack(contextSounds["hit"], audioCtx)
+                }
             }
         }
         for (let n = 0; n < this.game.road.totalObstacles.length; n++){
             if (this.isColliding(this.game.road.totalObstacles[n]) && this.transparent === 0 && !this.gameOver){
-                this.game.road.totalObstacles[n].hitByShield()
-                // this.setGameOverStatus(this.game.road.totalObstacles[n].z)
-                // playTrack(contextSounds["hit"], audioCtx)
+                if (this.shield > 0){
+                    this.game.road.totalObstacles[n].hitByShield()
+                } else {
+                    this.setGameOverStatus(this.game.road.totalObstacles[n].z)
+                    playTrack(contextSounds["hit"], audioCtx)
+                }
             }
         }
         for (let n = 0; n < this.game.road.totalAnimals.length; n++){
             if (this.isColliding(this.game.road.totalAnimals[n]) && this.transparent === 0 && !this.gameOver  && !this.over){
-                this.game.road.totalAnimals[n].hitByShield()
                 this.game.road.totalAnimals[n].hit = true
-                // this.setGameOverStatus(this.game.road.totalAnimals[n].z)
-                // playTrack(contextSounds["hit"], audioCtx)
+                if (this.shield > 0){
+                    this.game.road.totalAnimals[n].hitByShield()
+                } else {
+                    this.setGameOverStatus(this.game.road.totalAnimals[n].z)
+                    playTrack(contextSounds["hit"], audioCtx)
+                }
+
+
+
 
             }
         }
@@ -346,9 +375,9 @@ class Player {
         this.setMask(dt)
 
         this.z += this.speed*dt
-        // if (this.speed > 0 && this.turbo === 0 && !this.changingStage){
-        //     this.fuel -= dt*this.speed/(1000*this.difficulty.GAS_CORRECTION)
-        // }
+        if (this.speed > 0 && this.turbo === 0 && !this.changingStage){
+            this.fuel -= dt*this.speed/(1000*this.difficulty.GAS_CORRECTION)
+        }
         if (this.fuel < 0 && !this.gameOver){
             this.setGameOverStatus()
         }
@@ -356,9 +385,6 @@ class Player {
         if (this.game.road.findSegment(this.z) !== this.currentSegment){
             this.segmentCounter++
             this.currentSegment = this.game.road.findSegment(Math.floor(this.z))
-            if (this.currentSegment.YRoad){
-                console.log(this.currentSegment)
-            }
             this.currentSprite++;
             if (this.currentSprite > MAX_SPRITES) {
                 this.currentSprite = 0;
@@ -376,7 +402,7 @@ class Player {
         }
 
         this.updateEffects()
-        this.startCountDown()
+        this.startCountDown(audioCtx)
         this.gameOverCountDown()
 
         this.setLanes()
@@ -556,7 +582,7 @@ class Player {
 
     SettingJumpingY(){
         this.spriteHeight = SPRITE_SIZE - this.ySpeed*1.5
-        if (this.speed > 0){
+        if (!this.start){
             if (!this.jumping){
                 this.ySpeed = 0;
                 this.y = this.currentSegment.worldPoints.y
@@ -573,20 +599,23 @@ class Player {
     }
 
     handleInputUp(keys, audioCtx) {
-        switch (keys) {
-            case ('right'):
-                this.moveLeftRight(audioCtx, 1);
-                break;
-            case ('left'):
-                this.moveLeftRight(audioCtx, -1);
-                break;
-            case ('pause'):
-                this.setPause(audioCtx);
-                break;
-            case ('jump'):
-                this.setJump(audioCtx);
-                break;
+        if (!this.gameOver){
+            switch (keys) {
+                case ('right'):
+                    this.moveLeftRight(audioCtx, 1);
+                    break;
+                case ('left'):
+                    this.moveLeftRight(audioCtx, -1);
+                    break;
+                case ('pause'):
+                    this.setPause(audioCtx);
+                    break;
+                case ('jump'):
+                    this.setJump(audioCtx);
+                    break;
+            }
         }
+
     }
 
     setPause(audioCtx) {
@@ -599,7 +628,7 @@ class Player {
     }
 
     setJump(audioCtx) {
-        if (!this.movingLane && !this.jumping && this.game.gameState === PLAY_STATE && !this.gameOver && !this.start) {
+        if (!this.movingLane && !this.jumping && this.game.gameState === PLAY_STATE && !this.start) {
             playTrack(contextSounds["jump"], audioCtx, this.game.settings.sounds)
             this.jumping = true
             this.ySpeed = this.jumpSpeed

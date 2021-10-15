@@ -6,18 +6,6 @@ function percentageLeft(n, total) {
     return (n % total) / total;
 }
 
-function interpolate(y, y1, y2, x1, x2) {
-    return x1 + ((y-y1)*(x2-x1)/(y2-y1))
-}
-
-
-function extractDigits(num){
-    let digits = num.toString().split('');
-    digits.reverse()
-    return digits.map(Number)
-}
-
-
 function toInt(obj, def){
     if (obj !== null) {
         let x = parseInt(obj, 10);
@@ -28,10 +16,6 @@ function toInt(obj, def){
 
 function smoothIn(a, b, percent) {
     return a + (b - a) * Math.pow(percent, 2);
-}
-
-function smoothOut(a, b, percent) {
-    return a + (b - a) * (1 - Math.pow(1 - percent, 2));
 }
 
 function smoothInOut(a, b, percent) {
@@ -59,6 +43,13 @@ function setMaxMin(current, max, min) {
 
 function randomIntFromInterval(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+function fatorial(n) {
+    if (n === 0 || n === 1) {
+        return 1;
+    }
+    return n * fatorial(n - 1);
 }
 
 // ---------------------------------------------------------------------------------
@@ -251,13 +242,6 @@ function drawShadow(x, y, SpriteSize, ctx){
     ctx.fill();
 }
 
-// para rotacionar os sprites dos meteoros
-function setSpriteDirection(ctx, sprite, x, y, dir, spriteSize) {
-    ctx.save();
-    ctx.scale(dir, 1);
-    ctx.drawImage(...sprite, (-spriteSize / 2), (-spriteSize / 2), spriteSize, spriteSize);
-    ctx.restore();
-}
 // para mudar a opacidade do desenho
 function drawSpriteWithAlpha(ctx, sprite, x, y, width, height, alpha) {
     ctx.save();
@@ -284,7 +268,7 @@ async function loadSound(soundName, audioCtx) {
 
 function preloadSounds(sounds, audioCtx) {
     for (let i in sounds) {
-        loadSound(sounds[i], audioCtx)
+        loadSound(sounds[i], audioCtx).then(r => console.log("Loaded: " + r))
     }
 }
 
@@ -311,19 +295,27 @@ function playMusic(audioBuffer, audioCtx) {
     if (trackSource.buffer !== null){
         trackSource.loop = true
         trackSource.start();
-        return true
+        return trackSource
     }
-    return false
+    return null
 }
+
 
 // ---------------------------------------------------------------------------------
 // Mouse & Touch Helpers
 // ---------------------------------------------------------------------------------
 
 function getMouseCanvasArea(mouseX, mouseY, x, y, width, height){
-    console.log(mouseX)
-    console.log(mouseY)
-    console.log(x, x + width)
-    console.log(y, y + height)
+    console.log(mouseY, mouseX)
     return (mouseX > x && mouseX < x + width) && (mouseY > y && mouseY < y + height);
+}
+
+function toggleFullScreen(element) {
+    if (!element.fullscreenElement) {
+        element.requestFullscreen().then(r =>console.log(r));
+    } else {
+        if (element.exitFullscreen) {
+            element.exitFullscreen().then(r =>console.log(r));
+        }
+    }
 }

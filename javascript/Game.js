@@ -9,6 +9,7 @@ class Game {
         this.background = null;
         this.settings = null
         this.playingMusic = false;
+        this.currentMusic = null
         this.currentStage = SUBURB
         this.nextRight = null
         this.nextLeft = null
@@ -69,9 +70,10 @@ class Game {
                 game.road.update(dt)
                 game.gameCamera.update(dt)
                 game.background.update(dt)
-                game.UI.update()
-                if (game.playingMusic === false && game.settings.music){
-                    game.playingMusic = playMusic(contextSounds["passing_breeze"], audioCtx)
+                game.UI.update(audioCtx)
+                if (!game.playingMusic && game.settings.music){
+                    game.currentMusic = playMusic(contextSounds["passing_breeze"], audioCtx)
+                    game.playingMusic = true
                 }
                 break;
             case PAUSE_STATE:

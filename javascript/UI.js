@@ -12,6 +12,7 @@ class UI {
         this.game = game
         this.timer = 0
         this.ticker = 0
+        this.beepControl = false
         this.score = new CanvasText( 160, 100, game.player.score, 45 , "#00712f")
         this.coins = new CanvasText( CANVAS_WIDTH - 165, 100, game.player.coins, 45 , "#fd6601")
     }
@@ -68,7 +69,7 @@ class UI {
         ctx.drawImage(...UIReturn, CANVAS_CENTER_X - 100, CANVAS_CENTER_Y-55, 200, 200)
     }
 
-    drawFuel(ctx){
+    drawFuel(ctx, audioCtx){
         let fuel = this.game.player.fuel
         ctx.fillStyle = "#ff5a0a"
         let width = fuel*2.6
@@ -95,7 +96,7 @@ class UI {
         }
     }
 
-    update(){
+    update(audioCtx){
         this.timer++
         if (this.timer > 15){
             this.ticker++
@@ -103,6 +104,18 @@ class UI {
         }
         this.score.update(Math.floor(this.game.player.score), true)
         this.coins.update(Math.floor(this.game.player.coins), false)
+        if (this.game.player.fuel < 20){
+            if (this.ticker%4 === 0 ){
+                if (this.beepControl){
+                    playTrack(contextSounds["fuel_beep"], audioCtx, this.game.settings.sounds)
+                    this.beepControl = false
+                }
+            }
+            if (this.ticker%4 !== 0){
+                this.beepControl = true
+            }
+        }
+
     }
 
     renderPowerUpIcons(player, type, ctx){
@@ -170,7 +183,7 @@ class UI {
     handleMouseDown(x, y, audioCtx) {
         switch (this.game.gameState){
             case (PLAY_STATE):
-                if (this.game.settings.controls){
+                if (this.game.settings.controls && !this.game.player.start && !this.game.player.gameOver){
                     if (getMouseCanvasArea(x,y, 200, 10 ,100,100)){
                         this.game.player.setPause(audioCtx)
                     }
@@ -191,31 +204,45 @@ class UI {
                     this.game.player.setPause(audioCtx)
                 }
                 if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 250, CANVAS_CENTER_Y - 80 ,100,100)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
                     this.homeIcon = this.UIHomeIcon[1]
                 }
                 if (getMouseCanvasArea(x,y, CANVAS_CENTER_X + 150, CANVAS_CENTER_Y-20 ,100,100)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
                     this.configIcon = this.UIConfigIcon[1]
                 }
                 break
             case (CONFIG_STATE):
                 if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 260, CANVAS_CENTER_Y - 60 ,100,100)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
+                    if (this.game.settings.music){
+                        this.game.currentMusic.stop()
+                    }else{
+                        this.game.currentMusic = playMusic(contextSounds["passing_breeze"], audioCtx)
+                        this.game.playingMusic = true
+                    }
                     this.game.settings.music = !this.game.settings.music
                 }
                 if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 120, CANVAS_CENTER_Y - 60 ,100,100)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
                     this.game.settings.sounds = !this.game.settings.sounds
                 }
                 if (getMouseCanvasArea(x,y, CANVAS_CENTER_X + 20, CANVAS_CENTER_Y - 60 ,100,100)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
                     this.game.settings.controls = !this.game.settings.controls
                 }
                 if (getMouseCanvasArea(x,y, CANVAS_CENTER_X + 160, CANVAS_CENTER_Y - 60 ,100,100)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
                     this.game.settings.threeD = !this.game.settings.threeD
                 }
                 if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 70, CANVAS_CENTER_Y +75 ,100,100)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
                     this.returnIcon = this.UIReturnIcon[1]
                 }
                 break
             case (GAME_OVER_STATE):
                 if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 100, CANVAS_CENTER_Y - 55 ,200,2020)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
                     this.game.gameState = LOADING_STATE
                 }
                 break

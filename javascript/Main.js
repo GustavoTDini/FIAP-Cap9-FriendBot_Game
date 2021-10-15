@@ -10,21 +10,20 @@ window.onload = async function () {
         let game = new Game()
         // Listener para clique das teclas
         document.addEventListener('keyup', function (e) {
+            //toggleFullScreen(GAME_CANVAS)
             game.player.handleInputUp(ALLOWED_KEYS[e.code], audioContext);
         });
-        // GAME_CANVAS.addEventListener("mousemove", function (e) {
-        //     game.player.handleMouseMove('move', e)
-        // }, false);
+
         GAME_CANVAS.addEventListener("mousedown", function (e) {
             let rect = GAME_CANVAS.getBoundingClientRect();
-            let x = e.clientX - rect.left;
-            let y = e.clientY - rect.top;
+            let x = e.clientX -  rect.left
+            let y = e.clientY -  rect.top
             game.UI.handleMouseDown(x, y, audioContext)
         }, false);
         GAME_CANVAS.addEventListener("mouseup", function (e) {
             let rect = GAME_CANVAS.getBoundingClientRect();
-            let x = e.clientX - rect.left;
-            let y = e.clientY - rect.top;
+            let x = e.clientX -  rect.left
+            let y = e.clientY -  rect.top
             game.UI.handleMouseUp(x, y, audioContext)
         }, false);
         GameEngine.run({
@@ -33,9 +32,10 @@ window.onload = async function () {
             render: game.render,
             game: game,
             update: game.update,
-            playerColor: PINK,
-            difficulty: HARD
+            playerColor: BLUE,
+            difficulty: MEDIUM
         })
+
     }, 3000)
 
 }

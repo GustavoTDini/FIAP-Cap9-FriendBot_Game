@@ -54,16 +54,19 @@ class Road {
                 let screenPoints = currSegment.screenPoints;
                 let lastScreenPoints = currSegment.lastScreenPoints
                 this.renderGrass(ctx, currSegment.stage, currSegment.color, screenPoints.y, lastScreenPoints.y);
-
-                // if (currSegment.YRoad){
-                //     let dir = currSegment.curve > 0? -1:1
-                //     let lastX = lastScreenPoints.x + lastScreenPoints.w*currSegment.YRoadCounter*dir
-                //     let currX = screenPoints.x + screenPoints.w*currSegment.YRoadCounter*dir
-                //     this.renderSegment(
-                //         lastX, lastScreenPoints.y, lastScreenPoints.w,
-                //         currX, screenPoints.y, screenPoints.w,
-                //         currSegment.color, ctx, currSegment.stage, currSegment.texture, currSegment.index);
-                // }
+                if (currSegment.YRoad && Math.abs(currSegment.curve)> 1.5){
+                    let currSegmentCounter = currSegment.YRoadCounter
+                    let lastSegmentCounter = this.segments[currIndex-1].YRoadCounter ? this.segments[currIndex-1].YRoadCounter:0
+                    let dir = currSegment.curve > 0? 1:-1
+                    let curve = ROAD.CURVE.EASY*dir
+                    let lastX = lastScreenPoints.x + smoothIn(lastSegmentCounter*dir, curve, lastSegmentCounter/101)
+                    let currX = screenPoints.x + smoothIn(currSegmentCounter*dir, curve, currSegmentCounter/101)
+                    //drawPolygon(currX - screenPoints.w, screenPoints.y, currX + screenPoints.w, screenPoints.y, lastX + lastScreenPoints.w, lastScreenPoints.y, lastX - lastScreenPoints.w, lastScreenPoints.y, "#ff0000", ctx)
+                    this.renderSegment(
+                        lastX, lastScreenPoints.y, lastScreenPoints.w,
+                        currX, screenPoints.y, screenPoints.w,
+                        currSegment.color, ctx, currSegment.stage, currSegment.texture, currSegment.index);
+                }
 
                 this.renderSegment(
                     lastScreenPoints.x, lastScreenPoints.y, lastScreenPoints.w,
