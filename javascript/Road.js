@@ -97,12 +97,12 @@ class Road {
         }
     }
 
-    update(dt) {
+    update(dt, audioCtx) {
         let player = this.game.player
         this.setPlayerXScreen(player);
-        this.updateObjects(dt);
+        this.updateObjects(dt, audioCtx);
         this.removeObjects()
-        this.defineNewStage(player);
+        this.defineNewStage(player, audioCtx);
     }
 
     setPlayerXScreen(player) {
@@ -116,7 +116,7 @@ class Road {
         }
     }
 
-    defineNewStage(player) {
+    defineNewStage(player, audioCtx) {
         if (player.currentSegment.index > this.game.decideSegment && !player.changingStage) {
             player.changingStage = true
             let dir = 1
@@ -129,28 +129,31 @@ class Road {
             this.roadConstructor.yRoadSegment(dir)
         }
         if (player.currentSegment.index > this.game.newStageSegment && player.changingStage) {
+            this.game.currentMusic.stop()
+            this.game.playingMusic = true
             player.changingStage = false
             this.game.background.nextAlpha = 0
             this.game.background.changeBackground(this.game.nextStage, true)
             this.game.currentStage = this.game.nextStage
             this.game.nextStage = null
+            this.game.playMusic(this.game, audioCtx)
             this.roadConstructor.newStageSegment()
         }
     }
 
-    updateObjects(dt) {
+    updateObjects(dt, audioCtx) {
         for (let j = 0; j < this.segments.length; j++) {
             this.segments[j].inRoadObjects = []
         }
         for (let i = 0; i < this.totalCars.length; i++) {
             let carSegment = this.findSegment(this.totalCars[i].z)
             carSegment.inRoadObjects.push(this.totalCars[i])
-            this.totalCars[i].update(dt)
+            this.totalCars[i].update(dt, audioCtx)
         }
         for (let i = 0; i < this.totalTraffic.length; i++) {
             let trafficSegment = this.findSegment(this.totalTraffic[i].z)
             trafficSegment.inRoadObjects.push(this.totalTraffic[i])
-            this.totalTraffic[i].update(dt)
+            this.totalTraffic[i].update(dt, audioCtx)
         }
         for (let i = 0; i < this.totalCoins.length; i++) {
             let coinSegment = this.findSegment(this.totalCoins[i].z)
@@ -170,7 +173,7 @@ class Road {
         for (let i = 0; i < this.totalAnimals.length; i++) {
             let animalSegment = this.findSegment(this.totalAnimals[i].z)
             animalSegment.inRoadObjects.push(this.totalAnimals[i])
-            this.totalAnimals[i].update(dt)
+            this.totalAnimals[i].update(dt, audioCtx)
         }
         for (let i = 0; i < this.totalFuel.length; i++) {
             let fuelSegment = this.findSegment(this.totalFuel[i].z)

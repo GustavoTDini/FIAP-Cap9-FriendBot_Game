@@ -36,7 +36,7 @@ class RoadObjects {
     }
 
     hitByShield(audioCtx){
-        playTrack(contextSounds["shield_hit"], audioCtx, this.game.settings.sounds)
+        playTrack(contextSounds["shield_hit"], audioCtx, this.road.game.settings.sounds)
         if (this.road.game.player.currentLane === 0){
             if (this instanceof Cars){
                 this.nextX = ROAD_LANES[1]

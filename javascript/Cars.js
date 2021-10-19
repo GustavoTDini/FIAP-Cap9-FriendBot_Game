@@ -4,18 +4,17 @@ class Cars extends RoadObjects{
     constructor(sprite, x, y, z, spriteSize, road) {
         super(sprite, x, y, z, spriteSize, road);
         this.nextX = x
-        this.speed = randomIntFromInterval(20,100)
+        this.speed = randomIntFromInterval(50,200)
     }
 
-    update(dt){
+    update(dt, audioCtx){
         super.update(dt)
         this.randomX()
         this.setX()
         this.y = this.road.findSegment(this.z).worldPoints.y
         this.z += this.speed
-        if (this.z <= this.road.game.player.currentSegment.worldPoints.z -100){
-            let finalSegment = this.road.segments.length
-            this.z = this.road.segments[finalSegment-1].worldPoints.z
+        if (this.road.findSegment(this.z).index === this.road.game.player.currentSegment.index){
+            playTrack(contextSounds["car_pass"], audioCtx, this.road.game.settings.sounds)
         }
     }
 
@@ -23,11 +22,16 @@ class Cars extends RoadObjects{
         if (this.nextX !== this.x){
             if (this.x > this.nextX){
                 this.x = this.x - 0.05
+                if (this.x < this.nextX){
+                    this.x = this.nextX
+                }
             } else{
                 this.x = this.x + 0.05
+                if (this.x > this.nextX){
+                    this.x = this.nextX
+                }
+
             }
-        } else{
-            this.nextX = this.x
         }
     }
 

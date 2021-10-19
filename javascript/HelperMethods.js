@@ -279,23 +279,27 @@ function playTrack(audioBuffer, audioCtx, soundSetting) {
         }
         const trackSource = audioCtx.createBufferSource();
         trackSource.buffer = audioBuffer;
-        trackSource.connect(audioCtx.destination)
+        const gainNode = audioCtx.createGain();
+        gainNode.gain.value = 0.5
+        trackSource.connect(gainNode).connect(audioCtx.destination)
         trackSource.start();
     }
 
 }
 
-function playMusic(audioBuffer, audioCtx) {
-    if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-    }
-    const trackSource = audioCtx.createBufferSource();
-    trackSource.buffer = audioBuffer;
-    trackSource.connect(audioCtx.destination)
-    if (trackSource.buffer !== null){
-        trackSource.loop = true
-        trackSource.start();
-        return trackSource
+function playMusic(audioBuffer, audioCtx, musicSetting) {
+    if (musicSetting){
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        const trackSource = audioCtx.createBufferSource();
+        trackSource.buffer = audioBuffer;
+        trackSource.connect(audioCtx.destination)
+        if (trackSource.buffer !== null){
+            trackSource.start();
+            return trackSource
+        }
+        return null
     }
     return null
 }

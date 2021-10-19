@@ -105,7 +105,7 @@ class RoadConstructor {
                 }
 
             }
-            this.addObstacles(startSegment + 500, this.road.totalSegments-500, this.CARS)
+            this.addObstacles(startSegment + 200, this.road.totalSegments-500, this.CARS)
             this.addItems(startSegment, this.road.totalSegments-100)
             this.selectSegment()
             this.updateRoadSize()
@@ -306,8 +306,8 @@ class RoadConstructor {
                 if (currentPattern[i]){
                     this.road.totalCoins.push(new Coins(coin1, roadLaneX, y, z, SPRITE_SIZE, this.road))
                 } else{
-                    if (Math.random() > 0.97){
-                        if (Math.random() > 0.1){
+                    if (Math.random() > 0.95){
+                        if (Math.random() > 0.5){
                             this.road.totalFuel.push(new Fuel(gas1, roadLaneX, y, z, SPRITE_SIZE, this.road))
                         } else {
                             let powerUpType = randomIntFromInterval(6,9)

@@ -9,6 +9,7 @@ class Game {
         this.background = null;
         this.settings = null
         this.playingMusic = false;
+        this.musicName = null
         this.currentMusic = null
         this.currentStage = SUBURB
         this.nextRight = null
@@ -67,14 +68,12 @@ class Game {
                 break;
             case PLAY_STATE:
                 game.player.update(dt, audioCtx)
-                game.road.update(dt)
+                game.road.update(dt, audioCtx)
                 game.gameCamera.update(dt)
                 game.background.update(dt)
                 game.UI.update(audioCtx)
-                if (!game.playingMusic && game.settings.music){
-                    game.currentMusic = playMusic(contextSounds["passing_breeze"], audioCtx)
-                    game.playingMusic = true
-                }
+                game.playMusic(game, audioCtx);
+                game.checkMusicEnd(game, audioCtx);
                 break;
             case PAUSE_STATE:
                 break;
@@ -82,6 +81,25 @@ class Game {
                 break;
             case GAME_OVER_STATE:
                 break;
+        }
+    }
+
+    checkMusicEnd(game, audioCtx) {
+        if (game.playingMusic && game.currentMusic !== null && game.settings.music) {
+            game.currentMusic.onended = () => {
+                game.musicName = stageObjects[game.currentStage].MUSIC[randomIntFromInterval(0, 3)]
+                game.currentMusic = playMusic(contextSounds[game.musicName], audioCtx, game.settings.music)
+            }
+        }
+    }
+
+    playMusic(game, audioCtx) {
+        if (!game.playingMusic && game.settings.music) {
+            game.musicName = stageObjects[game.currentStage].MUSIC[randomIntFromInterval(0, 3)]
+            if (contextSounds[game.musicName] !== null && contextSounds[game.musicName] !== undefined) {
+                game.currentMusic = playMusic(contextSounds[game.musicName], audioCtx, game.settings.music)
+                game.playingMusic = true
+            }
         }
     }
 }

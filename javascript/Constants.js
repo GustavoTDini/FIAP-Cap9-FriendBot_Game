@@ -15,7 +15,7 @@ const FRAME_STEP = 1/FPS
 const UPDATE_STEP = 1/UPS
 const SEGMENT_LENGTH = 100;
 const MAX_ROAD_WIDTH = 1000;
-const MAX_SPEED = (SEGMENT_LENGTH/UPDATE_STEP)*4;
+const MAX_SPEED = (SEGMENT_LENGTH/UPDATE_STEP)*5;
 
 //States
 const LOADING_STATE = 0;
@@ -46,26 +46,26 @@ const BEACH = "BEACH";
 const DIFFICULTIES_SETS = {
   EASY: {
       START_SPEED: MAX_SPEED/10,
-      MAX_SPEED:  MAX_SPEED/2,
-      MAX_CARS: 25,
+      MAX_SPEED:  MAX_SPEED,
+      MAX_CARS: 100,
       MAX_OBSTACLES: 5,
       MAX_POWER_UPS: 20,
       GAS_CORRECTION: 4,
       MAX_CARS_SPEEDS: MAX_SPEED/4
   } ,
     MEDIUM: {
-        START_SPEED: MAX_SPEED/7,
-        MAX_SPEED:  MAX_SPEED*0.75,
-        MAX_CARS: 50,
+        START_SPEED: MAX_SPEED/5,
+        MAX_SPEED:  MAX_SPEED*2,
+        MAX_CARS: 200,
         MAX_OBSTACLES: 10,
         MAX_POWER_UPS: 20,
         GAS_CORRECTION: 3,
         MAX_CARS_SPEEDS: MAX_SPEED/3
     },
     HARD: {
-        START_SPEED: MAX_SPEED*2,
-        MAX_SPEED:  MAX_SPEED*2,
-        MAX_CARS: 75,
+        START_SPEED: MAX_SPEED,
+        MAX_SPEED:  MAX_SPEED*4,
+        MAX_CARS: 300,
         MAX_OBSTACLES: 15,
         MAX_POWER_UPS: 20,
         GAS_CORRECTION: 2,
@@ -792,102 +792,6 @@ const shieldIcons = [shieldIcon0, shieldIcon1,shieldIcon2,shieldIcon3,shieldIcon
 const racers = [racerShark, racerGiraffe, racerBear, racerPolarBear, racerMonkey, racerPanda1, racerPanda2, racerPanda3]
 const billboards = [commonScenarioBillboardFiap, commonScenarioBillboardTuring, commonScenarioBillboardVacina]
 
-
-const stageObjects = {
-    SUBURB:{
-        ROAD_TEXTURES: [images.sub_road_sprite_1, images.sub_road_sprite_2, images.sub_road_sprite_3, images.sub_road_sprite_4, images.sub_road_sprite_5],
-        SIDE_TEXTURES: [images.sub_texture_1, images.sub_texture_2, images.sub_texture_3],
-        SCENARIOS:[subScenarioBuilding1, subScenarioBuilding2, subScenarioBuilding3, subScenarioBuilding4, subScenarioBuilding5, subScenarioBuilding6, subScenarioBuilding7, subScenarioRock],
-        SIDE_SCENARIOS:[subScenarioBush, subScenarioTree1, subScenarioTree2, subScenarioTree3],
-        TRAFFIC:[motorcycle1, motorcycle2, motorcycle3, motorcycle4, motorcycle5],
-        OBSTACLES:[hotDogCart, stairs],
-        ANIMALS:[CAT, DOG_SUB],
-        COLORS:{
-            LIGHT:	{road: '#646466', grass: '#B36820', grassTextures: 0, shoulder: '#078116', lane: '#000000'},
-            DARK:	{road: '#484849', grass: '#e38b3a', grassTextures: 1, shoulder: '#ffcc00'},
-            DARKER:	{road: '#333333', grass: '#8d5313', grassTextures: 2, shoulder: '#078116'},
-        },
-        TUNNEL: commonScenarioCityTunnel
-    },
-    CITY:{
-        ROAD_TEXTURES: [images.city_road_sprite_1, images.city_road_sprite_2, images.city_road_sprite_3, images.city_road_sprite_4, images.city_road_sprite_5],
-        SIDE_TEXTURES: [images.city_texture_1, images.city_texture_2, images.city_texture_3],
-        SCENARIOS:[cityScenarioBuilding1, cityScenarioBuilding2,cityScenarioBuilding3,cityScenarioBuilding4,cityScenarioBuilding5,cityScenarioBuilding6,cityScenarioBuilding7,cityScenarioLamp],
-        SIDE_SCENARIOS:[cityScenarioTree1,cityScenarioTree2,cityScenarioTree3,cityScenarioTree4],
-        TRAFFIC:[car1, car2, car3, car4, car5],
-        OBSTACLES:[construction, trash],
-        ANIMALS:[DOG_CITY, CAPIVARA],
-        COLORS:{
-            LIGHT:	{road: '#888888', grass: '#5e5e5e', grassTextures: 0, shoulder: '#BCBCBC', lane: '#FFFFFF'},
-            DARK:	{road: '#666666', grass: '#a2a2a2', grassTextures: 1, shoulder: '#FF0000'},
-            DARKER:	{road: '#444444', grass: '#e5e5e5', grassTextures: 2, shoulder: '#BCBCBC'},
-        },
-        LEFT_SIGN: commonScenarioCityLeft,
-        RIGHT_SIGN: commonScenarioCityRight,
-        TUNNEL: commonScenarioCityTunnel
-    },
-    FARM:{
-        ROAD_TEXTURES: [images.farm_road_sprite_1, images.farm_road_sprite_2, images.farm_road_sprite_3, images.farm_road_sprite_4, images.farm_road_sprite_5],
-        SIDE_TEXTURES: [images.farm_texture_1, images.farm_texture_2, images.farm_texture_3],
-        SCENARIOS:[farmScenarioBush, farmScenarioCorn, farmScenarioFences, farmScenarioShed, farmScenarioWindmill, farmScenarioScarecrow, farmScenarioHay, farmScenarioWell],
-        SIDE_SCENARIOS:[farmScenarioRock1, farmScenarioRock2, farmScenarioTree1, farmScenarioTree2],
-        TRAFFIC:[pickup1, pickup2, pickup3, pickup4, pickup5],
-        OBSTACLES:[truck, log],
-        ANIMALS:[BULL, HORSE],
-        COLORS:{
-            LIGHT:	{road: '#888888', grass: '#48a15a', grassTextures: 0, shoulder: '#BCBCBC', lane: '#FFFFFF'},
-            DARK:	{road: '#666666', grass: '#398246', grassTextures: 1, shoulder: '#0344ce'},
-            DARKER:	{road: '#444444', grass: '#398246', grassTextures: 2, shoulder: '#BCBCBC'},
-        },
-        LEFT_SIGN: commonScenarioFarmLeft,
-        RIGHT_SIGN: commonScenarioFarmRight,
-        TUNNEL: commonScenarioCityTunnel
-    },
-    FOREST:{
-        ROAD_TEXTURES: [images.forest_road_sprite_1, images.forest_road_sprite_2, images.forest_road_sprite_3, images.forest_road_sprite_4, images.forest_road_sprite_5],
-        SIDE_TEXTURES: [images.forest_texture_1, images.forest_texture_2, images.forest_texture_3],
-        SCENARIOS:[forestScenarioHouse1, forestScenarioHouse2, forestScenarioHouse3, forestScenarioRock1, forestScenarioRock2, forestScenarioTree1, forestScenarioTree2, forestScenarioTree3],
-        SIDE_SCENARIOS:[forestScenarioTree4, forestScenarioRock3, forestScenarioTree5, forestScenarioTree6],
-        TRAFFIC:[jeep1, jeep2, jeep3, jeep4, jeep5],
-        OBSTACLES:[rock, tree],
-        ANIMALS:[GUARA, JAGUAR],
-        COLORS:{
-            LIGHT:	{road: '#937545', grass: '#4C8924', grassTextures: 0, shoulder: '#725e2a', lane: '#261d01'},
-            DARK:	{road: '#564428', grass: '#70c735', grassTextures: 1, shoulder: '#56da3d'},
-            DARKER:	{road: '#3d311d', grass: '#2f5d18', grassTextures: 2, shoulder: '#725e2a'},
-        },
-        LEFT_SIGN: commonScenarioForestLeft,
-        RIGHT_SIGN: commonScenarioForestRight,
-        TUNNEL: commonScenarioGrassTunnel
-    },
-    BEACH:{
-        ROAD_TEXTURES: [images.beach_road_sprite_1, images.beach_road_sprite_2, images.beach_road_sprite_3, images.beach_road_sprite_4, images.beach_road_sprite_5],
-        SIDE_TEXTURES: [images.beach_texture_1, images.beach_texture_2, images.beach_texture_3],
-        SCENARIOS:[beachScenarioBar, beachScenarioBoards1, beachScenarioBoards2, beachScenarioCoral, beachScenarioParasol1, beachScenarioParasol2, beachScenarioRock1, beachScenarioRock2],
-        SIDE_SCENARIOS:[beachScenarioTree1, beachScenarioTree2, beachScenarioTree3, beachScenarioTree4],
-        TRAFFIC:[beetle1, beetle2, beetle3, beetle4, beetle5],
-        OBSTACLES:[sandCastle, iceCreamCart],
-        ANIMALS:[TURTLE, DOG_BEACH],
-        COLORS:{
-            LIGHT:	{road: '#F5D890', grass: '#F5D890', grassTextures: 0, shoulder: '#F5D890', lane: '#4b3702'},
-            DARK:	{road: '#a89263', grass: '#e1cfad', grassTextures: 1, shoulder: '#4b3702'},
-            DARKER:	{road: '#947c3b', grass: '#a9a18a', grassTextures: 2, shoulder: '#F5D890'},
-        },
-        LEFT_SIGN: commonScenarioBeachLeft,
-        RIGHT_SIGN: commonScenarioBeachRight,
-        TUNNEL: commonScenarioGrassTunnel
-    },
-}
-
-const START_COLORS = {
-        LIGHT:	{road: '#d0d2d3',oppositeRoad: '#222a2c', roadTexture: images.start_road_sprite_1, shoulder: '#222a2c'},
-        DARK:	{road: '#222a2c',oppositeRoad: '#d0d2d3', roadTexture: images.start_road_sprite_2, shoulder: '#222a2c'},
-}
-
-
-
-
-
 // ---------------------------------------------------------------------------------
 // Music & Sounds
 // ---------------------------------------------------------------------------------
@@ -906,21 +810,149 @@ let sounds =[
     "lose",
     "shield_hit",
     "start_your_engines",
-    "passing_breeze",
     "coin",
     "hit",
     "jump",
     "tire",
     "turbo",
     "fail",
-    "pause"]
+    "pause",
+    "vanish",
+    "bubbles",
+    "horn",
+    "beach_music_1_80_synth",
+    "beach_music_2_summer_hit",
+    "beach_music_3_reggae",
+    "beach_music_4_bossa_nova",
+    "city_music_1_electropop",
+    "city_music_2_electro_house",
+    "city_music_3_aggressive_electronic",
+    "city_music_4_tuning_instrumental",
+    "farm_music_1_terra_incognita",
+    "farm_music_2_green_fields",
+    "farm_music_3_8_bit",
+    "farm_music_4_bass_and_choir",
+    "forest_music_1_happy",
+    "forest_music_2_fairy_tale",
+    "forest_music_3_digital_garden",
+    "forest_music_4_punk_8_bit",
+    "suburb_music_1_man_with_long_hair",
+    "suburb_music_2_psychedelic_trip",
+    "suburb_music_3_disco_funk",
+    "suburb_music_4_groovy_electronic",
+    "beach_dog_sound",
+    "bull_sound",
+    "capivara_sound",
+    "cat_sound",
+    "city_dog_sound",
+    "guara_sound",
+    "horse_sound",
+    "jaguar_sound",
+    "suburb_dog_sound",
+    "turtle_sound"]
 
 let contextSounds = {
 }
 
+// ---------------------------------------------------------------------------------
+// Stage Constants
+// ---------------------------------------------------------------------------------
 
+const stageObjects = {
+    SUBURB:{
+        ROAD_TEXTURES: [images.sub_road_sprite_1, images.sub_road_sprite_2, images.sub_road_sprite_3, images.sub_road_sprite_4, images.sub_road_sprite_5],
+        SIDE_TEXTURES: [images.sub_texture_1, images.sub_texture_2, images.sub_texture_3],
+        SCENARIOS:[subScenarioBuilding1, subScenarioBuilding2, subScenarioBuilding3, subScenarioBuilding4, subScenarioBuilding5, subScenarioBuilding6, subScenarioBuilding7, subScenarioRock],
+        SIDE_SCENARIOS:[subScenarioBush, subScenarioTree1, subScenarioTree2, subScenarioTree3],
+        TRAFFIC:[motorcycle1, motorcycle2, motorcycle3, motorcycle4, motorcycle5],
+        OBSTACLES:[hotDogCart, stairs],
+        ANIMALS:[CAT, DOG_SUB],
+        MUSIC:[sounds[39],sounds[40],sounds[41],sounds[42]],
+        COLORS:{
+            LIGHT:	{road: '#646466', grass: '#B36820', grassTextures: 0, shoulder: '#078116', lane: '#000000'},
+            DARK:	{road: '#484849', grass: '#e38b3a', grassTextures: 1, shoulder: '#ffcc00'},
+            DARKER:	{road: '#333333', grass: '#8d5313', grassTextures: 2, shoulder: '#078116'},
+        },
+        TUNNEL: commonScenarioCityTunnel
+    },
+    CITY:{
+        ROAD_TEXTURES: [images.city_road_sprite_1, images.city_road_sprite_2, images.city_road_sprite_3, images.city_road_sprite_4, images.city_road_sprite_5],
+        SIDE_TEXTURES: [images.city_texture_1, images.city_texture_2, images.city_texture_3],
+        SCENARIOS:[cityScenarioBuilding1, cityScenarioBuilding2,cityScenarioBuilding3,cityScenarioBuilding4,cityScenarioBuilding5,cityScenarioBuilding6,cityScenarioBuilding7,cityScenarioLamp],
+        SIDE_SCENARIOS:[cityScenarioTree1,cityScenarioTree2,cityScenarioTree3,cityScenarioTree4],
+        TRAFFIC:[car1, car2, car3, car4, car5],
+        OBSTACLES:[construction, trash],
+        ANIMALS:[DOG_CITY, CAPIVARA],
+        MUSIC:[sounds[27],sounds[28],sounds[29],sounds[30]],
+        COLORS:{
+            LIGHT:	{road: '#888888', grass: '#5e5e5e', grassTextures: 0, shoulder: '#BCBCBC', lane: '#FFFFFF'},
+            DARK:	{road: '#666666', grass: '#a2a2a2', grassTextures: 1, shoulder: '#FF0000'},
+            DARKER:	{road: '#444444', grass: '#e5e5e5', grassTextures: 2, shoulder: '#BCBCBC'},
+        },
+        LEFT_SIGN: commonScenarioCityLeft,
+        RIGHT_SIGN: commonScenarioCityRight,
+        TUNNEL: commonScenarioCityTunnel
+    },
+    FARM:{
+        ROAD_TEXTURES: [images.farm_road_sprite_1, images.farm_road_sprite_2, images.farm_road_sprite_3, images.farm_road_sprite_4, images.farm_road_sprite_5],
+        SIDE_TEXTURES: [images.farm_texture_1, images.farm_texture_2, images.farm_texture_3],
+        SCENARIOS:[farmScenarioBush, farmScenarioCorn, farmScenarioFences, farmScenarioShed, farmScenarioWindmill, farmScenarioScarecrow, farmScenarioHay, farmScenarioWell],
+        SIDE_SCENARIOS:[farmScenarioRock1, farmScenarioRock2, farmScenarioTree1, farmScenarioTree2],
+        TRAFFIC:[pickup1, pickup2, pickup3, pickup4, pickup5],
+        OBSTACLES:[truck, log],
+        ANIMALS:[BULL, HORSE],
+        MUSIC:[sounds[31],sounds[32],sounds[33],sounds[34]],
+        COLORS:{
+            LIGHT:	{road: '#888888', grass: '#48a15a', grassTextures: 0, shoulder: '#BCBCBC', lane: '#FFFFFF'},
+            DARK:	{road: '#666666', grass: '#398246', grassTextures: 1, shoulder: '#0344ce'},
+            DARKER:	{road: '#444444', grass: '#398246', grassTextures: 2, shoulder: '#BCBCBC'},
+        },
+        LEFT_SIGN: commonScenarioFarmLeft,
+        RIGHT_SIGN: commonScenarioFarmRight,
+        TUNNEL: commonScenarioCityTunnel
+    },
+    FOREST:{
+        ROAD_TEXTURES: [images.forest_road_sprite_1, images.forest_road_sprite_2, images.forest_road_sprite_3, images.forest_road_sprite_4, images.forest_road_sprite_5],
+        SIDE_TEXTURES: [images.forest_texture_1, images.forest_texture_2, images.forest_texture_3],
+        SCENARIOS:[forestScenarioHouse1, forestScenarioHouse2, forestScenarioHouse3, forestScenarioRock1, forestScenarioRock2, forestScenarioTree1, forestScenarioTree2, forestScenarioTree3],
+        SIDE_SCENARIOS:[forestScenarioTree4, forestScenarioRock3, forestScenarioTree5, forestScenarioTree6],
+        TRAFFIC:[jeep1, jeep2, jeep3, jeep4, jeep5],
+        OBSTACLES:[rock, tree],
+        ANIMALS:[GUARA, JAGUAR],
+        MUSIC:[sounds[35],sounds[36],sounds[37],sounds[38]],
+        COLORS:{
+            LIGHT:	{road: '#937545', grass: '#4C8924', grassTextures: 0, shoulder: '#725e2a', lane: '#261d01'},
+            DARK:	{road: '#564428', grass: '#70c735', grassTextures: 1, shoulder: '#56da3d'},
+            DARKER:	{road: '#3d311d', grass: '#2f5d18', grassTextures: 2, shoulder: '#725e2a'},
+        },
+        LEFT_SIGN: commonScenarioForestLeft,
+        RIGHT_SIGN: commonScenarioForestRight,
+        TUNNEL: commonScenarioGrassTunnel
+    },
+    BEACH:{
+        ROAD_TEXTURES: [images.beach_road_sprite_1, images.beach_road_sprite_2, images.beach_road_sprite_3, images.beach_road_sprite_4, images.beach_road_sprite_5],
+        SIDE_TEXTURES: [images.beach_texture_1, images.beach_texture_2, images.beach_texture_3],
+        SCENARIOS:[beachScenarioBar, beachScenarioBoards1, beachScenarioBoards2, beachScenarioCoral, beachScenarioParasol1, beachScenarioParasol2, beachScenarioRock1, beachScenarioRock2],
+        SIDE_SCENARIOS:[beachScenarioTree1, beachScenarioTree2, beachScenarioTree3, beachScenarioTree4],
+        TRAFFIC:[beetle1, beetle2, beetle3, beetle4, beetle5],
+        OBSTACLES:[sandCastle, iceCreamCart],
+        ANIMALS:[TURTLE, DOG_BEACH],
+        MUSIC:[sounds[23],sounds[24],sounds[25],sounds[26]],
+        COLORS:{
+            LIGHT:	{road: '#F5D890', grass: '#F5D890', grassTextures: 0, shoulder: '#F5D890', lane: '#4b3702'},
+            DARK:	{road: '#a89263', grass: '#e1cfad', grassTextures: 1, shoulder: '#4b3702'},
+            DARKER:	{road: '#947c3b', grass: '#a9a18a', grassTextures: 2, shoulder: '#F5D890'},
+        },
+        LEFT_SIGN: commonScenarioBeachLeft,
+        RIGHT_SIGN: commonScenarioBeachRight,
+        TUNNEL: commonScenarioGrassTunnel
+    },
+}
 
-
+const START_COLORS = {
+    LIGHT:	{road: '#d0d2d3',oppositeRoad: '#222a2c', roadTexture: images.start_road_sprite_1, shoulder: '#222a2c'},
+    DARK:	{road: '#222a2c',oppositeRoad: '#d0d2d3', roadTexture: images.start_road_sprite_2, shoulder: '#222a2c'},
+}
 
 
 

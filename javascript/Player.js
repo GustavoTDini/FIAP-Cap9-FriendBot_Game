@@ -55,7 +55,6 @@ class Player {
         this.gotEffect = new Effects(GOT_ITEM, this.screen.x, this.screen.y)
         this.turboEffectCorrector = 0
         this.changingStage = false
-
     }
 
     init(){
@@ -105,7 +104,6 @@ class Player {
             if (this.startCounter === 70 || this.startCounter === 55 || this.startCounter === 40 ){
                 playTrack(contextSounds["light_1"], audioCtx, this.game.settings.sounds)
             }
-
             if (this.startCounter === 25){
                 this.currentSpeed = this.difficulty.START_SPEED
                 playTrack(contextSounds["light_2"], audioCtx, this.game.settings.sounds)
@@ -225,15 +223,15 @@ class Player {
 
     //função para definir uma colisão entre o jogador e outro elemento
     isColliding(object) {
+        let thisZ = this.mask.z
+        if (object.z > thisZ - 500 && object.z < thisZ + this.game.gameCamera.drawDistance * SEGMENT_LENGTH){
         let thisX = this.mask.x
         let objectX = object.mask.x
-        let thisZ = this.mask.z
         let objectZ = object.mask.z
         let thisWidth = this.mask.w
         let objectWidth = object.mask.w
         let thisSize = this.mask.s
         let objectSize = object.mask.s
-        if (object.z > thisZ - 500 && object.z < thisZ + this.game.gameCamera.drawDistance * SEGMENT_LENGTH){
             return ((thisX < objectX + objectWidth) &&
                 (thisX + thisWidth > objectX) &&
                 (thisZ < objectZ + objectSize) &&
@@ -241,7 +239,6 @@ class Player {
         } else{
             return false
         }
-
     }
 
     checkCollidingCoins(audioCtx){
@@ -268,7 +265,7 @@ class Player {
                 this.gotEffect.setXY(this.screen.x, this.screen.y -64)
                 this.gotEffect.setPlay()
                 this.fuel = this.MAX_FUEL
-                playTrack(contextSounds["coin"], audioCtx, this.game.settings.sounds)
+                playTrack(contextSounds["bubbles"], audioCtx, this.game.settings.sounds)
             }
         }
     }
@@ -291,16 +288,16 @@ class Player {
                         break;
                     case (BOLT):
                         this.transparent = this.MAX_POWER_UP_COUNTER
-                        playTrack(contextSounds["turbo"], audioCtx, this.game.settings.sounds)
+                        playTrack(contextSounds["vanish"], audioCtx, this.game.settings.sounds)
                         break;
                     case (DOUBLE):
                         this.double = this.MAX_POWER_UP_COUNTER
-                        playTrack(contextSounds["turbo"], audioCtx, this.game.settings.sounds)
+                        playTrack(contextSounds["bell"], audioCtx, this.game.settings.sounds)
                         this.glitterEffect.setPlay()
                         break;
                     case (SHIELD):
                         this.shield = this.MAX_POWER_UP_COUNTER
-                        playTrack(contextSounds["turbo"], audioCtx, this.game.settings.sounds)
+                        playTrack(contextSounds["get_shield"], audioCtx, this.game.settings.sounds)
                         this.shieldEffect.setPlay()
                         break;
                 }
@@ -328,7 +325,8 @@ class Player {
                     this.game.road.totalTraffic[n].hitByShield(audioCtx)
                 } else{
                     this.setGameOverStatus(this.game.road.totalTraffic[n].z)
-                    playTrack(contextSounds["hit"], audioCtx)
+                    this.game.road.totalTraffic[n].speed = 0
+                    playTrack(contextSounds["crash"], audioCtx, this.game.settings.sounds)
                 }
             }
         }
@@ -338,7 +336,8 @@ class Player {
                     this.game.road.totalCars[n].hitByShield()
                 } else{
                     this.setGameOverStatus(this.game.road.totalCars[n].z)
-                    playTrack(contextSounds["hit"], audioCtx)
+                    this.game.road.totalTraffic[n].speed = 0
+                    playTrack(contextSounds["crash"], audioCtx, this.game.settings.sounds)
                 }
             }
         }
@@ -348,7 +347,8 @@ class Player {
                     this.game.road.totalObstacles[n].hitByShield()
                 } else {
                     this.setGameOverStatus(this.game.road.totalObstacles[n].z)
-                    playTrack(contextSounds["hit"], audioCtx)
+                    this.game.road.totalTraffic[n].speed = 0
+                    playTrack(contextSounds["crash"], audioCtx, this.game.settings.sounds)
                 }
             }
         }
@@ -359,59 +359,65 @@ class Player {
                     this.game.road.totalAnimals[n].hitByShield()
                 } else {
                     this.setGameOverStatus(this.game.road.totalAnimals[n].z)
-                    playTrack(contextSounds["hit"], audioCtx)
+                    playTrack(this.game.road.totalAnimals[n].sound, audioCtx, this.game.settings.sounds)
+                    playTrack(contextSounds["crash"], audioCtx, this.game.settings.sounds)
                 }
-
-
-
-
             }
         }
     }
 
 
     update(dt, audioCtx) {
-        let MAX_SPRITES = 2;
         this.setMask(dt)
+        this.speedAndFuelControl(dt);
+        this.segmentCount();
+        this.updateEffects()
+        this.startCountDown(audioCtx)
+        this.gameOverCountDown()
+        this.setLanes()
+        this.countPowerUps()
+        this.SettingJumpingY(dt)
+        //this.checkCollidingGameOver(audioCtx)
+        this.checkCollidingCoins(audioCtx)
+        this.checkCollidingPowerUp(audioCtx)
+        this.checkCollidingFuel(audioCtx)
+    }
 
-        this.z += this.speed*dt
-        if (this.speed > 0 && this.turbo === 0 && !this.changingStage){
-            this.fuel -= dt*this.speed/(1000*this.difficulty.GAS_CORRECTION)
-        }
-        if (this.fuel < 0 && !this.gameOver){
-            this.setGameOverStatus()
-        }
-
-        if (this.game.road.findSegment(this.z) !== this.currentSegment){
-            this.segmentCounter++
-            this.currentSegment = this.game.road.findSegment(Math.floor(this.z))
+    segmentCount() {
+        let MAX_SPRITES = 2;
+        let thisSegmentIndex = this.game.road.findSegment(this.z).index
+        let currSegmentIndex = this.currentSegment.index
+        if (thisSegmentIndex !== currSegmentIndex) {
+            let delta = thisSegmentIndex - currSegmentIndex
+            this.segmentCounter += delta
+            this.currentSegment = this.game.road.findSegment(this.z)
             this.currentSprite++;
+            this.score += 0.1*delta
             if (this.currentSprite > MAX_SPRITES) {
                 this.currentSprite = 0;
             }
         }
-        if (this.segmentCounter === 1000){
-            this.speed +=MAX_SPEED/20
-            if (this.speed > this.difficulty.MAX_SPEED){
+        if (this.segmentCounter > 2000) {
+            this.speed += MAX_SPEED / 20
+            if (this.speed > this.difficulty.MAX_SPEED) {
                 this.speed = this.difficulty.MAX_SPEED
+                console.log(this.speed)
             }
             this.segmentCounter = 0;
         }
-        if (!this.start && !this.gameOver){
-            this.score +=(dt*24)
+    }
+
+    speedAndFuelControl(dt) {
+        if (this.speed < this.currentSpeed && this.turbo === 0){
+            this.speed += this.acceleration
         }
-
-        this.updateEffects()
-        this.startCountDown(audioCtx)
-        this.gameOverCountDown()
-
-        this.setLanes()
-        this.countPowerUps()
-        this.SettingJumpingY(dt)
-        this.checkCollidingGameOver(audioCtx)
-        this.checkCollidingCoins(audioCtx)
-        this.checkCollidingPowerUp(audioCtx)
-        this.checkCollidingFuel(audioCtx)
+        this.z += this.speed * dt
+        // if (this.speed > 0 && this.turbo === 0 && !this.changingStage) {
+        //     this.fuel -= dt * this.speed / (1000 * this.difficulty.GAS_CORRECTION)
+        // }
+        if (this.fuel < 0 && !this.gameOver) {
+            this.setGameOverStatus()
+        }
     }
 
     countPowerUps(){
@@ -451,9 +457,7 @@ class Player {
                 this.shieldEffect.setStop()
             }
         }
-        if (this.speed < this.currentSpeed && this.turbo === 0){
-            this.speed += this.acceleration
-        }
+
     }
 
     setMask(dt){
@@ -586,7 +590,9 @@ class Player {
             if (!this.jumping){
                 this.ySpeed = 0;
                 this.y = this.currentSegment.worldPoints.y
-                this.screen.y = CANVAS_HEIGHT - this.screen.h + Math.floor((Math.random()*5))-10
+                if (!this.gameOver){
+                    this.screen.y = CANVAS_HEIGHT - this.screen.h + Math.floor((Math.random()*5))-10
+                }
             } else {
                 this.screen.y += this.ySpeed
                 this.ySpeed += this.gravity

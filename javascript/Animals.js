@@ -26,6 +26,7 @@ class Animals extends RoadObjects{
     hit = false
     slowSpeed = 0.01
     fastSpeed = 0.03
+    sound = null
 
     constructor(sprite, x, y, z, spriteSize, road, type) {
         super(sprite, x, y, z, spriteSize, road);
@@ -73,15 +74,21 @@ class Animals extends RoadObjects{
         }
     }
 
-    update(dt) {
+    update(dt, audioCtx) {
         super.update(dt);
         if (!this.hit){
             this.walkAndReturn()
             this.animateWalking()
+            if (this.road.findSegment(this.z).index === this.road.game.player.currentSegment.index){
+                if (Math.random() > 0.75){
+                    playTrack(this.sound, audioCtx, this.road.game.settings.sounds)
+                }
+            }
         } else if (this.hit){
             this.speed = 0
             this.sprite = this.sprites[4]
         }
+
     }
 
     setSpeed(){
@@ -105,12 +112,14 @@ class Animals extends RoadObjects{
         switch (this.road.game.currentStage) {
             case (SUBURB):
                 if (this.type === 0 ){
+                    this.sound = contextSounds["suburb_dog_sound"]
                     if (this.speed > 0){
                         return this.suburbDogSpritesRight
                     } else{
                         return this.suburbDogSpritesLeft
                     }
                 } else if (this.type === 1){
+                    this.sound = contextSounds["cat_sound"]
                     if (this.speed > 0){
                         return this.catSpritesRight
                     } else{
@@ -120,12 +129,14 @@ class Animals extends RoadObjects{
                 break
             case (CITY):
                 if (this.type === 0 ){
+                    this.sound = contextSounds["city_dog_sound"]
                     if (this.speed > 0){
                         return this.cityDogSpritesRight
                     } else{
                         return this.cityDogSpritesLeft
                     }
                 } else if (this.type === 1){
+                    this.sound = contextSounds["capivara_sound"]
                     if (this.speed > 0){
                         return this.capivaraSpritesRight
                     } else{
@@ -135,12 +146,14 @@ class Animals extends RoadObjects{
                 break
             case (BEACH):
                 if (this.type === 0 ){
+                    this.sound = contextSounds["turtle_sound"]
                     if (this.speed > 0){
                         return this.turtleSpritesRight
                     } else{
                         return this.turtleSpritesLeft
                     }
                 } else if (this.type === 1){
+                    this.sound = contextSounds["beach_dog_sound"]
                     if (this.speed > 0){
                         return this.beachDogSpritesRight
                     } else{
@@ -150,12 +163,14 @@ class Animals extends RoadObjects{
                 break
             case (FOREST):
                 if (this.type === 0 ){
+                    this.sound = contextSounds["guara_sound"]
                     if (this.speed > 0){
                         return this.guaraSpritesRight
                     } else{
                         return this.guaraSpritesLeft
                     }
                 } else if (this.type === 1){
+                    this.sound = contextSounds["jaguar_sound"]
                     if (this.speed > 0){
                         return this.jaguarSpritesRight
                     } else{
@@ -165,12 +180,14 @@ class Animals extends RoadObjects{
                 break
             case (FARM):
                 if (this.type === 0 ){
+                    this.sound = contextSounds["bull_sound"]
                     if (this.speed > 0){
                         return this.bullSpritesRight
                     } else{
                         return this.bullSpritesLeft
                     }
                 } else if (this.type === 1){
+                    this.sound = contextSounds["horse_sound"]
                     if (this.speed > 0){
                         return this.horseSpritesRight
                     } else{
