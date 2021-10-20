@@ -48,7 +48,7 @@ class Segment {
         let thisSprite = null
         if (type === Segment.REGULAR || type === Segment.ANIMALS){
             for (let places in sidePlaces){
-                if (Math.random() > 0.85) {
+                if (Math.random() > 0.9) {
                     thisSprite = randomIntFromInterval(0,7)
                     objects.push(new SideObjects(stageObjects[this.stage].SCENARIOS[thisSprite], sidePlaces[places], this.worldPoints.y, this.worldPoints.z, LARGE_SPRITE_SIZE, this.road, false))
                 }

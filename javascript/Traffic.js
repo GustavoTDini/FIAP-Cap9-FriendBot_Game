@@ -4,6 +4,7 @@ class Traffic extends RoadObjects{
     constructor(sprite, x, y, z, spriteSize, road) {
         super(sprite, x, y, z, spriteSize, road);
         this.speed = 100
+        this.nextX = this.x
     }
 
     update(dt, audioCtx){
@@ -16,5 +17,8 @@ class Traffic extends RoadObjects{
                 playTrack(contextSounds["horn"], audioCtx, this.road.game.settings.sounds)
             }
         }
+        this.dodgeOtherObjects()
+        this.setX()
+
     }
 }

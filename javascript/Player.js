@@ -333,7 +333,7 @@ class Player {
         for (let n = 0; n < this.game.road.totalCars.length; n++){
             if (this.isColliding(this.game.road.totalCars[n]) && this.transparent  === 0 && !this.gameOver  && !this.over){
                 if (this.shield > 0){
-                    this.game.road.totalCars[n].hitByShield()
+                    this.game.road.totalCars[n].hitByShield(audioCtx)
                 } else{
                     this.setGameOverStatus(this.game.road.totalCars[n].z)
                     this.game.road.totalTraffic[n].speed = 0
@@ -344,7 +344,7 @@ class Player {
         for (let n = 0; n < this.game.road.totalObstacles.length; n++){
             if (this.isColliding(this.game.road.totalObstacles[n]) && this.transparent === 0 && !this.gameOver){
                 if (this.shield > 0){
-                    this.game.road.totalObstacles[n].hitByShield()
+                    this.game.road.totalObstacles[n].hitByShield(audioCtx)
                 } else {
                     this.setGameOverStatus(this.game.road.totalObstacles[n].z)
                     this.game.road.totalTraffic[n].speed = 0
@@ -356,7 +356,7 @@ class Player {
             if (this.isColliding(this.game.road.totalAnimals[n]) && this.transparent === 0 && !this.gameOver  && !this.over){
                 this.game.road.totalAnimals[n].hit = true
                 if (this.shield > 0){
-                    this.game.road.totalAnimals[n].hitByShield()
+                    this.game.road.totalAnimals[n].hitByShield(audioCtx)
                 } else {
                     this.setGameOverStatus(this.game.road.totalAnimals[n].z)
                     playTrack(this.game.road.totalAnimals[n].sound, audioCtx, this.game.settings.sounds)
@@ -377,7 +377,7 @@ class Player {
         this.setLanes()
         this.countPowerUps()
         this.SettingJumpingY(dt)
-        //this.checkCollidingGameOver(audioCtx)
+        this.checkCollidingGameOver(audioCtx)
         this.checkCollidingCoins(audioCtx)
         this.checkCollidingPowerUp(audioCtx)
         this.checkCollidingFuel(audioCtx)

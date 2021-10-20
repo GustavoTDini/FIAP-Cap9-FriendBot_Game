@@ -62,7 +62,7 @@ class Animals extends RoadObjects{
 
     animateWalking() {
         let MAX_SPRITES = 3;
-        let MAX_FRAMES = 8;
+        let MAX_FRAMES = 5;
         this.frame++;
         if (this.frame > MAX_FRAMES) {
             this.frame = 0;

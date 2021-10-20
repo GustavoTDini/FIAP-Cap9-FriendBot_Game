@@ -214,12 +214,17 @@ function createTransformRoad(roadImage, x1, y1, w1, x2, y2, w2, ctx) {
 // Draw Helpers
 // ---------------------------------------------------------------------------------
 
-function preloadImages(images) {
-    for (let image in images) {
-        images[image].src = "./images/" +  image.toString() + ".png"
-    }
+async function getImages(imageName) {
+    let url = "./images/" +  imageName.toString() + ".png"
+    const response = await fetch(url);
+    images[imageName].src = response.url
 }
 
+async function preloadImages(images) {
+      for (let image in images) {
+         await getImages(image)
+    }
+}
 
 function drawPolygon(x1, y1, x2, y2, x3, y3, x4, y4, color, ctx){
     ctx.fillStyle = color
@@ -266,9 +271,9 @@ async function loadSound(soundName, audioCtx) {
     contextSounds[soundName] = await getSound(soundName, audioCtx)
 }
 
-function preloadSounds(sounds, audioCtx) {
+async function preloadSounds(sounds, audioCtx) {
     for (let i in sounds) {
-        loadSound(sounds[i], audioCtx).then(r => console.log("Loaded: " + r))
+        await loadSound(sounds[i], audioCtx)
     }
 }
 

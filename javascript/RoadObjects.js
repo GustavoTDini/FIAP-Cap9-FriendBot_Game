@@ -12,6 +12,7 @@ class RoadObjects {
         this.mask = {x:this.x, z:this.z, w:0.2, s: 100}
         this.segment = null
         this.dir = 1;
+        this.nextX
         this.tunnel = null
     }
 
@@ -80,6 +81,81 @@ class RoadObjects {
     setMask(){
         this.mask = {x:this.x, z:this.z, w:0.2, s: 100 }
     }
+
+    dodgeOtherObjects(){
+        let thisSegment = this.segment.index
+        let playerSegment = this.road.game.player.currentSegment.index
+        let maxSegment = playerSegment + this.road.game.gameCamera.drawDistance
+
+        if (thisSegment > playerSegment - 20 && thisSegment < maxSegment){
+            for (let n = playerSegment-20; n < maxSegment; n ++){
+                for (let obstacle in this.road.segments[n]){
+                    if (this.willCollide(obstacle)){
+                        switch (this.x){
+                            case ROAD_LANES[0]:
+                                this.nextX =  ROAD_LANES[1]
+                                break
+                            case ROAD_LANES[1]:
+                                this.nextX = Math.random() < 0.5 ? ROAD_LANES[0]: ROAD_LANES[2]
+                                break
+                            case ROAD_LANES[2]:
+                                this.nextX = Math.random() < 0.5 ? ROAD_LANES[1]: ROAD_LANES[3]
+                                break
+                            case ROAD_LANES[3]:
+                                this.nextX =  ROAD_LANES[2]
+                                break
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    setX(){
+        if (this.nextX !== this.x){
+            if (this.x > this.nextX){
+                this.x = this.x - 0.05
+                if (this.x < this.nextX){
+                    this.x = this.nextX
+                }
+            } else{
+                this.x = this.x + 0.05
+                if (this.x > this.nextX){
+                    this.x = this.nextX
+                }
+
+            }
+        }
+    }
+
+
+    //função para definir uma colisão entre 2 objetos
+    willCollide(object) {
+        let thisZ = this.mask.z
+        if (object instanceof Cars || object instanceof Traffic || object instanceof Obstacles || object instanceof Animals){
+            if (object.z > thisZ - 500 && object.z < thisZ + this.road.game.gameCamera.drawDistance * SEGMENT_LENGTH){
+                let thisX = this.mask.x
+                let objectX = object.mask.x
+                let objectZ = object.mask.z
+                let thisWidth = this.mask.w
+                let objectWidth = object.mask.w
+                let thisSize = this.mask.s
+                let objectSize = object.mask.s
+                thisZ = thisZ + this.speed*3
+                return ((thisX < objectX + objectWidth) &&
+                    (thisX + thisWidth > objectX) &&
+                    (thisZ < objectZ + objectSize) &&
+                    (thisZ + thisSize > objectZ))
+            } else{
+                return false
+            }
+        } else {
+            return false
+        }
+
+    }
+
 
     project3D(){
         this.segment = this.road.findSegment(this.z)
