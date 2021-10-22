@@ -52,6 +52,10 @@ function fatorial(n) {
     return n * fatorial(n - 1);
 }
 
+function interpolate(x1, x2, y1,y2, x) {
+    return y1 + (((x-x1)/(x2-x1))*(y2-y1))
+}
+
 // ---------------------------------------------------------------------------------
 // Matrix  & 3d Helpers
 // ---------------------------------------------------------------------------------
@@ -247,11 +251,29 @@ function drawShadow(x, y, SpriteSize, ctx){
     ctx.fill();
 }
 
+function scaleXDraw(canvasWidth, currentValue){
+    let standardWidth = 1280
+    return canvasWidth*currentValue/standardWidth
+}
+
+function scaleYDraw(canvasHeight, currentValue){
+    let standardHeight = 720
+    return canvasHeight*currentValue/standardHeight
+}
+
+function drawToCanvas(canvas, ctx, sprite, x, y, width, height){
+    ctx.drawImage(...sprite, scaleXDraw(canvas.width, x), scaleYDraw(canvas.height, y), scaleXDraw(canvas.width, width), scaleYDraw(canvas.height, height))
+}
+
+function drawRectToCanvas(canvas, ctx, x, y, width, height){
+    ctx.fillRect(scaleXDraw(canvas.width, x), scaleYDraw(canvas.height, y), scaleXDraw(canvas.width, width), scaleYDraw(canvas.height, height) )
+}
+
 // para mudar a opacidade do desenho
-function drawSpriteWithAlpha(ctx, sprite, x, y, width, height, alpha) {
+function drawSpriteWithAlpha(ctx, sprite, x, y, width, height, alpha, canvasWidth, canvasHeight) {
     ctx.save();
     ctx.globalAlpha = alpha;
-    ctx.drawImage(sprite, x, y, width, height);
+    ctx.drawImage(sprite, scaleXDraw(canvasWidth,x), scaleYDraw(canvasHeight,y), scaleXDraw(canvasWidth,width), scaleYDraw(canvasHeight,height));
     ctx.globalAlpha = 1
     ctx.restore();
 }
@@ -313,11 +335,26 @@ function playMusic(audioBuffer, audioCtx, musicSetting) {
 // ---------------------------------------------------------------------------------
 // Mouse & Touch Helpers
 // ---------------------------------------------------------------------------------
+function scaleXPoint(currentValue){
+    return screen.width*currentValue/STANDARD_WIDTH
+}
+
+function scaleYPoint(currentValue){
+    return screen.width*currentValue/STANDARD_HEIGHT
+}
+
 
 function getMouseCanvasArea(mouseX, mouseY, x, y, width, height){
-    console.log(mouseY, mouseX)
-    return (mouseX > x && mouseX < x + width) && (mouseY > y && mouseY < y + height);
+    let correctedX = scaleXPoint(mouseX)
+    let correctedY = scaleYPoint(mouseY)
+    console.log(mouseX, mouseY)
+    console.log(correctedX, correctedY)
+    return ((correctedX >  x) && (correctedX < x+width) && (correctedY >  y) && (correctedY < y+height));
 }
+
+// ---------------------------------------------------------------------------------
+// FullScreen Helpers
+// ---------------------------------------------------------------------------------
 
 function toggleFullScreen(element) {
     if (!element.fullscreenElement) {
@@ -327,4 +364,11 @@ function toggleFullScreen(element) {
             element.exitFullscreen().then(r =>console.log(r));
         }
     }
+}
+
+function isGameInFullscreen(elementNodeName) {
+    if (document.fullscreenElement && document.fullscreenElement.nodeName === elementNodeName) {
+        return true;
+    }
+    return false;
 }

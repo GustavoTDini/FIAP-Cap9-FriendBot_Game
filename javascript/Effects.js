@@ -36,9 +36,9 @@ class Effects{
         this.setSprite()
     }
 
-    render(ctx){
+    render(ctx, canvas){
         if (this.sprite < this.spritesSize){
-            ctx.drawImage(...this.sprites[this.sprite], this.x, this.y, this.width, this.height)
+            drawToCanvas(canvas, ctx, this.sprites[this.sprite], this.x, this.y, this.width, this.height)
         }
     }
 

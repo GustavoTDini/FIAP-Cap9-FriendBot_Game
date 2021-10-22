@@ -21,27 +21,27 @@ class Game {
     }
 
     // Função principal para renderizar os elementos do canvas
-    render(game, ctx)  {
+    render(game, ctx, canvas)  {
         switch(game.gameState){
             case LOADING_STATE:
                 break;
             case SET_STATE:
                 break;
             case PLAY_STATE:
-                ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-                game.background.render(ctx)
-                game.road.render(ctx)
-                game.player.render(ctx);
-                game.UI.renderGameUI(ctx)
+                ctx.clearRect(0, 0, STANDARD_WIDTH, STANDARD_HEIGHT)
+                game.background.render(ctx, canvas.width, canvas.height)
+                game.road.render(ctx, canvas.width, canvas.height)
+                game.player.render(ctx, canvas);
+                game.UI.renderGameUI(ctx, canvas)
                 break;
             case PAUSE_STATE:
-                game.UI.renderPauseUI(ctx)
+                game.UI.renderPauseUI(ctx, canvas)
                 break;
             case CONFIG_STATE:
-                game.UI.renderConfigUI(ctx)
+                game.UI.renderConfigUI(ctx, canvas)
                 break;
             case GAME_OVER_STATE:
-                game.UI.renderGameOverUI(ctx)
+                game.UI.renderGameOverUI(ctx, canvas)
                 break;
         }
     }
@@ -67,10 +67,10 @@ class Game {
                 game.gameState = PLAY_STATE;
                 break;
             case PLAY_STATE:
-                game.player.update(dt, audioCtx)
-                game.road.update(dt, audioCtx)
                 game.gameCamera.update(dt)
+                game.player.update(dt, audioCtx)
                 game.background.update(dt)
+                game.road.update(dt, audioCtx)
                 game.UI.update(audioCtx)
                 game.playMusic(game, audioCtx);
                 game.checkMusicEnd(game, audioCtx);
@@ -132,7 +132,7 @@ let GameEngine = {
             last = now;
             if (fdt > frameStep) {
                 fdt = fdt - frameStep;
-                render(game, ctx);
+                render(game, ctx, canvas);
             }
             if (udt > updateStep) {
                 udt = udt - updateStep;

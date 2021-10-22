@@ -4,26 +4,35 @@ window.onload = async function () {
     await preloadSounds(sounds, audioContext)
     const GAME_CANVAS = document.getElementById("game_canvas")
     document.getElementById("canvas_div").style.display = "flex"
-    GAME_CANVAS.width = CANVAS_WIDTH;
-    GAME_CANVAS.height = CANVAS_HEIGHT;
+    GAME_CANVAS.width = 780;
+    GAME_CANVAS.height = 440;
     let game = new Game()
     // Listener para clique das teclas
     document.addEventListener('keyup', function (e) {
-        //toggleFullScreen(GAME_CANVAS)
+        toggleFullScreen(GAME_CANVAS)
         game.player.handleInputUp(ALLOWED_KEYS[e.code], audioContext);
     });
 
     GAME_CANVAS.addEventListener("mousedown", function (e) {
         let rect = GAME_CANVAS.getBoundingClientRect();
-        let x = e.clientX -  rect.left
-        let y = e.clientY -  rect.top
-        game.UI.handleMouseDown(x, y, audioContext)
+        let fullScreen = isGameInFullscreen(GAME_CANVAS.nodeName)
+        let x,y
+        if(fullScreen){
+            x = interpolate(0,screen.width,0,GAME_CANVAS.width, e.clientX);
+            y = interpolate(0,screen.height,0,GAME_CANVAS.height, e.clientY);
+        } else {
+            x = e.clientX - rect.left;
+            y = e.clientY - rect.top;
+        }
+        console.log(x, y)
+        game.UI.handleMouseDown(x, y, audioContext, GAME_CANVAS.width, GAME_CANVAS.height)
     }, false);
     GAME_CANVAS.addEventListener("mouseup", function (e) {
         let rect = GAME_CANVAS.getBoundingClientRect();
+        let fullScreen = isGameInFullscreen(GAME_CANVAS.nodeName)
         let x = e.clientX -  rect.left
         let y = e.clientY -  rect.top
-        game.UI.handleMouseUp(x, y, audioContext)
+        game.UI.handleMouseUp(x, y, audioContext, GAME_CANVAS.width, GAME_CANVAS.height)
     }, false);
     GameEngine.run({
         canvas: GAME_CANVAS,
@@ -32,7 +41,7 @@ window.onload = async function () {
         game: game,
         update: game.update,
         playerColor: BLUE,
-        difficulty: MEDIUM
+        difficulty: HARD
     })
 }
 

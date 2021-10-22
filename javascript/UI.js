@@ -14,71 +14,96 @@ class UI {
         this.ticker = 0
         this.beepControl = false
         this.score = new CanvasText( 160, 100, game.player.score, 45 , "#00712f")
-        this.coins = new CanvasText( CANVAS_WIDTH - 165, 100, game.player.coins, 45 , "#fd6601")
+        this.coins = new CanvasText( STANDARD_WIDTH - 165, 100, game.player.coins, 45 , "#fd6601")
     }
 
-    renderGameUI(ctx){
-        let player = this.game.player
-        ctx.drawImage(...UIScore, 0, 10, 180, 100)
-        this.score.render(ctx)
-        ctx.drawImage(...UIStar, CANVAS_WIDTH-180, 10, 180, 100)
-        this.coins.render(ctx)
-        this.drawFuel(ctx)
+    renderGameUI(ctx, canvas){
+        drawToCanvas (canvas, ctx, UIScore, 0 ,10, 180, 100)
+        this.score.render(ctx, canvas)
+        drawToCanvas (canvas, ctx, UIStar, STANDARD_WIDTH-180 ,10, 180, 100)
+        this.coins.render(ctx, canvas)
+        this.drawFuel(ctx, canvas)
         if (this.game.settings.controls){
-            ctx.drawImage(...UIPauseButton, 200, 10, 100, 100)
-            ctx.drawImage(...UILeftButton, 10, CANVAS_HEIGHT-130, 120, 120)
-            ctx.drawImage(...UIRightButton, CANVAS_WIDTH-130, CANVAS_HEIGHT-130, 120, 120)
-            ctx.drawImage(...UIJumpButton, CANVAS_WIDTH-130, CANVAS_HEIGHT-260, 120, 120)
+            drawToCanvas (canvas, ctx, UIPauseButton, 200, 10, 100, 100)
+            drawToCanvas (canvas, ctx, UILeftButton, 10, STANDARD_HEIGHT-130, 120, 120)
+            drawToCanvas (canvas, ctx, UIRightButton, STANDARD_WIDTH-140, STANDARD_HEIGHT-130, 120, 120)
+            drawToCanvas (canvas, ctx, UIJumpButton, STANDARD_WIDTH-140, STANDARD_HEIGHT-260, 120, 120)
         }
-        this.renderPowerUpIcons(player, TURBO, ctx)
-        this.renderPowerUpIcons(player, BOLT, ctx)
-        this.renderPowerUpIcons(player, DOUBLE, ctx)
-        this.renderPowerUpIcons(player, SHIELD, ctx)
-        this.renderMiniMap(ctx)
+        this.renderPowerUpIcons(TURBO, ctx, canvas)
+        this.renderPowerUpIcons(BOLT, ctx, canvas)
+        this.renderPowerUpIcons(DOUBLE, ctx, canvas)
+        this.renderPowerUpIcons(SHIELD, ctx, canvas)
+        this.renderMiniMap(ctx, canvas)
     }
 
-    renderPauseUI(ctx){
-        ctx.drawImage(...UIPause, CANVAS_CENTER_X - 350, CANVAS_CENTER_Y - 200, 700, 400)
-        ctx.drawImage(...UIResume, CANVAS_CENTER_X - 100, CANVAS_CENTER_Y - 80, 200, 200)
-        ctx.drawImage(...this.homeIcon, CANVAS_CENTER_X - 250, CANVAS_CENTER_Y -20, 100, 100)
-        ctx.drawImage(...this.configIcon, CANVAS_CENTER_X + 150, CANVAS_CENTER_Y-20, 100, 100)
+    renderPauseUI(ctx, canvas){
+        drawToCanvas (canvas, ctx, UIPause, STANDARD_CENTER_X - 350, STANDARD_CENTER_Y - 200, 700, 400)
+        drawToCanvas (canvas, ctx, UIResume, STANDARD_CENTER_X - 100, STANDARD_CENTER_Y - 80, 200, 200)
+        drawToCanvas (canvas, ctx, this.homeIcon, STANDARD_CENTER_X - 250, STANDARD_CENTER_Y -20, 100, 100)
+        drawToCanvas (canvas, ctx, this.configIcon, STANDARD_CENTER_X + 150, STANDARD_CENTER_Y-20, 100, 100)
     }
-    renderMiniMap(ctx){
+    renderMiniMap(ctx, canvas){
+        let road = this.game.road
         let spriteWidth = 20
-        let spriteLenght = 4
+        let spriteLength = 8
+        let startSegment = this.game.player.currentSegment.index
+        let finalSegment = startSegment + this.game.gameCamera.drawDistance
+        let startZ = this.game.player.z
+        let finalZ = startZ + this.game.gameCamera.drawDistance*SEGMENT_LENGTH
         ctx.fillStyle = "rgba(47,47,47,0.58)"
-        ctx.fillRect(CANVAS_WIDTH - 120, 140 , 100, 300 )
+        drawRectToCanvas(canvas, ctx, STANDARD_WIDTH - 140, 140 , 120, 300)
         ctx.fillStyle = this.setMapCarColor()
+        drawRectToCanvas(canvas, ctx, this.setMapX(this.game.player.x), 420 , spriteWidth, spriteLength)
+        for (let n = startSegment; n < finalSegment; n++){
+            let roadObjects = road.segments[n].inRoadObjects
+            if (roadObjects.length > 0){
+                for (let index in roadObjects){
+                    let object = roadObjects[index]
+                    if (object instanceof Cars){
+                        ctx.fillStyle = "#ff0000"
+                        drawRectToCanvas(canvas, ctx, this.setMapX(object.x), this.setMapY(object.z, startZ, finalZ) , spriteWidth, spriteLength)
+                    } else if (object instanceof Traffic){
+                        ctx.fillStyle = "#05e5bc"
+                        drawRectToCanvas(canvas, ctx, this.setMapX(object.x), this.setMapY(object.z, startZ, finalZ) , spriteWidth, spriteLength)
+                    }else if (object instanceof Animals){
+                        ctx.fillStyle = "#e9f500"
+                        drawRectToCanvas(canvas, ctx, this.setMapX(object.x), this.setMapY(object.z, startZ, finalZ) , spriteWidth, spriteLength)
+                    }else if (object instanceof Obstacles){
+                        ctx.fillStyle = "#ff8f00"
+                        drawRectToCanvas(canvas, ctx, this.setMapX(object.x), this.setMapY(object.z, startZ, finalZ) , spriteWidth, spriteLength)
+                    }
+                }
+            }
+        }
     }
 
-    renderConfigUI(ctx){
-        ctx.drawImage(...UIPause, CANVAS_CENTER_X - 350, CANVAS_CENTER_Y - 200, 700, 400)
-        ctx.drawImage(...UIMusic, CANVAS_CENTER_X - 260, CANVAS_CENTER_Y - 60, 100, 100)
-        ctx.drawImage(...this.game.settings.music? UISelectorOn: UISelectorOff, CANVAS_CENTER_X - 270, CANVAS_CENTER_Y, 100, 100)
-        ctx.drawImage(...UISound, CANVAS_CENTER_X - 120, CANVAS_CENTER_Y - 60, 100, 100)
-        ctx.drawImage(...this.game.settings.sounds? UISelectorOn: UISelectorOff, CANVAS_CENTER_X - 130, CANVAS_CENTER_Y, 100, 100)
-        ctx.drawImage(...UIControl, CANVAS_CENTER_X + 20, CANVAS_CENTER_Y - 60, 100, 100)
-        ctx.drawImage(...this.game.settings.controls? UISelectorOn: UISelectorOff, CANVAS_CENTER_X + 10, CANVAS_CENTER_Y, 100, 100)
-        ctx.drawImage(...UI3d, CANVAS_CENTER_X + 160, CANVAS_CENTER_Y - 60, 100, 100)
-        ctx.drawImage(...this.game.settings.threeD? UISelectorOn: UISelectorOff, CANVAS_CENTER_X + 150, CANVAS_CENTER_Y, 100, 100)
-        ctx.drawImage(...this.returnIcon, CANVAS_CENTER_X - 70, CANVAS_CENTER_Y + 75, 100, 100)
+    renderConfigUI(ctx, canvas){
+        drawToCanvas (canvas, ctx, UIPause, STANDARD_CENTER_X - 350, STANDARD_CENTER_Y - 200, 700, 400)
+        drawToCanvas (canvas, ctx, UIMusic, STANDARD_CENTER_X - 260, STANDARD_CENTER_Y - 60, 100, 100)
+        drawToCanvas (canvas, ctx, this.game.settings.music? UISelectorOn: UISelectorOff, STANDARD_CENTER_X - 270, STANDARD_CENTER_Y, 100, 100)
+        drawToCanvas (canvas, ctx, UISound, STANDARD_CENTER_X - 120, STANDARD_CENTER_Y - 60, 100, 100)
+        drawToCanvas (canvas, ctx, this.game.settings.sounds? UISelectorOn: UISelectorOff, STANDARD_CENTER_X - 130, STANDARD_CENTER_Y, 100, 100)
+        drawToCanvas (canvas, ctx, UIControl, STANDARD_CENTER_X + 20, STANDARD_CENTER_Y - 60, 100, 100)
+        drawToCanvas (canvas, ctx, this.game.settings.controls? UISelectorOn: UISelectorOff, STANDARD_CENTER_X + 10, STANDARD_CENTER_Y, 100, 100)
+        drawToCanvas (canvas, ctx, UI3d, STANDARD_CENTER_X + 160, STANDARD_CENTER_Y - 60, 100, 100)
+        drawToCanvas (canvas, ctx, this.game.settings.threeD? UISelectorOn: UISelectorOff, STANDARD_CENTER_X + 150, STANDARD_CENTER_Y, 100, 100)
+        drawToCanvas (canvas, ctx, this.returnIcon, STANDARD_CENTER_X - 70, STANDARD_CENTER_Y + 75, 100, 100)
     }
 
-    renderGameOverUI(ctx){
-        ctx.drawImage(...UIGameOver, CANVAS_CENTER_X - 350, CANVAS_CENTER_Y - 150, 700, 300)
-        ctx.drawImage(...UIReturn, CANVAS_CENTER_X - 100, CANVAS_CENTER_Y-55, 200, 200)
+    renderGameOverUI(ctx, canvas){
+        drawToCanvas (canvas, ctx, UIGameOver, STANDARD_CENTER_X - 350, STANDARD_CENTER_Y - 150, 700, 300)
+        drawToCanvas (canvas, ctx, UIReturn, STANDARD_CENTER_X - 100, STANDARD_CENTER_Y-55, 200, 200)
     }
 
-    drawFuel(ctx, audioCtx){
+    drawFuel(ctx, canvas){
         let fuel = this.game.player.fuel
         ctx.fillStyle = "#ff5a0a"
         let width = fuel*2.6
-
-        ctx.fillRect(CANVAS_CENTER_X - 85, 32, width, 52)
-        ctx.drawImage(...UIFuel, CANVAS_CENTER_X - 180, 10, 360, 100)
+        drawRectToCanvas(canvas, ctx, STANDARD_CENTER_X - 85, 32 , width, 52)
+        drawToCanvas (canvas, ctx, UIFuel, STANDARD_CENTER_X - 180, 10, 360, 100)
         if (fuel < 20){
             if (this.ticker%2 === 0){
-                ctx.drawImage(...UIRedFuel, CANVAS_CENTER_X-162, 24, 65, 70)
+                drawToCanvas (canvas, ctx, UIRedFuel, STANDARD_CENTER_X-162, 24, 65, 70)
             }
         }
     }
@@ -94,6 +119,15 @@ class UI {
             default:
                 return "rgba(47,47,47,0.58)"
         }
+    }
+
+
+    setMapX(x){
+        return interpolate(-0.8,1.2,STANDARD_WIDTH - 140,STANDARD_WIDTH - 20, x)
+    }
+
+    setMapY(z, startZ, finalZ){
+        return interpolate(startZ,finalZ,420,140, z)
     }
 
     update(audioCtx){
@@ -118,130 +152,100 @@ class UI {
 
     }
 
-    renderPowerUpIcons(player, type, ctx){
+    renderPowerUpIcons(type, ctx, canvas){
         let icons = null
         let powerUpCounter = null
         let height = null
         switch (type){
             case (TURBO):
                 icons = turboIcons
-                powerUpCounter = player.turbo
+                powerUpCounter = this.game.player.turbo
                 height = 100
                 break;
             case (BOLT):
                 icons = boltIcons
-                powerUpCounter = player.transparent
-                height = 210
+                powerUpCounter = this.game.player.transparent
+                height =210
                 break;
             case (DOUBLE):
                 icons = doubleIcons
-                powerUpCounter = player.double
+                powerUpCounter = this.game.player.double
                 height = 320
                 break;
             case (SHIELD):
                 icons = shieldIcons
-                powerUpCounter = player.shield
+                powerUpCounter = this.game.player.shield
                 height = 430
                 break;
         }
         if (powerUpCounter > 0){
-            if (powerUpCounter >= 270){
-                ctx.drawImage(...icons[0], 10, height, 100, 100)
-            }
-            if (powerUpCounter >= 240 && powerUpCounter < 270){
-                ctx.drawImage(...icons[1], 10, height, 100, 100)
-            }
-            if (powerUpCounter >= 210 && powerUpCounter < 240){
-                ctx.drawImage(...icons[2], 10, height, 100, 100)
-            }
-            if (powerUpCounter >= 180 && powerUpCounter < 210){
-                ctx.drawImage(...icons[3], 10, height, 100, 100)
-            }
-            if (powerUpCounter >= 150 && powerUpCounter < 180){
-                ctx.drawImage(...icons[4], 10, height, 100, 100)
-            }
-            if (powerUpCounter >= 120 && powerUpCounter < 150){
-                ctx.drawImage(...icons[5], 10, height, 100, 100)
-            }
-            if (powerUpCounter >= 90 && powerUpCounter < 120){
-                ctx.drawImage(...icons[6], 10, height, 100, 100)
-            }
-            if (powerUpCounter >= 60 && powerUpCounter < 90){
-                ctx.drawImage(...icons[7], 10, height, 100, 100)
-            }
-            if (powerUpCounter >= 30 && powerUpCounter < 60){
-                ctx.drawImage(...icons[8], 10, height, 100, 100)
-            }
-            if (powerUpCounter < 30){
-                ctx.drawImage(...icons[9], 10, height, 100, 100)
-            }
+            drawToCanvas (canvas, ctx, icons[Math.max(0,9-Math.floor(powerUpCounter/30))], 10, height, 100, 100)
         }
 
 }
 
 
-    handleMouseDown(x, y, audioCtx) {
+    handleMouseDown(x, y, audioCtx, canvasWidth, canvasHeight) {
         switch (this.game.gameState){
             case (PLAY_STATE):
                 if (this.game.settings.controls && !this.game.player.start && !this.game.player.gameOver){
-                    if (getMouseCanvasArea(x,y, 200, 10 ,100,100)){
+                    if (getMouseCanvasArea(x,y, 200, 10 ,100,100, canvasWidth, canvasHeight)){
                         this.game.player.setPause(audioCtx)
                     }
-                    if (getMouseCanvasArea(x,y, 10, CANVAS_HEIGHT-130 ,120,120)){
+                    if (getMouseCanvasArea(x,y, 10, STANDARD_HEIGHT-130 ,120,120, canvasWidth, canvasHeight)){
                         this.game.player.moveLeftRight(audioCtx, -1)
                     }
-                    if (getMouseCanvasArea(x,y, CANVAS_WIDTH-130, CANVAS_HEIGHT-130 ,120,120)){
+                    if (getMouseCanvasArea(x,y, STANDARD_WIDTH-130, STANDARD_HEIGHT-130 ,120,120, canvasWidth, canvasHeight)){
                         this.game.player.moveLeftRight(audioCtx, 1)
                     }
-                    if (getMouseCanvasArea(x,y, CANVAS_WIDTH - 130, CANVAS_HEIGHT-260 ,120,120)){
+                    if (getMouseCanvasArea(x,y, STANDARD_WIDTH - 130, STANDARD_HEIGHT-260 ,120,120, canvasWidth, canvasHeight)){
                         this.game.player.setJump(audioCtx)
                     }
                 }
 
                 break
             case (PAUSE_STATE):
-                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 100, CANVAS_CENTER_Y - 80 ,200,200)){
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 100, STANDARD_CENTER_Y - 80 ,200,200, canvasWidth, canvasHeight)){
                     this.game.player.setPause(audioCtx)
                 }
-                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 250, CANVAS_CENTER_Y - 80 ,100,100)){
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 250, STANDARD_CENTER_Y - 80 ,100,100, canvasWidth, canvasHeight)){
                     playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
                     this.homeIcon = this.UIHomeIcon[1]
                 }
-                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X + 150, CANVAS_CENTER_Y-20 ,100,100)){
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X + 150, STANDARD_CENTER_Y-20 ,100,100, canvasWidth, canvasHeight)){
                     playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
                     this.configIcon = this.UIConfigIcon[1]
                 }
                 break
             case (CONFIG_STATE):
-                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 260, CANVAS_CENTER_Y - 60 ,100,100)){
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 260, STANDARD_CENTER_Y - 60 ,100,100, canvasWidth, canvasHeight)){
                     playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
                     if (this.game.settings.music){
                         this.game.currentMusic.stop()
                     }else{
-                        this.game.currentMusic = playMusic(contextSounds["passing_breeze"], audioCtx)
-                        this.game.playingMusic = true
+                        this.game.playMusic(this.game, audioCtx)
                     }
                     this.game.settings.music = !this.game.settings.music
                 }
-                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 120, CANVAS_CENTER_Y - 60 ,100,100)){
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 120, STANDARD_CENTER_Y - 60 ,100,100, canvasWidth, canvasHeight)){
                     playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
                     this.game.settings.sounds = !this.game.settings.sounds
                 }
-                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X + 20, CANVAS_CENTER_Y - 60 ,100,100)){
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X + 20, STANDARD_CENTER_Y - 60 ,100,100, canvasWidth, canvasHeight)){
                     playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
                     this.game.settings.controls = !this.game.settings.controls
                 }
-                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X + 160, CANVAS_CENTER_Y - 60 ,100,100)){
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X + 160, STANDARD_CENTER_Y - 60 ,100,100, canvasWidth, canvasHeight)){
                     playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
                     this.game.settings.threeD = !this.game.settings.threeD
                 }
-                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 70, CANVAS_CENTER_Y +75 ,100,100)){
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 70, STANDARD_CENTER_Y +75 ,100,100, canvasWidth, canvasHeight)){
                     playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
                     this.returnIcon = this.UIReturnIcon[1]
                 }
                 break
             case (GAME_OVER_STATE):
-                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 100, CANVAS_CENTER_Y - 55 ,200,2020)){
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 100, STANDARD_CENTER_Y - 55 ,200,200, canvasWidth, canvasHeight)){
                     playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
                     this.game.gameState = LOADING_STATE
                 }
@@ -250,22 +254,22 @@ class UI {
 
     }
 
-    handleMouseUp(x, y, audioCtx) {
+    handleMouseUp(x, y, audioCtx, canvasWidth, canvasHeighht) {
         this.homeIcon = this.UIHomeIcon[0]
         this.configIcon = this.UIConfigIcon[0]
         this.returnIcon = this.UIReturnIcon[0]
 
         switch (this.game.gameState){
             case (PAUSE_STATE):
-                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 250, CANVAS_CENTER_Y - 80 ,100,100)){
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 250, STANDARD_CENTER_Y - 80 ,100,100, canvasWidth, canvasHeighht)){
                     this.game.gameState = LOADING_STATE
                 }
-                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X + 150, CANVAS_CENTER_Y-20 ,100,100)){
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X + 150, STANDARD_CENTER_Y-20 ,100,100, canvasWidth, canvasHeighht)){
                     this.game.gameState = CONFIG_STATE
                 }
                 break
             case (CONFIG_STATE):
-                if (getMouseCanvasArea(x,y, CANVAS_CENTER_X - 70, CANVAS_CENTER_Y +75 ,100,100)){
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 70, STANDARD_CENTER_Y +75 ,100,100, canvasWidth, canvasHeighht)){
                     this.game.gameState = PAUSE_STATE
                 }
                 break
@@ -285,18 +289,18 @@ class CanvasText {
         this.color = color
     }
 
-    render(ctx) {
-        ctx.font = this.size + "px trebuchet MS";
+    render(ctx, canvas) {
+        ctx.font = scaleYDraw(canvas.height,this.size) + "px trebuchet MS";
         ctx.fillStyle = "black"
         ctx.strokeStyle = this.color
-        ctx.fillText(this.text, this.x, this.y);
-        ctx.strokeText(this.text, this.x, this.y);
+        ctx.fillText(this.text, scaleXDraw(canvas.width, this.x), scaleYDraw(canvas.height, this.y));
+        ctx.strokeText(this.text, scaleXDraw(canvas.width, this.x), scaleYDraw(canvas.height, this.y));
     }
 
     update(newText, correction) {
         this.text = newText
         if (correction){
-            this.x = 160 - (newText.toString().length*22)
+            this.x = 160 - (newText.toString().length*this.size/2)
         }
 
     }

@@ -21,7 +21,7 @@ class Road {
         return this.segments[Math.floor(z/SEGMENT_LENGTH) % this.segments.length];
     }
 
-    render(ctx) {
+    render(ctx, canvasWidth, canvasHeight) {
         let gameCamera = this.game.gameCamera
 
         let baseSegment = this.findSegment(gameCamera.z);
@@ -29,7 +29,7 @@ class Road {
         let basePercent   = percentageLeft(gameCamera.z, SEGMENT_LENGTH);
         let x  = 0;
         let dx = - (baseSegment.curve * basePercent);
-        let maxBottomLine = CANVAS_HEIGHT;
+        let maxBottomLine = canvasHeight;
 
         for (let n=0; n<gameCamera.drawDistance; n++){
             // get the current segment
@@ -37,7 +37,7 @@ class Road {
             let currSegment = this.segments[currIndex];
             let offsetZ = (currIndex < baseSegmentIndex) ? this.roadLength : 0;
             // project the segment to the screen space
-            currSegment.screenPoints = this.project3D(currSegment, gameCamera, offsetZ, x);
+            currSegment.screenPoints = this.project3D(currSegment, gameCamera, offsetZ, x, canvasWidth, canvasHeight);
             currSegment.lastScreenPoints = this.correctedLastPoints(currIndex)
             currSegment.maxHeight = maxBottomLine
             // draw this segment only if it is above the clipping bottom line
@@ -53,7 +53,7 @@ class Road {
             if (n>0 && currBottomLine < maxBottomLine){
                 let screenPoints = currSegment.screenPoints;
                 let lastScreenPoints = currSegment.lastScreenPoints
-                this.renderGrass(ctx, currSegment.stage, currSegment.color, screenPoints.y, lastScreenPoints.y);
+                this.renderGrass(ctx, currSegment.stage, currSegment.color, screenPoints.y, lastScreenPoints.y, canvasWidth);
                 if (currSegment.YRoad && Math.abs(currSegment.curve)> 1.5){
                     let currSegmentCounter = currSegment.YRoadCounter
                     let lastSegmentCounter = this.segments[currIndex-1].YRoadCounter ? this.segments[currIndex-1].YRoadCounter:0
@@ -80,7 +80,7 @@ class Road {
         for(let n = (gameCamera.drawDistance-1) ; n >= 0 ; n--) {
             let currIndex = (baseSegmentIndex + n) % this.totalSegments;
             let currSegment = this.segments[currIndex];
-            let maxBottomLine = CANVAS_HEIGHT;
+            let maxBottomLine = canvasHeight;
             for (let j=0; j<n; j++){
                 let maxLineIndex = (baseSegmentIndex + n) % this.totalSegments;
                 let maxHeight = this.segments[maxLineIndex].maxHeight
@@ -89,10 +89,10 @@ class Road {
                 }
             }
             for(let i = 0 ; i < currSegment.roadSideObjects.length ; i++) {
-                currSegment.roadSideObjects[i].render(ctx, maxBottomLine)
+                currSegment.roadSideObjects[i].render(ctx, maxBottomLine, canvasWidth, canvasHeight)
             }
             for(let j = 0 ; j < currSegment.inRoadObjects.length ; j++) {
-                currSegment.inRoadObjects[j].render(ctx, maxBottomLine)
+                currSegment.inRoadObjects[j].render(ctx, maxBottomLine, canvasWidth, canvasHeight)
             }
         }
     }
@@ -110,9 +110,9 @@ class Road {
         let centrifugal = 30;
         let currentCurve = playerSegment.curve
         if (currentCurve) {
-            player.screen.x = CANVAS_CENTER_X - SPRITE_SIZE / 2 + currentCurve * centrifugal
+            player.screen.x = STANDARD_CENTER_X - SPRITE_SIZE / 2 + currentCurve * centrifugal
         } else {
-            player.screen.x = CANVAS_CENTER_X - SPRITE_SIZE / 2
+            player.screen.x = STANDARD_CENTER_X - SPRITE_SIZE / 2
         }
     }
 
@@ -185,7 +185,7 @@ class Road {
 
 
     // Função para fazer a projeção dos pontos em 3D - usa a regra dos triangulos iguais
-    project3D(segment, camera, offSetZ, xCurve){
+    project3D(segment, camera, offSetZ, xCurve, canvasWidth, canvasHeight){
         // definimos as distancias em relação a camera
         let transX = segment.worldPoints.x - (camera.x - xCurve);
         let transY = segment.worldPoints.y - camera.y;
@@ -200,9 +200,9 @@ class Road {
         let projectedW = segment.scale * this.roadWidth;
 
         // utilizando a pontos do plano, e o tamanho da tela - definimos os segmentos na Canvas
-        let x = Math.round((1 + projectedX) * CANVAS_CENTER_X);
-        let y = Math.round((1 - projectedY) * CANVAS_CENTER_Y);
-        let w = Math.round(projectedW * CANVAS_CENTER_X);
+        let x = Math.round((1 + projectedX) * canvasWidth/2);
+        let y = Math.round((1 - projectedY) * canvasHeight/2);
+        let w = Math.round(projectedW * canvasWidth/2);
         return {x:x, y:y, w:w}
     }
 
@@ -288,9 +288,9 @@ class Road {
         }
     }
 
-    renderGrass(ctx, stage, color, y2, y1) {
+    renderGrass(ctx, stage, color, y2, y1, canvasWidth) {
         ctx.fillStyle = ctx.createPattern(stageObjects[stage].SIDE_TEXTURES[color.grassTextures], "repeat")
-        ctx.fillRect(0, y2 - 1, CANVAS_WIDTH, y1 - y2);
+        ctx.fillRect(0, y2 - 1, canvasWidth, y1 - y2);
     }
 }
 

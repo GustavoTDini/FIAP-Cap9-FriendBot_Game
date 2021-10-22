@@ -16,8 +16,8 @@ class RoadObjects {
         this.tunnel = null
     }
 
-    render(ctx, maxDrawLine) {
-        this.screen = this.project3D()
+    render(ctx, maxDrawLine, canvasWidth, canvasHeight) {
+        this.screen = this.project3D(canvasWidth, canvasHeight)
         if (maxDrawLine > this.screen.y){
             let spriteHeight = Math.min((maxDrawLine - this.screen.y), this.screen.spriteSize)
             let drawSprite = this.sprite.map((x) => x);
@@ -157,7 +157,7 @@ class RoadObjects {
     }
 
 
-    project3D(){
+    project3D(canvasWidth, canvasHeight){
         this.segment = this.road.findSegment(this.z)
         let camera = this.road.game.gameCamera
         // definimos as distancias em relação a camera
@@ -172,9 +172,9 @@ class RoadObjects {
         let projectedSize = scale * this.spriteSize;
 
         // utilizando a pontos do plano, o tamanho da tela  e o segmento atual- dfinimos os pontos do sprite
-        let w = projectedW * CANVAS_CENTER_X * this.x
-        let spriteSize = projectedSize * CANVAS_WIDTH
-        let y = (1-projectedY) * CANVAS_CENTER_Y - spriteSize
+        let w = projectedW * canvasWidth/2 * this.x
+        let spriteSize = projectedSize * canvasWidth
+        let y = (1-projectedY) * canvasHeight/2 - spriteSize
         let x = this.segment.screenPoints.x
 
         return {x:x + w, y:y, spriteSize:spriteSize}

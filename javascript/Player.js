@@ -10,6 +10,10 @@ class Player {
     MAX_FUEL = 100;
     currentSprite = 0
 
+    // ---------------------------------------------------------------------------------
+    // Construtor & Setting Functions
+    // ---------------------------------------------------------------------------------
+
     constructor(game, color, difficulty) {
         this.game = game;
         this.difficulty = difficulty;
@@ -28,7 +32,7 @@ class Player {
         this.coins = 0;
         this.jumping = false;
         this.over = false;
-        this.turboSpeed = MAX_SPEED*2
+        this.turboSpeed =difficulty.MAX_SPEED*1.3
         this.currentSpeed = this.speed
         this.transparent = 0;
         this.turbo = 0;
@@ -46,15 +50,14 @@ class Player {
         this.gameOverCounter = 0;
         this.turboEffect = null
         this.turboEffect2 = null
-        this.getReadyEffect = new Effects(GET_READY, CANVAS_CENTER_X - 337, CANVAS_CENTER_Y - 75)
-        this.gameOverEffect = new Effects(GAME_OVER, CANVAS_CENTER_X - 337, CANVAS_CENTER_Y - 75)
+        this.getReadyEffect = new Effects(GET_READY, STANDARD_CENTER_X - 337, STANDARD_CENTER_Y - 75)
+        this.gameOverEffect = new Effects(GAME_OVER, STANDARD_CENTER_X - 337, STANDARD_CENTER_Y - 75)
         this.glitterEffect = new Effects(GLITTER, this.screen.x, this.screen.y)
         this.explosionEffect = new Effects(EXPLOSION, this.screen.x, this.screen.y)
         this.shieldEffect = new Effects(SHIELD_EFFECT, this.screen.x, this.screen.y)
         this.starEffect = new Effects(STAR, this.screen.x, this.screen.y)
         this.gotEffect = new Effects(GOT_ITEM, this.screen.x, this.screen.y)
         this.turboEffectCorrector = 0
-        this.changingStage = false
     }
 
     init(){
@@ -63,8 +66,8 @@ class Player {
         this.screen.h = SPRITE_SIZE;
 
         // set the player screen position
-        this.screen.x = CANVAS_CENTER_X - SPRITE_SIZE/2
-        this.screen.y = CANVAS_HEIGHT - this.screen.h;
+        this.screen.x = STANDARD_CENTER_X - SPRITE_SIZE/2
+        this.screen.y = STANDARD_HEIGHT - this.screen.h;
 
         // set the player Colors
         this.sprites = this.setSpritesColor(this.color)
@@ -76,6 +79,45 @@ class Player {
         this.z = 1200;
         this.currentSegment = this.game.road.findSegment(this.z)
         this.currentSpeed = 0
+    }
+
+    setSpritesColor(color){
+        switch (color){
+            case BLUE: {
+                this.turboEffect = new Effects(FIRE, this.screen.x, this.screen.y)
+                this.turboEffect2 = new Effects(FIRE, this.screen.x, this.screen.y)
+                return  bluePlayerSprites
+            }
+            case PINK: {
+                this.turboEffect = new Effects(TURBO_EFFECT, this.screen.x, this.screen.y)
+                return  pinkPlayerSprites
+            }
+            case GREEN: {
+                this.turboEffect = new Effects(FIRE, this.screen.x, this.screen.y)
+                this.turboEffect2 = new Effects(FIRE, this.screen.x, this.screen.y)
+                return  greenPlayerSprites
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------------------------
+    // Update Functions And Render
+    // ---------------------------------------------------------------------------------
+
+    update(dt, audioCtx) {
+        this.setMask(dt)
+        this.speedAndFuelControl(dt);
+        this.segmentCount();
+        this.updateEffects()
+        this.startCountDown(audioCtx)
+        this.gameOverCountDown()
+        this.setLanes()
+        this.countPowerUps()
+        this.SettingJumpingY(dt)
+        //this.checkCollidingGameOver(audioCtx)
+        this.checkCollidingCoins(audioCtx)
+        this.checkCollidingPowerUp(audioCtx)
+        this.checkCollidingFuel(audioCtx)
     }
 
     updateEffects(){
@@ -91,6 +133,141 @@ class Player {
         this.starEffect.update()
         this.gotEffect.update()
     }
+
+    countPowerUps(){
+        if (this.turbo > 0){
+            this.turbo--
+            if (this.color === GREEN){
+                this.turboEffect.setXY(this.screen.x + 20 + this.turboEffectCorrector, this.screen.y + 60)
+                this.turboEffect2.setXY(this.screen.x + 50 + this.turboEffectCorrector, this.screen.y + 60)
+            }
+            if (this.color === BLUE){
+                this.turboEffect.setXY(this.screen.x + 20 + this.turboEffectCorrector, this.screen.y + 30)
+                this.turboEffect2.setXY(this.screen.x + 50 + this.turboEffectCorrector, this.screen.y + 30)
+            }
+            if (this.color === PINK){
+                this.turboEffect.setXY(this.screen.x + 32 + this.turboEffectCorrector, this.screen.y + 65)
+            }
+        }
+
+        if (this.transparent > 0){
+            this.transparent--
+        }
+        if (this.double > 0){
+            this.glitterEffect.setXY(this.screen.x, this.screen.y)
+            this.double--
+            if (this.double === 0){
+                this.glitterEffect.setStop()
+            }
+        }
+        if (this.shield > 0){
+            this.shieldEffect.setXY(this.screen.x - 26, this.screen.y - 26)
+            this.shield--
+            if (this.shield === 0){
+                this.shieldEffect.setStop()
+            }
+        }
+
+    }
+
+    render(ctx, canvas) {
+        let road = this.game.road
+        let shadowScale = SPRITE_SIZE*this.screen.y/586
+        drawShadow(this.screen.x,  STANDARD_HEIGHT - this.screen.h, shadowScale, ctx)
+        let playerSegmentCurve = road.findSegment(this.z).curve;
+        this.gotEffect.render(ctx, canvas)
+        this.startRender(ctx, canvas)
+        this.gameOverRender(ctx, canvas)
+        if (this.transparent > 0 && this.transparent %2 === 0){
+            return
+        }
+
+
+        if (playerSegmentCurve >= 4 ){
+            if (this.movingLane){
+                if (this.nextLane > this.currentLane){
+                    drawToCanvas(canvas, ctx, this.sprites.maxRight[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                    this.turboEffectCorrector = -24
+                } else if (this.nextLane < this.currentLane){
+                    drawToCanvas(canvas, ctx, this.sprites.right[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                    this.turboEffectCorrector = -8
+                }
+            }  else {
+                drawToCanvas(canvas, ctx, this.sprites.maxRight[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                this.turboEffectCorrector = -24
+            }
+        } else if ( playerSegmentCurve  < 4 && playerSegmentCurve > 2){
+            if (this.movingLane){
+                if (this.nextLane > this.currentLane){
+                    drawToCanvas(canvas, ctx, this.sprites.maxRight[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                    this.turboEffectCorrector = -24
+                } else if (this.nextLane < this.currentLane){
+                    drawToCanvas(canvas, ctx, this.sprites.center[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                    this.turboEffectCorrector = 0
+                }
+            }  else {
+                drawToCanvas(canvas, ctx, this.sprites.right[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                this.turboEffectCorrector = -8
+            }
+        } else if ( playerSegmentCurve  < -2 && playerSegmentCurve > -4) {
+            if (this.movingLane){
+                if (this.nextLane > this.currentLane){
+                    drawToCanvas(canvas, ctx, this.sprites.center[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                    this.turboEffectCorrector = 0
+                } else if (this.nextLane < this.currentLane){
+                    drawToCanvas(canvas, ctx, this.sprites.maxLeft[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                    this.turboEffectCorrector = 8
+                }
+            }  else {
+                drawToCanvas(canvas, ctx, this.sprites.left[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                this.turboEffectCorrector = 30
+            }
+        } else if  ( playerSegmentCurve  <= -4) {
+            if (this.movingLane){
+                if (this.nextLane > this.currentLane){
+                    drawToCanvas(canvas, ctx, this.sprites.left[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                    this.turboEffectCorrector = 8
+                } else if (this.nextLane < this.currentLane){
+                    drawToCanvas(canvas, ctx, this.sprites.maxLeft[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                    this.turboEffectCorrector = 30
+                }
+            }  else {
+                drawToCanvas(canvas, ctx, this.sprites.maxLeft[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                this.turboEffectCorrector = 30
+            }
+        } else {
+            if (this.nextLane > this.currentLane){
+                drawToCanvas(canvas, ctx, this.sprites.right[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                this.turboEffectCorrector = -8
+            } else if (this.nextLane < this.currentLane){
+                drawToCanvas(canvas, ctx, this.sprites.left[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                this.turboEffectCorrector = 8
+            } else if (!this.movingLane){
+                drawToCanvas(canvas, ctx, this.sprites.center[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                this.turboEffectCorrector = 0
+            }
+        }
+        if (this.double > 0){
+            this.glitterEffect.render(ctx, canvas)
+        }
+        if (this.turbo> 0 ){
+            this.turboEffect.render(ctx, canvas)
+            if (this.turboEffect2 !== null){
+                this.turboEffect2.render(ctx, canvas)
+            }
+        }
+        if (this.shield > 0){
+            this.shieldEffect.render(ctx, canvas)
+        }
+        if (this.gameOver){
+            this.starEffect.render(ctx, canvas)
+        }
+
+    }
+
+    // ---------------------------------------------------------------------------------
+    // Start Functions
+    // ---------------------------------------------------------------------------------
 
     startCountDown(audioCtx){
         if (this.start){
@@ -117,48 +294,63 @@ class Player {
         }
     }
 
-    startRender(ctx){
+    startRender(ctx, canvas){
         if (this.start){
             if (this.startCounter <= 180 && this.startCounter > 100){
-                this.getReadyEffect.render(ctx)
+                this.getReadyEffect.render(ctx, canvas)
             }
             if (this.startCounter === 100){
                 this.getReadyEffect.setStop()
             }
             if (this.startCounter < 100 && this.startCounter >= 70){
-                ctx.drawImage(...lights_out, CANVAS_CENTER_X - 400, CANVAS_CENTER_Y - 150, 200, 350)
-                ctx.drawImage(...lights_out, CANVAS_CENTER_X - 100, CANVAS_CENTER_Y - 150, 200 , 350)
-                ctx.drawImage(...lights_out, CANVAS_CENTER_X + 200, CANVAS_CENTER_Y - 150, 200 , 350)
+                drawToCanvas(canvas, ctx, lights_out, STANDARD_CENTER_X - 400, STANDARD_CENTER_Y - 150, 200, 350)
+                drawToCanvas(canvas, ctx, lights_out, STANDARD_CENTER_X - 100, STANDARD_CENTER_Y - 150, 200, 350)
+                drawToCanvas(canvas, ctx, lights_out, STANDARD_CENTER_X + 200, STANDARD_CENTER_Y - 150, 200, 350)
             }
             if (this.startCounter < 70 && this.startCounter >= 55){
-                ctx.drawImage(...lights_red, CANVAS_CENTER_X - 400, CANVAS_CENTER_Y - 150, 200, 350)
-                ctx.drawImage(...lights_out, CANVAS_CENTER_X - 100, CANVAS_CENTER_Y - 150, 200 , 350)
-                ctx.drawImage(...lights_out, CANVAS_CENTER_X + 200, CANVAS_CENTER_Y - 150, 200 , 350)
+                drawToCanvas(canvas, ctx, lights_red, STANDARD_CENTER_X - 400, STANDARD_CENTER_Y - 150, 200, 350)
+                drawToCanvas(canvas, ctx, lights_out, STANDARD_CENTER_X - 100, STANDARD_CENTER_Y - 150, 200, 350)
+                drawToCanvas(canvas, ctx, lights_out, STANDARD_CENTER_X + 200, STANDARD_CENTER_Y - 150, 200, 350)
             }
             if (this.startCounter < 55 && this.startCounter >= 40){
-                ctx.drawImage(...lights_red, CANVAS_CENTER_X - 400, CANVAS_CENTER_Y - 150, 200, 350)
-                ctx.drawImage(...lights_red, CANVAS_CENTER_X - 100, CANVAS_CENTER_Y - 150, 200 , 350)
-                ctx.drawImage(...lights_out, CANVAS_CENTER_X + 200, CANVAS_CENTER_Y - 150, 200 , 350)
+                drawToCanvas(canvas, ctx, lights_red, STANDARD_CENTER_X - 400, STANDARD_CENTER_Y - 150, 200, 350)
+                drawToCanvas(canvas, ctx, lights_red, STANDARD_CENTER_X - 100, STANDARD_CENTER_Y - 150, 200, 350)
+                drawToCanvas(canvas, ctx, lights_out, STANDARD_CENTER_X + 200, STANDARD_CENTER_Y - 150, 200, 350)
             }
             if (this.startCounter < 40 && this.startCounter >= 25){
-                ctx.drawImage(...lights_red, CANVAS_CENTER_X - 400, CANVAS_CENTER_Y - 150, 200, 350)
-                ctx.drawImage(...lights_red, CANVAS_CENTER_X - 100, CANVAS_CENTER_Y - 150, 200 , 350)
-                ctx.drawImage(...lights_red, CANVAS_CENTER_X + 200, CANVAS_CENTER_Y - 150, 200 , 350)
+                drawToCanvas(canvas, ctx, lights_red, STANDARD_CENTER_X - 400, STANDARD_CENTER_Y - 150, 200, 350)
+                drawToCanvas(canvas, ctx, lights_red, STANDARD_CENTER_X - 100, STANDARD_CENTER_Y - 150, 200, 350)
+                drawToCanvas(canvas, ctx, lights_red, STANDARD_CENTER_X + 200, STANDARD_CENTER_Y - 150, 200, 350)
             }
             if (this.startCounter < 25 && this.startCounter > 0){
-                ctx.drawImage(...lights_green, CANVAS_CENTER_X - 400, CANVAS_CENTER_Y - 150, 200, 350)
-                ctx.drawImage(...lights_green, CANVAS_CENTER_X - 100, CANVAS_CENTER_Y - 150, 200 , 350)
-                ctx.drawImage(...lights_green, CANVAS_CENTER_X + 200, CANVAS_CENTER_Y - 150, 200 , 350)
+                drawToCanvas(canvas, ctx, lights_green, STANDARD_CENTER_X - 400, STANDARD_CENTER_Y - 150, 200, 350)
+                drawToCanvas(canvas, ctx, lights_green, STANDARD_CENTER_X - 100, STANDARD_CENTER_Y - 150, 200, 350)
+                drawToCanvas(canvas, ctx, lights_green, STANDARD_CENTER_X + 200, STANDARD_CENTER_Y - 150, 200, 350)
             }
             if (this.startCounter < 20 && this.startCounter > 0){
                 if (this.startCounter %2 === 0){
-                    ctx.drawImage(...go1, CANVAS_CENTER_X - 350, CANVAS_CENTER_Y - 220, 700, 100)
+                    drawToCanvas(canvas, ctx, go1, STANDARD_CENTER_X - 350, STANDARD_CENTER_Y - 220, 700, 100)
                 } else {
-                    ctx.drawImage(...go2, CANVAS_CENTER_X - 350, CANVAS_CENTER_Y - 220, 700, 100)
+                    drawToCanvas(canvas, ctx, go2, STANDARD_CENTER_X - 350, STANDARD_CENTER_Y - 220, 700, 100)
                 }
             }
         }
 
+    }
+
+    // ---------------------------------------------------------------------------------
+    // GameOver Functions
+    // ---------------------------------------------------------------------------------
+
+    setGameOverStatus(){
+        this.speed = 0
+        this.currentSpeed = 0
+        this.gameOver = true
+        this.gameOverCounter = this.MAX_EVENTS_COUNTER
+        this.turbo = 0
+        this.transparent = 0
+        this.double = 0
+        this.shield = 0
     }
 
     gameOverCountDown(){
@@ -193,35 +385,23 @@ class Player {
         }
     }
 
-    gameOverRender(ctx){
+    gameOverRender(ctx, canvas){
         if (this.gameOver){
-            this.gameOverEffect.render(ctx)
+            this.gameOverEffect.render(ctx, canvas)
             if (this.fuel > 0){
-                this.explosionEffect.render(ctx)
+                this.explosionEffect.render(ctx, canvas)
             }
         }
     }
 
-    setSpritesColor(color){
-        switch (color){
-            case BLUE: {
-                this.turboEffect = new Effects(FIRE, this.screen.x, this.screen.y)
-                this.turboEffect2 = new Effects(FIRE, this.screen.x, this.screen.y)
-                return  bluePlayerSprites
-            }
-            case PINK: {
-                this.turboEffect = new Effects(TURBO_EFFECT, this.screen.x, this.screen.y)
-                return  pinkPlayerSprites
-            }
-            case GREEN: {
-                this.turboEffect = new Effects(FIRE, this.screen.x, this.screen.y)
-                this.turboEffect2 = new Effects(FIRE, this.screen.x, this.screen.y)
-                return  greenPlayerSprites
-            }
-        }
+    // ---------------------------------------------------------------------------------
+    // Colliding Functions
+    // ---------------------------------------------------------------------------------
+
+    setMask(dt){
+        this.mask = {x:this.x, z:this.z, w:this.w, s: this.speed*dt}
     }
 
-    //função para definir uma colisão entre o jogador e outro elemento
     isColliding(object) {
         let thisZ = this.mask.z
         if (object.z > thisZ - 500 && object.z < thisZ + this.game.gameCamera.drawDistance * SEGMENT_LENGTH){
@@ -283,7 +463,6 @@ class Player {
                         if (this.turboEffect2 !== null){
                             this.turboEffect2.setPlay()
                         }
-                        this.currentSpeed = this.speed
                         this.speed = this.turboSpeed
                         break;
                     case (BOLT):
@@ -305,18 +484,6 @@ class Player {
             }
         }
     }
-
-    setGameOverStatus(){
-        this.speed = 0
-        this.currentSpeed = 0
-        this.gameOver = true
-        this.gameOverCounter = this.MAX_EVENTS_COUNTER
-        this.turbo = 0
-        this.transparent = 0
-        this.double = 0
-        this.shield = 0
-    }
-
 
     checkCollidingGameOver(audioCtx){
         for (let n = 0; n < this.game.road.totalTraffic.length; n++){
@@ -366,22 +533,9 @@ class Player {
         }
     }
 
-
-    update(dt, audioCtx) {
-        this.setMask(dt)
-        this.speedAndFuelControl(dt);
-        this.segmentCount();
-        this.updateEffects()
-        this.startCountDown(audioCtx)
-        this.gameOverCountDown()
-        this.setLanes()
-        this.countPowerUps()
-        this.SettingJumpingY(dt)
-        this.checkCollidingGameOver(audioCtx)
-        this.checkCollidingCoins(audioCtx)
-        this.checkCollidingPowerUp(audioCtx)
-        this.checkCollidingFuel(audioCtx)
-    }
+    // ---------------------------------------------------------------------------------
+    // Position And Speed Functions
+    // ---------------------------------------------------------------------------------
 
     segmentCount() {
         let MAX_SPRITES = 2;
@@ -398,19 +552,23 @@ class Player {
             }
         }
         if (this.segmentCounter > 2000) {
-            this.speed += MAX_SPEED / 20
-            if (this.speed > this.difficulty.MAX_SPEED) {
-                this.speed = this.difficulty.MAX_SPEED
-                console.log(this.speed)
+            this.currentSpeed += MAX_SPEED / 20
+            if (this.currentSpeed > this.difficulty.MAX_SPEED) {
+                this.currentSpeed = this.difficulty.MAX_SPEED
             }
             this.segmentCounter = 0;
         }
     }
 
     speedAndFuelControl(dt) {
-        if (this.speed < this.currentSpeed && this.turbo === 0){
-            this.speed += this.acceleration
+        if (this.turbo === 0){
+            if (this.speed < this.currentSpeed){
+                this.speed += this.acceleration
+            } else if (this.speed > this.currentSpeed){
+                this.speed -= this.acceleration
+            }
         }
+
         this.z += this.speed * dt
         // if (this.speed > 0 && this.turbo === 0 && !this.changingStage) {
         //     this.fuel -= dt * this.speed / (1000 * this.difficulty.GAS_CORRECTION)
@@ -418,145 +576,6 @@ class Player {
         if (this.fuel < 0 && !this.gameOver) {
             this.setGameOverStatus()
         }
-    }
-
-    countPowerUps(){
-        if (this.turbo > 0){
-            this.turbo--
-            if (this.color === GREEN){
-                this.turboEffect.setXY(this.screen.x + 20 + this.turboEffectCorrector, this.screen.y + 60)
-                this.turboEffect2.setXY(this.screen.x + 50 + this.turboEffectCorrector, this.screen.y + 60)
-            }
-            if (this.color === BLUE){
-                this.turboEffect.setXY(this.screen.x + 20 + this.turboEffectCorrector, this.screen.y + 30)
-                this.turboEffect2.setXY(this.screen.x + 50 + this.turboEffectCorrector, this.screen.y + 30)
-            }
-            if (this.color === PINK){
-                this.turboEffect.setXY(this.screen.x + 32 + this.turboEffectCorrector, this.screen.y + 65)
-            }
-            if (this.turbo === 0){
-                this.speed = this.currentSpeed
-                this.turboEffect.setStop()
-            }
-        }
-
-        if (this.transparent > 0){
-            this.transparent--
-        }
-        if (this.double > 0){
-            this.glitterEffect.setXY(this.screen.x, this.screen.y)
-            this.double--
-            if (this.double === 0){
-                this.glitterEffect.setStop()
-            }
-        }
-        if (this.shield > 0){
-            this.shieldEffect.setXY(this.screen.x - 26, this.screen.y - 26)
-            this.shield--
-            if (this.shield === 0){
-                this.shieldEffect.setStop()
-            }
-        }
-
-    }
-
-    setMask(dt){
-        this.mask = {x:this.x, z:this.z, w:this.w, s: this.speed*dt}
-    }
-
-    render(ctx) {
-        let road = this.game.road
-        let shadowScale = SPRITE_SIZE*this.screen.y/586
-        drawShadow(this.screen.x,  CANVAS_HEIGHT - this.screen.h, shadowScale, ctx)
-        let playerSegmentCurve = road.findSegment(this.z).curve;
-        this.gotEffect.render(ctx)
-        this.startRender( ctx)
-        this.gameOverRender(ctx)
-        if (this.transparent > 0 && this.transparent %2 === 0){
-            return
-        }
-
-
-        if (playerSegmentCurve >= 4 ){
-            if (this.movingLane){
-                if (this.nextLane > this.currentLane){
-                    ctx.drawImage(...this.sprites.maxRight[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
-                    this.turboEffectCorrector = -24
-                } else if (this.nextLane < this.currentLane){
-                    ctx.drawImage(...this.sprites.right[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
-                    this.turboEffectCorrector = -8
-                }
-            }  else {
-                ctx.drawImage(...this.sprites.maxRight[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
-                this.turboEffectCorrector = -24
-            }
-        } else if ( playerSegmentCurve  < 4 && playerSegmentCurve > 2){
-            if (this.movingLane){
-                if (this.nextLane > this.currentLane){
-                    ctx.drawImage(...this.sprites.maxRight[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
-                    this.turboEffectCorrector = -24
-                } else if (this.nextLane < this.currentLane){
-                    ctx.drawImage(...this.sprites.center[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
-                    this.turboEffectCorrector = 0
-                }
-            }  else {
-                ctx.drawImage(...this.sprites.right[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
-                this.turboEffectCorrector = -8
-            }
-        } else if ( playerSegmentCurve  < -2 && playerSegmentCurve > -4) {
-            if (this.movingLane){
-                if (this.nextLane > this.currentLane){
-                    ctx.drawImage(...this.sprites.center[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
-                    this.turboEffectCorrector = 0
-                } else if (this.nextLane < this.currentLane){
-                    ctx.drawImage(...this.sprites.maxLeft[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
-                    this.turboEffectCorrector = 8
-                }
-            }  else {
-                ctx.drawImage(...this.sprites.left[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
-                this.turboEffectCorrector = 30
-            }
-        } else if  ( playerSegmentCurve  <= -4) {
-            if (this.movingLane){
-                if (this.nextLane > this.currentLane){
-                    ctx.drawImage(...this.sprites.left[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
-                    this.turboEffectCorrector = 8
-                } else if (this.nextLane < this.currentLane){
-                    ctx.drawImage(...this.sprites.maxLeft[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
-                    this.turboEffectCorrector = 30
-                }
-            }  else {
-                ctx.drawImage(...this.sprites.maxLeft[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
-                this.turboEffectCorrector = 30
-            }
-        } else {
-            if (this.nextLane > this.currentLane){
-                ctx.drawImage(...this.sprites.right[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
-                this.turboEffectCorrector = -8
-            } else if (this.nextLane < this.currentLane){
-                ctx.drawImage(...this.sprites.left[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
-                this.turboEffectCorrector = 8
-            } else if (!this.movingLane){
-                ctx.drawImage(...this.sprites.center[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
-                this.turboEffectCorrector = 0
-            }
-        }
-        if (this.double > 0){
-            this.glitterEffect.render(ctx)
-        }
-        if (this.turbo> 0 ){
-            this.turboEffect.render(ctx)
-            if (this.turboEffect2 !== null){
-                this.turboEffect2.render(ctx)
-            }
-        }
-        if (this.shield > 0){
-            this.shieldEffect.render(ctx)
-        }
-        if (this.gameOver){
-            this.starEffect.render(ctx)
-        }
-
     }
 
     setLanes(){
@@ -591,18 +610,22 @@ class Player {
                 this.ySpeed = 0;
                 this.y = this.currentSegment.worldPoints.y
                 if (!this.gameOver){
-                    this.screen.y = CANVAS_HEIGHT - this.screen.h + Math.floor((Math.random()*5))-10
+                    this.screen.y = STANDARD_HEIGHT - this.screen.h + Math.floor((Math.random()*5))-10
                 }
             } else {
                 this.screen.y += this.ySpeed
                 this.ySpeed += this.gravity
-                if (this.screen.y > CANVAS_HEIGHT - this.screen.h){
+                if (this.screen.y > STANDARD_HEIGHT - this.screen.h){
                     this.jumping = false
                 }
             }
             this.over = this.screen.y < 500;
         }
     }
+
+    // ---------------------------------------------------------------------------------
+    // Controls Functions
+    // ---------------------------------------------------------------------------------
 
     handleInputUp(keys, audioCtx) {
         if (!this.gameOver){
@@ -651,7 +674,6 @@ class Player {
             }
         }
     }
-
 
 }
 

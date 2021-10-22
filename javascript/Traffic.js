@@ -13,9 +13,7 @@ class Traffic extends RoadObjects{
         this.segment = this.road.findSegment(this.z)
         this.y = this.segment.worldPoints.y
         if (this.road.findSegment(this.z).index === this.road.game.player.currentSegment.index){
-            if (Math.random() > 0.75){
-                playTrack(contextSounds["horn"], audioCtx, this.road.game.settings.sounds)
-            }
+            playTrack(contextSounds["horn"], audioCtx, this.road.game.settings.sounds)
         }
         this.dodgeOtherObjects()
         this.setX()

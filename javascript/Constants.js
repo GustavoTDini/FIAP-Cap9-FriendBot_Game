@@ -3,12 +3,12 @@
 // ---------------------------------------------------------------------------------
 
 // Sizes
-const CANVAS_WIDTH = 1280;
-const CANVAS_HEIGHT = 720;
+const STANDARD_WIDTH = 1280;
+const STANDARD_HEIGHT = 720;
 const SPRITE_SIZE = 128;
 const LARGE_SPRITE_SIZE = 4*SPRITE_SIZE
-const CANVAS_CENTER_X = CANVAS_WIDTH/2;
-const CANVAS_CENTER_Y = CANVAS_HEIGHT/2;
+const STANDARD_CENTER_X = STANDARD_WIDTH/2;
+const STANDARD_CENTER_Y = STANDARD_HEIGHT/2;
 const FPS = 60;
 const UPS = 120;
 const FRAME_STEP = 1/FPS
@@ -45,8 +45,8 @@ const BEACH = "BEACH";
 //Player Difficulties
 const DIFFICULTIES_SETS = {
   EASY: {
-      START_SPEED: MAX_SPEED/10,
-      MAX_SPEED:  MAX_SPEED,
+      START_SPEED: 0.1*MAX_SPEED,
+      MAX_SPEED:  0.8*MAX_SPEED,
       MAX_CARS: 100,
       MAX_OBSTACLES: 5,
       MAX_POWER_UPS: 20,
@@ -54,8 +54,8 @@ const DIFFICULTIES_SETS = {
       MAX_CARS_SPEEDS: MAX_SPEED/4
   } ,
     MEDIUM: {
-        START_SPEED: MAX_SPEED/5,
-        MAX_SPEED:  MAX_SPEED*2,
+        START_SPEED: 0.2*MAX_SPEED,
+        MAX_SPEED:  MAX_SPEED,
         MAX_CARS: 200,
         MAX_OBSTACLES: 10,
         MAX_POWER_UPS: 20,
@@ -63,8 +63,8 @@ const DIFFICULTIES_SETS = {
         MAX_CARS_SPEEDS: MAX_SPEED/3
     },
     HARD: {
-        START_SPEED: MAX_SPEED,
-        MAX_SPEED:  MAX_SPEED*4,
+        START_SPEED: 0.5*MAX_SPEED,
+        MAX_SPEED:  1.5*MAX_SPEED,
         MAX_CARS: 300,
         MAX_OBSTACLES: 15,
         MAX_POWER_UPS: 20,

@@ -17,7 +17,7 @@ class Segment {
         this.lastScreenPoints = {x:0, y:0, w:0}
         this.YRoad = YRoad
         this.YRoadCounter = YRoadCounter
-        this.maxHeight = CANVAS_HEIGHT
+        this.maxHeight = STANDARD_HEIGHT
         this.scale = -1;
         this.curve = curve
         this.stage = stage

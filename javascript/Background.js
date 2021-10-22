@@ -18,30 +18,30 @@ class Background {
 
     }
 
-    render(ctx){
+    render(ctx, canvasWidth, canvasHeight){
         let BC1Correction = 0.00002
         let BC2Correction = 0.00004
         let BC3Correction = 0.00006
-        let BC1X = setMaxMin(this.offSetX*BC1Correction*this.game.player.speed, CANVAS_WIDTH, 0)
+        let BC1X = setMaxMin(this.offSetX*BC1Correction*this.game.player.speed, STANDARD_WIDTH, 0)
         let BC1Y = setMaxMin(-20 + this.offSetY*BC1Correction, 0, -50)
-        let BC2X = setMaxMin(this.offSetX*BC2Correction*this.game.player.speed, CANVAS_WIDTH, 0)
+        let BC2X = setMaxMin(this.offSetX*BC2Correction*this.game.player.speed, STANDARD_WIDTH, 0)
         let BC2Y = setMaxMin(-20 + this.offSetY*BC2Correction, 0, -50)
-        let BC3X = setMaxMin(this.offSetX*BC3Correction*this.game.player.speed, CANVAS_WIDTH, 0)
+        let BC3X = setMaxMin(this.offSetX*BC3Correction*this.game.player.speed, STANDARD_WIDTH, 0)
         let BC3Y = setMaxMin(-20 + this.offSetY*BC3Correction, 0, -50)
-        this.sky !== null && drawSpriteWithAlpha(ctx, this.sky, 0, 0,CANVAS_WIDTH, CANVAS_HEIGHT, this.currentAlpha)
-        this.nextSky !== null && drawSpriteWithAlpha(ctx, this.nextSky, 0, 0,CANVAS_WIDTH, CANVAS_HEIGHT, this.nextAlpha)
-        this.BC1 !== null && drawSpriteWithAlpha(ctx, this.BC1, CANVAS_CENTER_X - BC1X, BC1Y,this.BC1.width, this.BC1.height, this.currentAlpha)
-        this.BC1 !== null && drawSpriteWithAlpha(ctx, this.BC1, CANVAS_CENTER_X- this.BC1.width - BC1X, BC1Y,this.BC1.width, this.BC1.height, this.currentAlpha)
-        this.nextBC1 !== null && drawSpriteWithAlpha(ctx, this.nextBC1, CANVAS_CENTER_X - BC1X, BC1Y,this.nextBC1.width, this.nextBC1.height, this.nextAlpha)
-        this.nextBC1 !== null && drawSpriteWithAlpha(ctx, this.nextBC1, CANVAS_CENTER_X- this.nextBC1.width - BC1X, BC1Y,this.nextBC1.width, this.nextBC1.height, this.nextAlpha)
-        this.BC2 !== null && drawSpriteWithAlpha(ctx, this.BC2, CANVAS_CENTER_X- this.BC2.width - BC2X, BC2Y,this.BC2.width, this.BC2.height, this.currentAlpha)
-        this.BC2 !== null && drawSpriteWithAlpha(ctx, this.BC2, CANVAS_CENTER_X - BC2X, BC2Y,this.BC2.width, this.BC2.height, this.currentAlpha)
-        this.nextBC2 !== null && drawSpriteWithAlpha(ctx, this.nextBC2, CANVAS_CENTER_X- this.nextBC2.width - BC2X, BC2Y,this.nextBC2.width, this.nextBC2.height, this.nextAlpha)
-        this.nextBC2 !== null && drawSpriteWithAlpha(ctx, this.nextBC2, CANVAS_CENTER_X - BC2X, BC2Y,this.nextBC2.width, this.nextBC2.height, this.nextAlpha)
-        this.BC3 !== null && drawSpriteWithAlpha(ctx, this.BC3, CANVAS_CENTER_X - BC3X, BC3Y,this.BC3.width, this.BC3.height, this.currentAlpha)
-        this.BC3 !== null && drawSpriteWithAlpha(ctx, this.BC3, CANVAS_CENTER_X- this.BC3.width - BC3X, BC3Y,this.BC3.width, this.BC3.height, this.currentAlpha)
-        this.nextBC3 !== null && drawSpriteWithAlpha(ctx, this.nextBC3, CANVAS_CENTER_X - BC3X, BC3Y,this.nextBC3.width, this.nextBC3.height, this.nextAlpha)
-        this.nextBC3 !== null && drawSpriteWithAlpha(ctx, this.nextBC3, CANVAS_CENTER_X- this.nextBC3.width - BC3X, BC3Y,this.nextBC3.width, this.nextBC3.height, this.nextAlpha)
+        this.sky !== null && drawSpriteWithAlpha(ctx, this.sky, 0, 0,STANDARD_WIDTH, STANDARD_HEIGHT, this.currentAlpha, canvasWidth, canvasHeight)
+        this.nextSky !== null && drawSpriteWithAlpha(ctx, this.nextSky, 0, 0,STANDARD_WIDTH, STANDARD_HEIGHT, this.nextAlpha, canvasWidth, canvasHeight)
+        this.BC1 !== null && drawSpriteWithAlpha(ctx, this.BC1, STANDARD_CENTER_X - BC1X, BC1Y,this.BC1.width, this.BC1.height, this.currentAlpha, canvasWidth, canvasHeight)
+        this.BC1 !== null && drawSpriteWithAlpha(ctx, this.BC1, STANDARD_CENTER_X- this.BC1.width - BC1X, BC1Y,this.BC1.width, this.BC1.height, this.currentAlpha, canvasWidth, canvasHeight)
+        this.nextBC1 !== null && drawSpriteWithAlpha(ctx, this.nextBC1, STANDARD_CENTER_X - BC1X, BC1Y,this.nextBC1.width, this.nextBC1.height, this.nextAlpha, canvasWidth, canvasHeight)
+        this.nextBC1 !== null && drawSpriteWithAlpha(ctx, this.nextBC1, STANDARD_CENTER_X- this.nextBC1.width - BC1X, BC1Y,this.nextBC1.width, this.nextBC1.height, this.nextAlpha, canvasWidth, canvasHeight)
+        this.BC2 !== null && drawSpriteWithAlpha(ctx, this.BC2, STANDARD_CENTER_X- this.BC2.width - BC2X, BC2Y,this.BC2.width, this.BC2.height, this.currentAlpha, canvasWidth, canvasHeight)
+        this.BC2 !== null && drawSpriteWithAlpha(ctx, this.BC2, STANDARD_CENTER_X - BC2X, BC2Y,this.BC2.width, this.BC2.height, this.currentAlpha, canvasWidth, canvasHeight)
+        this.nextBC2 !== null && drawSpriteWithAlpha(ctx, this.nextBC2, STANDARD_CENTER_X- this.nextBC2.width - BC2X, BC2Y,this.nextBC2.width, this.nextBC2.height, this.nextAlpha, canvasWidth, canvasHeight)
+        this.nextBC2 !== null && drawSpriteWithAlpha(ctx, this.nextBC2, STANDARD_CENTER_X - BC2X, BC2Y,this.nextBC2.width, this.nextBC2.height, this.nextAlpha, canvasWidth, canvasHeight)
+        this.BC3 !== null && drawSpriteWithAlpha(ctx, this.BC3, STANDARD_CENTER_X - BC3X, BC3Y,this.BC3.width, this.BC3.height, this.currentAlpha, canvasWidth, canvasHeight)
+        this.BC3 !== null && drawSpriteWithAlpha(ctx, this.BC3, STANDARD_CENTER_X- this.BC3.width - BC3X, BC3Y,this.BC3.width, this.BC3.height, this.currentAlpha, canvasWidth, canvasHeight)
+        this.nextBC3 !== null && drawSpriteWithAlpha(ctx, this.nextBC3, STANDARD_CENTER_X - BC3X, BC3Y,this.nextBC3.width, this.nextBC3.height, this.nextAlpha, canvasWidth, canvasHeight)
+        this.nextBC3 !== null && drawSpriteWithAlpha(ctx, this.nextBC3, STANDARD_CENTER_X- this.nextBC3.width - BC3X, BC3Y,this.nextBC3.width, this.nextBC3.height, this.nextAlpha, canvasWidth, canvasHeight)
 
     }
 
