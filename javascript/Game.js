@@ -60,6 +60,7 @@ class Game {
                 game.player.init()
                 game.gameState = SET_STATE;
                 game.currentStage = SUBURB
+                game.currentMusic = null
                 break;
             case SET_STATE:
                 game.road.roadConstructor.createRoad()
@@ -85,7 +86,7 @@ class Game {
     }
 
     checkMusicEnd(game, audioCtx) {
-        if (game.playingMusic && game.currentMusic !== null && game.settings.music) {
+        if (game.playingMusic && game.currentMusic !== null && game.settings.music && !game.player.gameOver) {
             game.currentMusic.onended = () => {
                 game.musicName = stageObjects[game.currentStage].MUSIC[randomIntFromInterval(0, 3)]
                 game.currentMusic = playMusic(contextSounds[game.musicName], audioCtx, game.settings.music)
@@ -94,12 +95,19 @@ class Game {
     }
 
     playMusic(game, audioCtx) {
-        if (!game.playingMusic && game.settings.music) {
+        if (!game.playingMusic && game.settings.music && !game.player.gameOver) {
             game.musicName = stageObjects[game.currentStage].MUSIC[randomIntFromInterval(0, 3)]
             if (contextSounds[game.musicName] !== null && contextSounds[game.musicName] !== undefined) {
                 game.currentMusic = playMusic(contextSounds[game.musicName], audioCtx, game.settings.music)
                 game.playingMusic = true
             }
+        }
+    }
+
+    stopMusic(game) {
+        if (contextSounds[game.musicName] !== null && contextSounds[game.musicName] !== undefined) {
+            game.currentMusic.stop()
+            game.playingMusic = false
         }
     }
 }

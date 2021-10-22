@@ -221,7 +221,7 @@ class UI {
                 if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 260, STANDARD_CENTER_Y - 60 ,100,100, canvasWidth, canvasHeight)){
                     playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
                     if (this.game.settings.music){
-                        this.game.currentMusic.stop()
+                        this.game.stopMusic(this.game)
                     }else{
                         this.game.playMusic(this.game, audioCtx)
                     }

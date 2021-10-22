@@ -58,6 +58,7 @@ class Player {
         this.starEffect = new Effects(STAR, this.screen.x, this.screen.y)
         this.gotEffect = new Effects(GOT_ITEM, this.screen.x, this.screen.y)
         this.turboEffectCorrector = 0
+        this.changingStage = false
     }
 
     init(){
@@ -110,11 +111,11 @@ class Player {
         this.segmentCount();
         this.updateEffects()
         this.startCountDown(audioCtx)
-        this.gameOverCountDown()
+        this.gameOverCountDown(audioCtx)
         this.setLanes()
         this.countPowerUps()
         this.SettingJumpingY(dt)
-        //this.checkCollidingGameOver(audioCtx)
+        this.checkCollidingGameOver(audioCtx)
         this.checkCollidingCoins(audioCtx)
         this.checkCollidingPowerUp(audioCtx)
         this.checkCollidingFuel(audioCtx)
@@ -342,7 +343,7 @@ class Player {
     // GameOver Functions
     // ---------------------------------------------------------------------------------
 
-    setGameOverStatus(){
+    setGameOverStatus(z){
         this.speed = 0
         this.currentSpeed = 0
         this.gameOver = true
@@ -351,22 +352,25 @@ class Player {
         this.transparent = 0
         this.double = 0
         this.shield = 0
+        this.game.stopMusic(this.game)
+        if (z){
+            this.z = z-SEGMENT_LENGTH
+        }
+
     }
 
-    gameOverCountDown(){
+    gameOverCountDown(audioCtx){
         if (this.gameOver){
             this.gameOverCounter--
             if (this.gameOverCounter === 179){
+                this.game.currentMusic.stop()
+                playTrack(contextSounds["lose"], audioCtx, this.game.settings.sounds)
+                this.explosionEffect.setXY(this.screen.x - 64, this.screen.y-64)
                 this.jumping = true
-                this.ySpeed = 10
-                this.speed = -200
+                this.ySpeed = -10
             }
-
-            if (this.speed < 0){
-                this.speed += 5
-                this.z +=this.speed
-            } else {
-                this.speed = 0
+            if (this.gameOverCounter === 100){
+                playTrack(contextSounds["game_over"], audioCtx, this.game.settings.sounds)
             }
             if (!this.gameOverEffect.play){
                 this.gameOverEffect.setPlay()
@@ -377,7 +381,6 @@ class Player {
             if (!this.starEffect.play){
                 this.starEffect.setPlay()
             }
-            this.explosionEffect.setXY(this.screen.x - 64, this.screen.y-64)
             this.starEffect.setXY(this.screen.x + 32, this.screen.y - 20)
             if (this.gameOverCounter === 0){
                 this.game.gameState = GAME_OVER_STATE
@@ -503,7 +506,7 @@ class Player {
                     this.game.road.totalCars[n].hitByShield(audioCtx)
                 } else{
                     this.setGameOverStatus(this.game.road.totalCars[n].z)
-                    this.game.road.totalTraffic[n].speed = 0
+                    this.game.road.totalCars[n].speed = 0
                     playTrack(contextSounds["crash"], audioCtx, this.game.settings.sounds)
                 }
             }
@@ -514,7 +517,6 @@ class Player {
                     this.game.road.totalObstacles[n].hitByShield(audioCtx)
                 } else {
                     this.setGameOverStatus(this.game.road.totalObstacles[n].z)
-                    this.game.road.totalTraffic[n].speed = 0
                     playTrack(contextSounds["crash"], audioCtx, this.game.settings.sounds)
                 }
             }
@@ -568,14 +570,13 @@ class Player {
                 this.speed -= this.acceleration
             }
         }
-
-        this.z += this.speed * dt
-        // if (this.speed > 0 && this.turbo === 0 && !this.changingStage) {
-        //     this.fuel -= dt * this.speed / (1000 * this.difficulty.GAS_CORRECTION)
-        // }
+        if (this.speed > 0 && this.turbo === 0 && !this.changingStage) {
+            this.fuel -= dt * this.speed / (1000 * this.difficulty.GAS_CORRECTION)
+        }
         if (this.fuel < 0 && !this.gameOver) {
             this.setGameOverStatus()
         }
+        this.z += this.speed * dt
     }
 
     setLanes(){

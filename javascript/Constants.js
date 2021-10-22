@@ -304,9 +304,9 @@ const doubleItem2 = [images.items_spritesheet, 512, 384, SPRITE_SIZE, SPRITE_SIZ
 // ---------------------------------------------------------------------------------
 const go1 = [images.start_spritesheet, 0, 0, 750, 100]
 const go2 = [images.start_spritesheet, 0, 100, 750, 100]
-const lights_out = [images.start_spritesheet, 0, 200, 200, 350]
-const lights_red = [images.start_spritesheet, 200, 200, 200, 350]
-const lights_green = [images.start_spritesheet, 400, 200, 200, 350]
+const lights_out = [images.start_spritesheet, 0, 201, 199, 350]
+const lights_red = [images.start_spritesheet, 200, 201, 199, 350]
+const lights_green = [images.start_spritesheet, 400, 201, 199, 350]
 
 // ---------------------------------------------------------------------------------
 // Effects Sprites

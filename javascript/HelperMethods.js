@@ -344,12 +344,12 @@ function scaleYPoint(currentValue){
 }
 
 
-function getMouseCanvasArea(mouseX, mouseY, x, y, width, height){
-    let correctedX = scaleXPoint(mouseX)
-    let correctedY = scaleYPoint(mouseY)
+function getMouseCanvasArea(mouseX, mouseY, x, y, width, height, canvasWidth, canvasHeight){
+    let correctedX = scaleXDraw(canvasWidth,mouseX)
+    let correctedY = scaleYDraw(canvasHeight, mouseY)
     console.log(mouseX, mouseY)
     console.log(correctedX, correctedY)
-    return ((correctedX >  x) && (correctedX < x+width) && (correctedY >  y) && (correctedY < y+height));
+    return ((mouseX >  x) && (mouseX < x+width) && (mouseY >  y) && (mouseY < y+height));
 }
 
 // ---------------------------------------------------------------------------------
@@ -367,8 +367,5 @@ function toggleFullScreen(element) {
 }
 
 function isGameInFullscreen(elementNodeName) {
-    if (document.fullscreenElement && document.fullscreenElement.nodeName === elementNodeName) {
-        return true;
-    }
-    return false;
+    return document.fullscreenElement && document.fullscreenElement.nodeName === elementNodeName;
 }
