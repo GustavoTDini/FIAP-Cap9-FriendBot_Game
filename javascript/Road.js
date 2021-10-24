@@ -17,6 +17,7 @@ class Road {
         this.totalAnimals = []
     }
 
+
     findSegment(z) {
         return this.segments[Math.floor(z/SEGMENT_LENGTH) % this.segments.length];
     }
@@ -49,29 +50,45 @@ class Road {
                 (currSegment.screenPoints.y >= maxBottomLine)){
                 continue;
             }
-
             if (n>0 && currBottomLine < maxBottomLine){
                 let screenPoints = currSegment.screenPoints;
                 let lastScreenPoints = currSegment.lastScreenPoints
                 this.renderGrass(ctx, currSegment.stage, currSegment.color, screenPoints.y, lastScreenPoints.y, canvasWidth);
-                if (currSegment.YRoad && Math.abs(currSegment.curve)> 1.5){
+                if (currSegment.YRoad){
                     let currSegmentCounter = currSegment.YRoadCounter
                     let lastSegmentCounter = this.segments[currIndex-1].YRoadCounter ? this.segments[currIndex-1].YRoadCounter:0
                     let dir = currSegment.curve > 0? 1:-1
-                    let curve = ROAD.CURVE.EASY*dir
+                    let curve = ROAD.CURVE.MEDIUM*dir
                     let lastX = lastScreenPoints.x + smoothIn(lastSegmentCounter*dir, curve, lastSegmentCounter/101)
                     let currX = screenPoints.x + smoothIn(currSegmentCounter*dir, curve, currSegmentCounter/101)
-                    //drawPolygon(currX - screenPoints.w, screenPoints.y, currX + screenPoints.w, screenPoints.y, lastX + lastScreenPoints.w, lastScreenPoints.y, lastX - lastScreenPoints.w, lastScreenPoints.y, "#ff0000", ctx)
+                    if (Math.abs(currX - screenPoints.x) <= Math.abs(screenPoints.w/4)){
+                        this.renderSegment(
+                            lastScreenPoints.x, lastScreenPoints.y, lastScreenPoints.w,
+                            screenPoints.x, screenPoints.y, screenPoints.w,
+                            currSegment.color, ctx, currSegment.stage, currSegment.texture, currSegment.index);
+                    } else if (Math.abs(currX - screenPoints.x) > Math.abs(screenPoints.w/4) && (Math.abs(currX - screenPoints.x) <= Math.abs(2*screenPoints.w))){
+                        this.renderYSegment(
+                            lastScreenPoints.x, lastX, lastScreenPoints.y, lastScreenPoints.w,
+                            screenPoints.x, currX, screenPoints.y, screenPoints.w,
+                            currSegment.color, ctx, currSegment.stage, currSegment.texture, dir)
+                    } else if (Math.abs(currX - screenPoints.x) > Math.abs(2*screenPoints.w)){
+                        this.renderSegment(
+                            lastX, lastScreenPoints.y, lastScreenPoints.w,
+                            currX, screenPoints.y, screenPoints.w,
+                            currSegment.color, ctx, currSegment.stage, currSegment.texture, currSegment.index);
+                        this.renderSegment(
+                            lastScreenPoints.x, lastScreenPoints.y, lastScreenPoints.w,
+                            screenPoints.x, screenPoints.y, screenPoints.w,
+                            currSegment.color, ctx, currSegment.stage, currSegment.texture, currSegment.index);
+                    }
+                } else {
                     this.renderSegment(
-                        lastX, lastScreenPoints.y, lastScreenPoints.w,
-                        currX, screenPoints.y, screenPoints.w,
+                        lastScreenPoints.x, lastScreenPoints.y, lastScreenPoints.w,
+                        screenPoints.x, screenPoints.y, screenPoints.w,
                         currSegment.color, ctx, currSegment.stage, currSegment.texture, currSegment.index);
                 }
 
-                this.renderSegment(
-                    lastScreenPoints.x, lastScreenPoints.y, lastScreenPoints.w,
-                    screenPoints.x, screenPoints.y, screenPoints.w,
-                    currSegment.color, ctx, currSegment.stage, currSegment.texture, currSegment.index);
+
                 // move the clipping bottom line up
                 maxBottomLine = currBottomLine;
             }
@@ -247,6 +264,35 @@ class Road {
             if (this.findSegment(this.totalAnimals[i].z).index < removeSegment){
                 this.totalAnimals.splice(i,1)
             }
+        }
+    }
+
+    renderYSegment(x1, otherRoadX1, y1, w1, x2, otherRoadX2, y2, w2, color, ctx, stage, texture, dir){
+        let linesWidth1 = w1/12
+        let linesWidth2 = w2/12
+        let lineDistance1 = w1/2.5
+        let lineDistance2 = w2/2.5
+        let roadTexture = stageObjects[stage].ROAD_TEXTURES[texture]
+        if (dir < 0){
+            drawPolygon(x1 - w1, y1, otherRoadX1 + w1, y1, otherRoadX2 + w2, y2, x2 - w2, y2, color.road, ctx)
+            this.game.settings.threeD && create3dRoad(roadTexture, x1, y1, w1, x2, y2, w2, ctx);
+            this.game.settings.threeD && create3dRoad(roadTexture, otherRoadX1, y1, w1, otherRoadX2, y2, w2, ctx);
+            drawPolygon(x1-w1, y1,	x1-w1+linesWidth1, y1, x2-w2+linesWidth2, y2, x2-w2, y2, color.shoulder, ctx);
+            drawPolygon(otherRoadX1+w1+linesWidth1, y1,	otherRoadX1+w1, y1, otherRoadX2+w2, y2, otherRoadX2+w2+linesWidth2, y2, color.shoulder, ctx);
+        } else {
+            drawPolygon(otherRoadX1 - w1, y1, x1 + w1, y1, x2 + w2, y2, otherRoadX2 - w2, y2, color.road, ctx)
+            this.game.settings.threeD && create3dRoad(roadTexture, x1, y1, w1, x2, y2, w2, ctx);
+            this.game.settings.threeD && create3dRoad(roadTexture, otherRoadX1, y1, w1, otherRoadX2, y2, w2, ctx);
+            drawPolygon(otherRoadX1-w1, y1,	otherRoadX1-w1+linesWidth1, y1, otherRoadX2-w2+linesWidth2, y2, otherRoadX2-w2, y2, color.shoulder, ctx);
+            drawPolygon(x1+w1+linesWidth1, y1,	x1+w1, y1, x2+w2, y2, x2+w2+linesWidth2, y2, color.shoulder, ctx);
+        }
+        if (color.lane){
+            drawPolygon(x1+(linesWidth1/2), y1,	x1-(linesWidth1/2), y1, x2-(linesWidth2/2), y2, x2+(linesWidth2/2), y2, color.lane, ctx);
+            drawPolygon(x1+lineDistance1, y1,	x1+lineDistance1+linesWidth1, y1, x2+lineDistance2+linesWidth2, y2, x2+lineDistance2, y2, color.lane, ctx);
+            drawPolygon(x1-lineDistance1, y1,	x1-lineDistance1-linesWidth1, y1, x2-lineDistance2-linesWidth2, y2, x2-lineDistance2, y2, color.lane, ctx);
+            drawPolygon(otherRoadX1+(linesWidth1/2), y1,	otherRoadX1-(linesWidth1/2), y1, otherRoadX2-(linesWidth2/2), y2, otherRoadX2+(linesWidth2/2), y2, color.lane, ctx);
+            drawPolygon(otherRoadX1+lineDistance1, y1,	otherRoadX1+lineDistance1+linesWidth1, y1, otherRoadX2+lineDistance2+linesWidth2, y2, otherRoadX2+lineDistance2, y2, color.lane, ctx);
+            drawPolygon(otherRoadX1-lineDistance1, y1,	otherRoadX1-lineDistance1-linesWidth1, y1, otherRoadX2-lineDistance2-linesWidth2, y2, otherRoadX2-lineDistance2, y2, color.lane, ctx);
         }
     }
 

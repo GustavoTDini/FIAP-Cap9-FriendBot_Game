@@ -244,10 +244,10 @@ function drawPolygon(x1, y1, x2, y2, x3, y3, x4, y4, color, ctx){
     ctx.fill();
 }
 
-function drawShadow(x, y, SpriteSize, ctx){
+function drawShadow(x, y, spriteSize, ctx, canvas){
     ctx.fillStyle = "rgba(50, 50, 50, 0.6)";
     ctx.beginPath();
-    ctx.ellipse(x+SPRITE_SIZE/2, y+SPRITE_SIZE*0.85, SpriteSize/3, SpriteSize/8, 0, 0, 2 * Math.PI);
+    drawEllipseToCanvas(canvas, ctx, x, y, spriteSize)
     ctx.fill();
 }
 
@@ -267,6 +267,10 @@ function drawToCanvas(canvas, ctx, sprite, x, y, width, height){
 
 function drawRectToCanvas(canvas, ctx, x, y, width, height){
     ctx.fillRect(scaleXDraw(canvas.width, x), scaleYDraw(canvas.height, y), scaleXDraw(canvas.width, width), scaleYDraw(canvas.height, height) )
+}
+
+function drawEllipseToCanvas(canvas, ctx, x, y, spriteSize){
+    ctx.ellipse(scaleXDraw(canvas.width, x+SPRITE_SIZE/2), scaleYDraw(canvas.height, y+SPRITE_SIZE*0.85), scaleXDraw(canvas.width, spriteSize/3), scaleYDraw(canvas.height, spriteSize/8) , 0,0,2 * Math.PI )
 }
 
 // para mudar a opacidade do desenho

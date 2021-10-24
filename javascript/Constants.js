@@ -43,6 +43,7 @@ const FOREST = "FOREST";
 const BEACH = "BEACH";
 
 //Player Difficulties
+// TODO - Adjust Difficulties
 const DIFFICULTIES_SETS = {
   EASY: {
       START_SPEED: 0.1*MAX_SPEED,

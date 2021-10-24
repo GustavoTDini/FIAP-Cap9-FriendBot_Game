@@ -82,6 +82,7 @@ class RoadObjects {
         this.mask = {x:this.x, z:this.z, w:0.2, s: 100 }
     }
 
+    // TODO - Fix dodge AI
     dodgeOtherObjects(){
         let thisSegment = this.segment.index
         let playerSegment = this.road.game.player.currentSegment.index
@@ -132,7 +133,7 @@ class RoadObjects {
 
     //função para definir uma colisão entre 2 objetos
     willCollide(object) {
-        let thisZ = this.mask.z
+        let thisZ = this.z
         if (object instanceof Cars || object instanceof Traffic || object instanceof Obstacles || object instanceof Animals){
             if (object.z > thisZ - 500 && object.z < thisZ + this.road.game.gameCamera.drawDistance * SEGMENT_LENGTH){
                 let thisX = this.mask.x
@@ -142,7 +143,7 @@ class RoadObjects {
                 let objectWidth = object.mask.w
                 let thisSize = this.mask.s
                 let objectSize = object.mask.s
-                thisZ = thisZ + this.speed*3
+                thisZ = thisZ + this.speed*10
                 return ((thisX < objectX + objectWidth) &&
                     (thisX + thisWidth > objectX) &&
                     (thisZ < objectZ + objectSize) &&

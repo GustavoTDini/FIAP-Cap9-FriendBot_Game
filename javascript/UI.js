@@ -217,6 +217,7 @@ class UI {
                     this.configIcon = this.UIConfigIcon[1]
                 }
                 break
+            // TODO - Modify Config Screen
             case (CONFIG_STATE):
                 if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 260, STANDARD_CENTER_Y - 60 ,100,100, canvasWidth, canvasHeight)){
                     playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)

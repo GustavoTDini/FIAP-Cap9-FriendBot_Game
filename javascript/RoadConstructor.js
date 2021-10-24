@@ -81,7 +81,7 @@ class RoadConstructor {
     addMoreRoad(){
             let startSegment = this.road.segments.length
             this.selectStage()
-            for (let n = 1; n < 10; n++){
+            for (let n = 1; n < 2; n++){
                 let random = randomIntFromInterval(0, 5)
                 switch (random){
                     case 0:
@@ -159,9 +159,8 @@ class RoadConstructor {
         this.updateRoadSize()
     }
 
-    //TODO - arrumar a YRoad
     addYCurve(dir) {
-        this.addMoreSegments(ROAD.LENGTH.LONG, ROAD.LENGTH.LONG, ROAD.LENGTH.LONG, dir*ROAD.CURVE.EASY, ROAD.HILL.NONE, this.game.currentStage, Segment.EMPTY, true);
+        this.addMoreSegments(ROAD.LENGTH.LONG, ROAD.LENGTH.LONG, ROAD.LENGTH.LONG, dir*ROAD.CURVE.MEDIUM, ROAD.HILL.NONE, this.game.currentStage, Segment.EMPTY, true);
         this.updateRoadSize()
     }
 
@@ -286,7 +285,7 @@ class RoadConstructor {
                     break;
                 case this.TRAFFIC:
                     sprite = stageObjects[startSegment.stage].TRAFFIC[Math.floor(Math.random() * 5)]
-                    this.road.totalTraffic.push(new Traffic(sprite, roadLane, y,  z, SPRITE_SIZE, this.road))
+                    this.road.totalTraffic.push(new Traffic(sprite, roadLane, y,  z, SPRITE_SIZE*1.5, this.road))
                     break;
             }
         }
@@ -336,6 +335,7 @@ class RoadConstructor {
         this.game.yRoadStartSegment = this.road.segments.length
     }
 
+    // TODO - Add Change Screen GUI
     selectStage(){
         let stages = [FOREST, BEACH, CITY, FARM]
         if (stages.includes(this.game.currentStage)){

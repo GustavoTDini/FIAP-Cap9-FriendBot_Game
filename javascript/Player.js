@@ -115,7 +115,7 @@ class Player {
         this.setLanes()
         this.countPowerUps()
         this.SettingJumpingY(dt)
-        this.checkCollidingGameOver(audioCtx)
+        //this.checkCollidingGameOver(audioCtx)
         this.checkCollidingCoins(audioCtx)
         this.checkCollidingPowerUp(audioCtx)
         this.checkCollidingFuel(audioCtx)
@@ -174,7 +174,7 @@ class Player {
     render(ctx, canvas) {
         let road = this.game.road
         let shadowScale = SPRITE_SIZE*this.screen.y/586
-        drawShadow(this.screen.x,  STANDARD_HEIGHT - this.screen.h, shadowScale, ctx)
+        drawShadow(this.screen.x,  STANDARD_HEIGHT - this.screen.h, shadowScale, ctx, canvas)
         let playerSegmentCurve = road.findSegment(this.z).curve;
         this.gotEffect.render(ctx, canvas)
         this.startRender(ctx, canvas)
@@ -570,9 +570,9 @@ class Player {
                 this.speed -= this.acceleration
             }
         }
-        if (this.speed > 0 && this.turbo === 0 && !this.changingStage) {
-            this.fuel -= dt * this.speed / (1000 * this.difficulty.GAS_CORRECTION)
-        }
+        // if (this.speed > 0 && this.turbo === 0 && !this.changingStage) {
+        //     this.fuel -= dt * this.speed / (1000 * this.difficulty.GAS_CORRECTION)
+        // }
         if (this.fuel < 0 && !this.gameOver) {
             this.setGameOverStatus()
         }
