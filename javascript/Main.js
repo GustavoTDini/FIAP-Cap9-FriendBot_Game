@@ -13,30 +13,50 @@ window.onload = async function () {
         toggleFullScreen(GAME_CANVAS)
         game.player.handleInputUp(ALLOWED_KEYS[e.code], audioContext);
     });
-
-    GAME_CANVAS.addEventListener("mousedown", function (e) {
+    GAME_CANVAS.addEventListener("touchstart", function (e) {
         let rect = GAME_CANVAS.getBoundingClientRect();
         let fullScreen = isGameInFullscreen(GAME_CANVAS.nodeName)
-        let x,y
-        // TODO - Correct FullScreen mouse
-        if(fullScreen){
-            x = interpolate(0,screen.width,0,GAME_CANVAS.width, e.clientX);
-            y = interpolate(0,screen.height,0,GAME_CANVAS.height, e.clientY);
-        } else {
-            x = e.clientX - rect.left;
-            y = e.clientY - rect.top;
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+        console.log(x,y)
+        game.UI.handleMouseDown(x, y, audioContext, fullScreen)
+    }, false);
+    swipeDetect(GAME_CANVAS, function(swipeDir){
+        if (swipeDir === 'right'){
+            game.player.moveLeftRight(audioContext,1)
         }
-        console.log(x, y)
-        game.UI.handleMouseDown(x, y, audioContext, GAME_CANVAS.width, GAME_CANVAS.height)
+        if (swipeDir === 'left'){
+            game.player.moveLeftRight(audioContext,-1)
+        }
+        if (swipeDir === 'up'){
+            game.player.setJump(audioContext)
+        }
+        if (swipeDir === 'down'){
+            game.player.setPause(audioContext)
+        }
+    })
+    GAME_CANVAS.addEventListener("touchend", function (e) {
+        let rect = GAME_CANVAS.getBoundingClientRect();
+        let fullScreen = isGameInFullscreen(GAME_CANVAS.nodeName)
+        let x = e.pageX -  rect.left
+        let y = e.pageY -  rect.top
+        console.log(x,y)
+        game.UI.handleMouseUp(x, y, audioContext, fullScreen)
     }, false);
     GAME_CANVAS.addEventListener("mouseup", function (e) {
         let rect = GAME_CANVAS.getBoundingClientRect();
         let fullScreen = isGameInFullscreen(GAME_CANVAS.nodeName)
-        let x = e.clientX -  rect.left
-        let y = e.clientY -  rect.top
-        game.UI.handleMouseUp(x, y, audioContext, GAME_CANVAS.width, GAME_CANVAS.height)
+        let x = e.pageX -  rect.left
+        let y = e.pageY -  rect.top
+        game.UI.handleMouseUp(x, y, audioContext, fullScreen)
     }, false);
-    // TODO - Add Touch Listener
+    GAME_CANVAS.addEventListener("mousedown", function (e) {
+        let rect = GAME_CANVAS.getBoundingClientRect();
+        let fullScreen = isGameInFullscreen(GAME_CANVAS.nodeName)
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+        game.UI.handleMouseDown(x, y, audioContext, fullScreen)
+    }, false);
     GameEngine.run({
         canvas: GAME_CANVAS,
         audio: audioContext,

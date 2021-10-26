@@ -15,6 +15,7 @@ class RoadObjects {
         this.dir = 1;
         this.nextX
         this.tunnel = null
+        this.dodgeble = false
     }
 
     render(ctx, maxDrawLine, canvasWidth, canvasHeight) {
@@ -138,16 +139,16 @@ class RoadObjects {
 
 
     //função para definir uma colisão entre 2 objetos
-    willCollide(object) {
-        if ((object !== this) && (object instanceof Cars || object instanceof Traffic || object instanceof Obstacles || object instanceof Animals)){
-            let thisZ = this.mask.z
+    willCollide(object, dir) {
+        if (object !== this && object.dodgeble){
+            let thisZ = dir === 1? this.mask.z : this.mask.z + this.mask.s*10
             let thisX = this.mask.x
             let thisWidth = this.mask.w
             let thisSize = this.mask.s*10
             let objectZ = object.mask.z
             let objectX = object.mask.x
             let objectWidth = object.mask.w
-            let objectSize = object.mask.s*10
+            let objectSize = object.mask.s*10*dir
             return ((thisX < objectX + objectWidth) &&
                 (thisX + thisWidth > objectX) &&
                 (thisZ < objectZ + objectSize) &&

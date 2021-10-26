@@ -9,8 +9,8 @@ class Settings{
         this.sounds = true
         this.threeD = true
         this.controls = true
-        this.musicVolume = 1
-        this.soundVolume = 1
+        this.musicVolume = 10
+        this.soundVolume = 10
         this.resolution = 1
         this.musicNode = audioCtx.createGain()
     }

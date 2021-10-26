@@ -5,12 +5,13 @@ class Cars extends RoadObjects{
         super(sprite, x, y, z, spriteSize, road);
         this.nextX = x
         this.speed = randomIntFromInterval(100,500)
+        this.dodgeble = true
     }
 
     update(dt, audioCtx){
         super.update(dt)
         this.randomX()
-        this.dodgeOtherObjects(1)
+        this.dodgeOtherObjects(-1)
         this.setX()
         this.speedUp()
         this.setYZ()

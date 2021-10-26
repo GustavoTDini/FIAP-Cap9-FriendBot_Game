@@ -141,6 +141,7 @@ let GameEngine = {
             audioCtx = options.audio
 
         function frame() {
+            requestAnimationFrame(frame);
             now = new Date().getTime();
             dt  = Math.min(1, (now - last) / 1000);
             udt = udt + dt;
@@ -154,7 +155,6 @@ let GameEngine = {
                 udt = udt - updateStep;
                 update(game, updateStep, DIFFICULTIES_SETS[difficulty], playerColor, audioCtx, canvas);
             }
-            requestAnimationFrame(frame);
         }
         frame();
     }

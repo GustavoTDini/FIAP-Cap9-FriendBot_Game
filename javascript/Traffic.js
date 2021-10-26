@@ -5,13 +5,14 @@ class Traffic extends RoadObjects{
         super(sprite, x, y, z, spriteSize, road);
         this.speed = randomIntFromInterval(-100, -50)
         this.nextX = this.x
+        this.dodgeble = true
     }
 
     update(dt, audioCtx){
         super.update(dt)
         this.setYZ()
         this.playSound(audioCtx, contextSounds["horn"])
-        this.dodgeOtherObjects(-1)
+        this.dodgeOtherObjects(1)
         this.setX()
 
     }

@@ -34,6 +34,7 @@ class Animals extends RoadObjects{
         this.sprites = this.setAnimalType(type)
         this.sprite = this.sprites[0]
         this.speed = this.setSpeed()
+        this.dodgeble = true
     }
 
     walkAndReturn(){
