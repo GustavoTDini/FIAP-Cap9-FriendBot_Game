@@ -79,11 +79,7 @@ class Animals extends RoadObjects{
         if (!this.hit){
             this.walkAndReturn()
             this.animateWalking()
-            if (this.road.findSegment(this.z).index === this.road.game.player.currentSegment.index){
-                if (Math.random() > 0.75){
-                    playTrack(this.sound, audioCtx, this.road.game.settings.sounds)
-                }
-            }
+            this.playSound(audioCtx, this.sound)
         } else if (this.hit){
             this.speed = 0
             this.sprite = this.sprites[4]

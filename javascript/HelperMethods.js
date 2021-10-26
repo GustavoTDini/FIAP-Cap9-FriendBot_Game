@@ -303,7 +303,7 @@ async function preloadSounds(sounds, audioCtx) {
     }
 }
 
-function playTrack(audioBuffer, audioCtx, soundSetting) {
+function playTrack(audioBuffer, audioCtx, soundSetting, gain) {
     if (soundSetting){
         if (audioCtx.state === 'suspended') {
             audioCtx.resume();
@@ -311,21 +311,21 @@ function playTrack(audioBuffer, audioCtx, soundSetting) {
         const trackSource = audioCtx.createBufferSource();
         trackSource.buffer = audioBuffer;
         const gainNode = audioCtx.createGain();
-        gainNode.gain.value = 0.5
+        gainNode.gain.value = gain
         trackSource.connect(gainNode).connect(audioCtx.destination)
         trackSource.start();
     }
 
 }
 
-function playMusic(audioBuffer, audioCtx, musicSetting) {
+function playMusic(audioBuffer, audioCtx, musicSetting, gain) {
     if (musicSetting){
         if (audioCtx.state === 'suspended') {
             audioCtx.resume();
         }
         const trackSource = audioCtx.createBufferSource();
         trackSource.buffer = audioBuffer;
-        trackSource.connect(audioCtx.destination)
+        trackSource.connect(gain).connect(audioCtx.destination)
         if (trackSource.buffer !== null){
             trackSource.start();
             return trackSource

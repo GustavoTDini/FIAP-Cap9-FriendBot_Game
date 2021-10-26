@@ -3,19 +3,15 @@ class Traffic extends RoadObjects{
 
     constructor(sprite, x, y, z, spriteSize, road) {
         super(sprite, x, y, z, spriteSize, road);
-        this.speed = 100
+        this.speed = randomIntFromInterval(-100, -50)
         this.nextX = this.x
     }
 
     update(dt, audioCtx){
-        this.mask = {x:this.x, z:this.z-this.speed, w:0.2, s: this.speed*dt}
-        this.z = this.z - this.speed
-        this.segment = this.road.findSegment(this.z)
-        this.y = this.segment.worldPoints.y
-        if (this.road.findSegment(this.z).index === this.road.game.player.currentSegment.index){
-            playTrack(contextSounds["horn"], audioCtx, this.road.game.settings.sounds)
-        }
-        this.dodgeOtherObjects()
+        super.update(dt)
+        this.setYZ()
+        this.playSound(audioCtx, contextSounds["horn"])
+        this.dodgeOtherObjects(-1)
         this.setX()
 
     }

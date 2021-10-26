@@ -4,24 +4,28 @@ class Cars extends RoadObjects{
     constructor(sprite, x, y, z, spriteSize, road) {
         super(sprite, x, y, z, spriteSize, road);
         this.nextX = x
-        this.speed = randomIntFromInterval(50,200)
+        this.speed = randomIntFromInterval(100,500)
     }
 
     update(dt, audioCtx){
         super.update(dt)
         this.randomX()
-        this.dodgeOtherObjects()
+        this.dodgeOtherObjects(1)
         this.setX()
-        this.y = this.road.findSegment(this.z).worldPoints.y
-        this.z += this.speed
-        if (this.road.findSegment(this.z).index === this.road.game.player.currentSegment.index){
-            playTrack(contextSounds["car_pass"], audioCtx, this.road.game.settings.sounds)
-        }
+        this.speedUp()
+        this.setYZ()
+        this.playSound(audioCtx, contextSounds["car_pass"])
     }
 
     randomX(){
         if (Math.random() > 0.998){
             this.nextX = ROAD_LANES[Math.floor(Math.random()*4)]
+        }
+    }
+
+    speedUp(){
+        if (this.road.findSegment(this.z).index > this.road.game.decideSegment -200){
+            this.speed = MAX_SPEED
         }
     }
 

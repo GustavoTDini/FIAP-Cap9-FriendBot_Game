@@ -5,7 +5,7 @@ window.onload = async function () {
     await preloadSounds(sounds, audioContext)
     const GAME_CANVAS = document.getElementById("game_canvas")
     document.getElementById("canvas_div").style.display = "flex"
-    GAME_CANVAS.width = 640;
+    GAME_CANVAS.width = 800;
     GAME_CANVAS.height = 480;
     let game = new Game()
     // Listener para clique das teclas
@@ -44,7 +44,7 @@ window.onload = async function () {
         game: game,
         update: game.update,
         playerColor: BLUE,
-        difficulty: MEDIUM
+        difficulty: HARD
     })
 }
 

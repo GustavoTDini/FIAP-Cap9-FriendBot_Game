@@ -17,7 +17,6 @@ class Road {
         this.totalAnimals = []
     }
 
-
     findSegment(z) {
         return this.segments[Math.floor(z/SEGMENT_LENGTH) % this.segments.length];
     }
@@ -58,20 +57,20 @@ class Road {
                     let currSegmentCounter = currSegment.YRoadCounter
                     let lastSegmentCounter = this.segments[currIndex-1].YRoadCounter ? this.segments[currIndex-1].YRoadCounter:0
                     let dir = currSegment.curve > 0? 1:-1
-                    let curve = ROAD.CURVE.MEDIUM*dir
+                    let curve = ROAD.CURVE.HARD*dir
                     let lastX = lastScreenPoints.x + smoothIn(lastSegmentCounter*dir, curve, lastSegmentCounter/101)
                     let currX = screenPoints.x + smoothIn(currSegmentCounter*dir, curve, currSegmentCounter/101)
-                    if (Math.abs(currX - screenPoints.x) <= Math.abs(screenPoints.w/4)){
+                    if (Math.abs(currX - screenPoints.x) <= Math.abs(lastScreenPoints.w)){
                         this.renderSegment(
                             lastScreenPoints.x, lastScreenPoints.y, lastScreenPoints.w,
                             screenPoints.x, screenPoints.y, screenPoints.w,
                             currSegment.color, ctx, currSegment.stage, currSegment.texture, currSegment.index);
-                    } else if (Math.abs(currX - screenPoints.x) > Math.abs(screenPoints.w/4) && (Math.abs(currX - screenPoints.x) <= Math.abs(2*screenPoints.w))){
+                    } else if (Math.abs(currX - screenPoints.x) > Math.abs(lastScreenPoints.w) && (Math.abs(currX - screenPoints.x) <= Math.abs(2*lastScreenPoints.w))){
                         this.renderYSegment(
                             lastScreenPoints.x, lastX, lastScreenPoints.y, lastScreenPoints.w,
                             screenPoints.x, currX, screenPoints.y, screenPoints.w,
                             currSegment.color, ctx, currSegment.stage, currSegment.texture, dir)
-                    } else if (Math.abs(currX - screenPoints.x) > Math.abs(2*screenPoints.w)){
+                    } else if (Math.abs(currX - screenPoints.x) > Math.abs(2*lastScreenPoints.w)){
                         this.renderSegment(
                             lastX, lastScreenPoints.y, lastScreenPoints.w,
                             currX, screenPoints.y, screenPoints.w,
@@ -115,26 +114,18 @@ class Road {
     }
 
     update(dt, audioCtx) {
-        let player = this.game.player
-        this.setPlayerXScreen(player);
         this.updateObjects(dt, audioCtx);
         this.removeObjects()
-        this.defineNewStage(player, audioCtx);
+        this.defineNewStage(audioCtx);
     }
 
-    setPlayerXScreen(player) {
-        let playerSegment = this.findSegment(player.z);
-        let centrifugal = 30;
-        let currentCurve = playerSegment.curve
-        if (currentCurve) {
-            player.screen.x = STANDARD_CENTER_X - SPRITE_SIZE / 2 + currentCurve * centrifugal
-        } else {
-            player.screen.x = STANDARD_CENTER_X - SPRITE_SIZE / 2
+    defineNewStage(audioCtx) {
+        let player = this.game.player
+        if (player.currentSegment.index > this.game.selectSegment && player.selectCounter === 0) {
+            player.selectCounter = player.MAX_EVENTS_COUNTER
         }
-    }
-
-    defineNewStage(player, audioCtx) {
         if (player.currentSegment.index > this.game.decideSegment && !player.changingStage) {
+            player.selectCounter = player.MAX_EVENTS_COUNTER
             player.changingStage = true
             let dir = 1
             if (player.currentLane === 0 || player.currentLane === 1) {
@@ -149,6 +140,7 @@ class Road {
             this.game.currentMusic.stop()
             this.game.playingMusic = true
             player.changingStage = false
+            player.selectCounter = 0
             this.game.background.nextAlpha = 0
             this.game.background.changeBackground(this.game.nextStage, true)
             this.game.currentStage = this.game.nextStage
@@ -231,7 +223,8 @@ class Road {
     removeObjects(){
         let removeSegment = this.game.player.currentSegment.index - 50
         for (let i = 0; i < this.totalCars.length; i++){
-            if (this.findSegment(this.totalCars[i].z).index < removeSegment){
+            let carSegment  = this.findSegment(this.totalCars[i].z).index
+            if (carSegment < removeSegment || carSegment > this.totalSegments-100){
                 this.totalCars.splice(i,1)
             }
         }

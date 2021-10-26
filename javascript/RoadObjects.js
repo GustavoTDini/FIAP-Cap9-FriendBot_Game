@@ -1,4 +1,5 @@
 class RoadObjects {
+    sound;
 
     constructor(sprite, x, y, z, spriteSize, road){
         this.sprite = sprite
@@ -33,11 +34,16 @@ class RoadObjects {
 
     update(dt){
         this.segment = this.road.findSegment(this.z)
-        this.setMask()
+        this.setMask(dt)
+    }
+
+    setYZ() {
+        this.y = this.road.findSegment(this.z).worldPoints.y
+        this.z += this.speed
     }
 
     hitByShield(audioCtx){
-        playTrack(contextSounds["shield_hit"], audioCtx, this.road.game.settings.sounds)
+        playTrack(contextSounds["shield_hit"], audioCtx, this.road.game.settings.sounds, this.road.game.settings.soundVolume)
         if (this.road.game.player.currentLane === 0){
             if (this instanceof Cars){
                 this.nextX = ROAD_LANES[1]
@@ -78,20 +84,20 @@ class RoadObjects {
         }
     }
 
-    setMask(){
-        this.mask = {x:this.x, z:this.z, w:0.2, s: 100 }
+    setMask(dt){
+        this.mask = {x:this.x, z:this.z, w:0.2, s: this.speed === 0? 100: this.speed*dt*100}
     }
 
     // TODO - Fix dodge AI
-    dodgeOtherObjects(){
+    dodgeOtherObjects(dir){
         let thisSegment = this.segment.index
         let playerSegment = this.road.game.player.currentSegment.index
         let maxSegment = playerSegment + this.road.game.gameCamera.drawDistance
-
-        if (thisSegment > playerSegment - 20 && thisSegment < maxSegment){
-            for (let n = playerSegment-20; n < maxSegment; n ++){
-                for (let obstacle in this.road.segments[n]){
-                    if (this.willCollide(obstacle)){
+        if (thisSegment > playerSegment - 50 && thisSegment < maxSegment && thisSegment < this.road.totalSegments){
+            for (let n = Math.max(playerSegment-50, 0); n < maxSegment; n ++){
+                for (let obstacle in this.road.segments[n].inRoadObjects){
+                    if (this.willCollide(this.road.segments[n].inRoadObjects[obstacle],dir)){
+                        console.log("Collide")
                         switch (this.x){
                             case ROAD_LANES[0]:
                                 this.nextX =  ROAD_LANES[1]
@@ -133,29 +139,31 @@ class RoadObjects {
 
     //função para definir uma colisão entre 2 objetos
     willCollide(object) {
-        let thisZ = this.z
-        if (object instanceof Cars || object instanceof Traffic || object instanceof Obstacles || object instanceof Animals){
-            if (object.z > thisZ - 500 && object.z < thisZ + this.road.game.gameCamera.drawDistance * SEGMENT_LENGTH){
-                let thisX = this.mask.x
-                let objectX = object.mask.x
-                let objectZ = object.mask.z
-                let thisWidth = this.mask.w
-                let objectWidth = object.mask.w
-                let thisSize = this.mask.s
-                let objectSize = object.mask.s
-                thisZ = thisZ + this.speed*10
-                return ((thisX < objectX + objectWidth) &&
-                    (thisX + thisWidth > objectX) &&
-                    (thisZ < objectZ + objectSize) &&
-                    (thisZ + thisSize > objectZ))
-            } else{
-                return false
-            }
-        } else {
+        if ((object !== this) && (object instanceof Cars || object instanceof Traffic || object instanceof Obstacles || object instanceof Animals)){
+            let thisZ = this.mask.z
+            let thisX = this.mask.x
+            let thisWidth = this.mask.w
+            let thisSize = this.mask.s*10
+            let objectZ = object.mask.z
+            let objectX = object.mask.x
+            let objectWidth = object.mask.w
+            let objectSize = object.mask.s*10
+            return ((thisX < objectX + objectWidth) &&
+                (thisX + thisWidth > objectX) &&
+                (thisZ < objectZ + objectSize) &&
+                (thisZ + thisSize > objectZ))
+        } else{
             return false
         }
-
     }
+
+    playSound(audioCtx, sound){
+        if (this.road.findSegment(this.z).index === this.road.game.player.currentSegment.index){
+            playTrack(sound, audioCtx, this.road.game.settings.sounds, this.road.game.settings.soundVolume)
+    }
+
+}
+
 
 
     project3D(canvasWidth, canvasHeight){
@@ -180,6 +188,8 @@ class RoadObjects {
 
         return {x:x + w, y:y, spriteSize:spriteSize}
     }
+
+
 }
 
 

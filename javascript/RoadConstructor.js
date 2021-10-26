@@ -81,7 +81,7 @@ class RoadConstructor {
     addMoreRoad(){
             let startSegment = this.road.segments.length
             this.selectStage()
-            for (let n = 1; n < 2; n++){
+            for (let n = 1; n < 12; n++){
                 let random = randomIntFromInterval(0, 5)
                 switch (random){
                     case 0:
@@ -300,7 +300,7 @@ class RoadConstructor {
             let segment = startSegment
             for (let i = 0; i < currentPattern.length; i ++){
                 let z = this.road.segments[segment].worldPoints.z
-                let y = this.road.segments[segment].worldPoints.y+100
+                let y = this.road.segments[segment].worldPoints.y+64
                 let roadLaneX = ROAD_LANES[roadLane]
                 if (currentPattern[i]){
                     this.road.totalCoins.push(new Coins(coin1, roadLaneX, y, z, SPRITE_SIZE, this.road))
@@ -329,13 +329,18 @@ class RoadConstructor {
     // ---------------------------------------------------------------------------------
 
     selectSegment(){
-        this.addStraight(ROAD.LENGTH.MEDIUM, Segment.YROAD);
+        this.game.selectSegment = this.road.segments.length
+        this.addStraight(ROAD.LENGTH.LONG, Segment.YROAD);
         this.game.decideSegment = this.road.segments.length
+        let z = this.road.segments[this.game.decideSegment-1].worldPoints.z
+        let y = this.road.segments[this.game.decideSegment-1].worldPoints.y+64
+        for (let lane in ROAD_LANES){
+            this.road.totalFuel.push(new Fuel(gas1, ROAD_LANES[lane], y, z, SPRITE_SIZE, this.road))
+        }
         this.addStraight(ROAD.LENGTH.LONG, Segment.TUNNEL)
         this.game.yRoadStartSegment = this.road.segments.length
     }
 
-    // TODO - Add Change Screen GUI
     selectStage(){
         let stages = [FOREST, BEACH, CITY, FARM]
         if (stages.includes(this.game.currentStage)){

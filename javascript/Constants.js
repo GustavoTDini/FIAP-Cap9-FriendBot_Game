@@ -711,6 +711,17 @@ const UIConfigOff = [images.menu_spritesheet, 900, 400, 100, 100]
 const UIConfigOn = [images.menu_spritesheet, 900, 500, 100, 100]
 const UIReturnOff = [images.menu_spritesheet, 700, 600, 100, 100]
 const UIReturnOn = [images.menu_spritesheet, 800, 600, 100, 100]
+const UIConfig = [images.menu_spritesheet, 0, 700, 700, 600]
+const UIRes = [images.menu_spritesheet, 900, 600, 100, 100]
+const UIPlusOff = [images.menu_spritesheet, 800, 700, 100, 100]
+const UIPlusOn = [images.menu_spritesheet, 800, 800, 100, 100]
+const UIMinusOff = [images.menu_spritesheet, 700, 700, 100, 100]
+const UIMinusOn = [images.menu_spritesheet, 700, 800, 100, 100]
+const UIBarSelector = [images.menu_spritesheet, 900, 700, 100, 100]
+const UIRedBar = [images.menu_spritesheet, 700, 900, 300, 100]
+const UIGreenBar = [images.menu_spritesheet, 700, 1000, 300, 100]
+const UIWhiteBar = [images.menu_spritesheet, 700, 1100, 300, 100]
+const UIScale = [images.menu_spritesheet, 700, 1200, 300, 100]
 
 // ---------------------------------------------------------------------------------
 // PowerUp Icons Sprites
@@ -756,7 +767,16 @@ const turboIcon7 = [images.power_ups_icons_spritesheet, 700, 300, 100, 100]
 const turboIcon8 = [images.power_ups_icons_spritesheet, 800, 300, 100, 100]
 const turboIcon9 = [images.power_ups_icons_spritesheet, 900, 300, 100, 100]
 
+// ---------------------------------------------------------------------------------
+// Changing Stage Signs Sprites
+// ---------------------------------------------------------------------------------
 
+const turnLeftSign = [images.y_road_screen_signs, 0, 0, 250, 250]
+const turnRightSign = [images.y_road_screen_signs, 0, 250, 250, 250]
+const beachSign = [images.y_road_screen_signs, 250, 0, 250, 60]
+const forestSign = [images.y_road_screen_signs, 250, 60, 250, 60]
+const farmSign = [images.y_road_screen_signs, 250, 120, 250, 60]
+const citySign = [images.y_road_screen_signs, 250, 180, 250, 60]
 
 // ---------------------------------------------------------------------------------
 // Sprites Groups
@@ -892,6 +912,7 @@ const stageObjects = {
         },
         LEFT_SIGN: commonScenarioCityLeft,
         RIGHT_SIGN: commonScenarioCityRight,
+        GUI_SIGN: citySign,
         TUNNEL: commonScenarioCityTunnel
     },
     FARM:{
@@ -910,6 +931,7 @@ const stageObjects = {
         },
         LEFT_SIGN: commonScenarioFarmLeft,
         RIGHT_SIGN: commonScenarioFarmRight,
+        GUI_SIGN: farmSign,
         TUNNEL: commonScenarioCityTunnel
     },
     FOREST:{
@@ -928,6 +950,7 @@ const stageObjects = {
         },
         LEFT_SIGN: commonScenarioForestLeft,
         RIGHT_SIGN: commonScenarioForestRight,
+        GUI_SIGN: forestSign,
         TUNNEL: commonScenarioGrassTunnel
     },
     BEACH:{
@@ -946,6 +969,7 @@ const stageObjects = {
         },
         LEFT_SIGN: commonScenarioBeachLeft,
         RIGHT_SIGN: commonScenarioBeachRight,
+        GUI_SIGN: beachSign,
         TUNNEL: commonScenarioGrassTunnel
     },
 }

@@ -3,10 +3,20 @@ class UI {
     UIHomeIcon = [UIHomeOff, UIHomeOn]
     UIConfigIcon = [UIConfigOff, UIConfigOn]
     UIReturnIcon = [UIReturnOff, UIReturnOn]
+    UIPlusIcon = [UIPlusOff, UIPlusOn]
+    UIMinusIcon = [UIMinusOff, UIMinusOn]
 
     homeIcon = this.UIHomeIcon[0]
     configIcon = this.UIConfigIcon[0]
     returnIcon = this.UIReturnIcon[0]
+    soundPlusIcon = this.UIPlusIcon[0]
+    soundMinusIcon = this.UIMinusIcon[0]
+    musicPlusIcon = this.UIPlusIcon[0]
+    musicMinusIcon = this.UIMinusIcon[0]
+    resPlusIcon = this.UIPlusIcon[0]
+    resMinusIcon = this.UIMinusIcon[0]
+
+    resPositions = [STANDARD_CENTER_X - 100, STANDARD_CENTER_X - 40, STANDARD_CENTER_X +20 , STANDARD_CENTER_X +80]
 
     constructor(game){
         this.game = game
@@ -78,16 +88,37 @@ class UI {
     }
 
     renderConfigUI(ctx, canvas){
-        drawToCanvas (canvas, ctx, UIPause, STANDARD_CENTER_X - 350, STANDARD_CENTER_Y - 200, 700, 400)
-        drawToCanvas (canvas, ctx, UIMusic, STANDARD_CENTER_X - 260, STANDARD_CENTER_Y - 60, 100, 100)
-        drawToCanvas (canvas, ctx, this.game.settings.music? UISelectorOn: UISelectorOff, STANDARD_CENTER_X - 270, STANDARD_CENTER_Y, 100, 100)
-        drawToCanvas (canvas, ctx, UISound, STANDARD_CENTER_X - 120, STANDARD_CENTER_Y - 60, 100, 100)
-        drawToCanvas (canvas, ctx, this.game.settings.sounds? UISelectorOn: UISelectorOff, STANDARD_CENTER_X - 130, STANDARD_CENTER_Y, 100, 100)
-        drawToCanvas (canvas, ctx, UIControl, STANDARD_CENTER_X + 20, STANDARD_CENTER_Y - 60, 100, 100)
-        drawToCanvas (canvas, ctx, this.game.settings.controls? UISelectorOn: UISelectorOff, STANDARD_CENTER_X + 10, STANDARD_CENTER_Y, 100, 100)
-        drawToCanvas (canvas, ctx, UI3d, STANDARD_CENTER_X + 160, STANDARD_CENTER_Y - 60, 100, 100)
-        drawToCanvas (canvas, ctx, this.game.settings.threeD? UISelectorOn: UISelectorOff, STANDARD_CENTER_X + 150, STANDARD_CENTER_Y, 100, 100)
-        drawToCanvas (canvas, ctx, this.returnIcon, STANDARD_CENTER_X - 70, STANDARD_CENTER_Y + 75, 100, 100)
+        drawToCanvas (canvas, ctx, UIConfig, STANDARD_CENTER_X - 350, STANDARD_CENTER_Y - 250, 700, 600)
+
+        drawToCanvas (canvas, ctx, UIMusic, STANDARD_CENTER_X - 270, STANDARD_CENTER_Y - 210, 100, 100)
+        drawToCanvas (canvas, ctx, this.game.settings.music? UISelectorOn: UISelectorOff, STANDARD_CENTER_X - 280, STANDARD_CENTER_Y-150, 100, 100)
+        drawToCanvas (canvas, ctx, this.musicMinusIcon, STANDARD_CENTER_X - 170, STANDARD_CENTER_Y - 200, 100, 100)
+        drawToCanvas (canvas, ctx, this.musicPlusIcon, STANDARD_CENTER_X + 230, STANDARD_CENTER_Y - 200, 100, 100)
+        drawToCanvas (canvas, ctx, UIScale, STANDARD_CENTER_X - 60, STANDARD_CENTER_Y - 250, 300, 80)
+        ctx.fillStyle = "#5c0000"
+        drawRectToCanvas(canvas,ctx, STANDARD_CENTER_X - 60, STANDARD_CENTER_Y - 185, this.game.settings.musicVolume*280, 50)
+        drawToCanvas (canvas, ctx, UIRedBar, STANDARD_CENTER_X - 70, STANDARD_CENTER_Y - 210, 300, 100)
+
+        drawToCanvas (canvas, ctx, UISound, STANDARD_CENTER_X - 290, STANDARD_CENTER_Y - 80, 100, 100)
+        drawToCanvas (canvas, ctx, this.game.settings.sounds? UISelectorOn: UISelectorOff, STANDARD_CENTER_X - 300, STANDARD_CENTER_Y -20, 100, 100)
+        drawToCanvas (canvas, ctx, this.soundMinusIcon, STANDARD_CENTER_X - 190, STANDARD_CENTER_Y - 70, 100, 100)
+        drawToCanvas (canvas, ctx, this.soundPlusIcon, STANDARD_CENTER_X + 210, STANDARD_CENTER_Y - 70, 100, 100)
+        drawToCanvas (canvas, ctx, UIScale, STANDARD_CENTER_X - 80, STANDARD_CENTER_Y - 120, 300, 80)
+        ctx.fillStyle = "#144c20"
+        drawRectToCanvas(canvas,ctx, STANDARD_CENTER_X - 80, STANDARD_CENTER_Y - 55, this.game.settings.soundVolume*280, 50)
+        drawToCanvas (canvas, ctx, UIGreenBar, STANDARD_CENTER_X - 90, STANDARD_CENTER_Y - 80, 300, 100)
+
+        drawToCanvas (canvas, ctx, UIRes, STANDARD_CENTER_X - 310, STANDARD_CENTER_Y + 50, 100, 100)
+        drawToCanvas (canvas, ctx, this.resMinusIcon, STANDARD_CENTER_X - 210, STANDARD_CENTER_Y + 60, 100, 100)
+        drawToCanvas (canvas, ctx, this.resPlusIcon, STANDARD_CENTER_X + 190, STANDARD_CENTER_Y + 60, 100, 100)
+        drawToCanvas (canvas, ctx, UIWhiteBar, STANDARD_CENTER_X - 110, STANDARD_CENTER_Y + 50, 300, 100)
+        drawToCanvas (canvas, ctx, UIBarSelector, this.resPositions[this.game.settings.resolution], STANDARD_CENTER_Y + 47, 100, 100)
+
+        drawToCanvas (canvas, ctx, UIControl, STANDARD_CENTER_X -260, STANDARD_CENTER_Y + 160, 100, 100)
+        drawToCanvas (canvas, ctx, this.game.settings.controls? UISelectorOn: UISelectorOff, STANDARD_CENTER_X -270, STANDARD_CENTER_Y + 220, 100, 100)
+        drawToCanvas (canvas, ctx, UI3d, STANDARD_CENTER_X + 140, STANDARD_CENTER_Y + 160, 100, 100)
+        drawToCanvas (canvas, ctx, this.game.settings.threeD? UISelectorOn: UISelectorOff, STANDARD_CENTER_X + 130, STANDARD_CENTER_Y + 220, 100, 100)
+        drawToCanvas (canvas, ctx, this.returnIcon, STANDARD_CENTER_X - 70, STANDARD_CENTER_Y + 180, 100, 100)
     }
 
     renderGameOverUI(ctx, canvas){
@@ -207,20 +238,20 @@ class UI {
             case (PAUSE_STATE):
                 if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 100, STANDARD_CENTER_Y - 80 ,200,200, canvasWidth, canvasHeight)){
                     this.game.player.setPause(audioCtx)
+                    this.game.settings.setNewResolution()
                 }
                 if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 250, STANDARD_CENTER_Y - 80 ,100,100, canvasWidth, canvasHeight)){
-                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.homeIcon = this.UIHomeIcon[1]
                 }
                 if (getMouseCanvasArea(x,y, STANDARD_CENTER_X + 150, STANDARD_CENTER_Y-20 ,100,100, canvasWidth, canvasHeight)){
-                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.configIcon = this.UIConfigIcon[1]
                 }
                 break
-            // TODO - Modify Config Screen
             case (CONFIG_STATE):
-                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 260, STANDARD_CENTER_Y - 60 ,100,100, canvasWidth, canvasHeight)){
-                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 270, STANDARD_CENTER_Y - 210 ,100,100, canvasWidth, canvasHeight)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     if (this.game.settings.music){
                         this.game.stopMusic(this.game)
                     }else{
@@ -228,26 +259,50 @@ class UI {
                     }
                     this.game.settings.music = !this.game.settings.music
                 }
-                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 120, STANDARD_CENTER_Y - 60 ,100,100, canvasWidth, canvasHeight)){
-                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 170, STANDARD_CENTER_Y - 200 ,100,100, canvasWidth, canvasHeight)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                    this.musicMinusIcon = this.UIMinusIcon[1]
+                }
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X + 230, STANDARD_CENTER_Y - 200 ,100,100, canvasWidth, canvasHeight)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                    this.musicPlusIcon = this.UIPlusIcon[1]
+                }
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 290, STANDARD_CENTER_Y - 80 ,100,100, canvasWidth, canvasHeight)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.game.settings.sounds = !this.game.settings.sounds
                 }
-                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X + 20, STANDARD_CENTER_Y - 60 ,100,100, canvasWidth, canvasHeight)){
-                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 190, STANDARD_CENTER_Y - 70 ,100,100, canvasWidth, canvasHeight)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                    this.soundMinusIcon = this.UIMinusIcon[1]
+                }
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X + 210, STANDARD_CENTER_Y - 70 ,100,100, canvasWidth, canvasHeight)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                    this.soundPlusIcon = this.UIPlusIcon[1]
+                }
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 210, STANDARD_CENTER_Y + 60 ,100,100, canvasWidth, canvasHeight)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                    this.resMinusIcon = this.UIMinusIcon[1]
+                }
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X + 190, STANDARD_CENTER_Y +60 ,100,100, canvasWidth, canvasHeight)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                    this.resPlusIcon = this.UIPlusIcon[1]
+                }
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X -260, STANDARD_CENTER_Y +160 ,100,100, canvasWidth, canvasHeight)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.game.settings.controls = !this.game.settings.controls
                 }
-                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X + 160, STANDARD_CENTER_Y - 60 ,100,100, canvasWidth, canvasHeight)){
-                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X + 140, STANDARD_CENTER_Y +160 ,100,100, canvasWidth, canvasHeight)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.game.settings.threeD = !this.game.settings.threeD
                 }
-                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 70, STANDARD_CENTER_Y +75 ,100,100, canvasWidth, canvasHeight)){
-                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 70, STANDARD_CENTER_Y +180 ,100,100, canvasWidth, canvasHeight)){
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.returnIcon = this.UIReturnIcon[1]
                 }
                 break
             case (GAME_OVER_STATE):
                 if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 100, STANDARD_CENTER_Y - 55 ,200,200, canvasWidth, canvasHeight)){
-                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds)
+                    playTrack(contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.game.gameState = LOADING_STATE
                 }
                 break
@@ -255,22 +310,66 @@ class UI {
 
     }
 
-    handleMouseUp(x, y, audioCtx, canvasWidth, canvasHeighht) {
+    handleMouseUp(x, y, audioCtx, canvasWidth, canvasHeight) {
         this.homeIcon = this.UIHomeIcon[0]
         this.configIcon = this.UIConfigIcon[0]
         this.returnIcon = this.UIReturnIcon[0]
-
         switch (this.game.gameState){
             case (PAUSE_STATE):
-                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 250, STANDARD_CENTER_Y - 80 ,100,100, canvasWidth, canvasHeighht)){
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 250, STANDARD_CENTER_Y - 80 ,100,100, canvasWidth, canvasHeight)){
                     this.game.gameState = LOADING_STATE
                 }
-                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X + 150, STANDARD_CENTER_Y-20 ,100,100, canvasWidth, canvasHeighht)){
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X + 150, STANDARD_CENTER_Y-20 ,100,100, canvasWidth, canvasHeight)){
                     this.game.gameState = CONFIG_STATE
                 }
                 break
             case (CONFIG_STATE):
-                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 70, STANDARD_CENTER_Y +75 ,100,100, canvasWidth, canvasHeighht)){
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 170, STANDARD_CENTER_Y - 200 ,100,100, canvasWidth, canvasHeight)){
+                    this.musicMinusIcon = this.UIMinusIcon[0]
+                    this.game.settings.musicVolume -= 0.1
+                    if (this.game.settings.musicVolume < 0){
+                        this.game.settings.musicVolume = 0
+                    }
+                    this.game.settings.setMusicVolume()
+                }
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X + 230, STANDARD_CENTER_Y - 200 ,100,100, canvasWidth, canvasHeight)){
+                    this.musicPlusIcon = this.UIPlusIcon[0]
+                    this.game.settings.musicVolume += 0.1
+                    if (this.game.settings.musicVolume > 1){
+                        this.game.settings.musicVolume = 1
+                    }
+                    this.game.settings.setMusicVolume()
+                }
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 190, STANDARD_CENTER_Y - 70 ,100,100, canvasWidth, canvasHeight)){
+                    this.soundMinusIcon = this.UIMinusIcon[0]
+                    this.game.settings.soundVolume -= 0.1
+                    if (this.game.settings.soundVolume < 0){
+                        this.game.settings.soundVolume = 0
+                    }
+                }
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X + 210, STANDARD_CENTER_Y - 70 ,100,100, canvasWidth, canvasHeight)){
+                    this.soundPlusIcon = this.UIPlusIcon[0]
+                    this.game.settings.soundVolume += 0.1
+                    if (this.game.settings.soundVolume > 1){
+                        this.game.settings.soundVolume = 1
+                    }
+                }
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 210, STANDARD_CENTER_Y + 60 ,100,100, canvasWidth, canvasHeight)){
+                    this.resMinusIcon = this.UIMinusIcon[0]
+                    this.game.settings.resolution --;
+                    if (this.game.settings.resolution < 0){
+                        this.game.settings.resolution = 0
+                    }
+                }
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X + 190, STANDARD_CENTER_Y +60 ,100,100, canvasWidth, canvasHeight)){
+                    this.resPlusIcon = this.UIPlusIcon[0]
+                    this.game.settings.resolution ++;
+                    if (this.game.settings.resolution > 3){
+                        this.game.settings.resolution = 3
+                    }
+                }
+
+                if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 70, STANDARD_CENTER_Y +180 ,100,100, canvasWidth, canvasHeight)){
                     this.game.gameState = PAUSE_STATE
                 }
                 break

@@ -18,6 +18,7 @@ class Game {
         this.decideSegment = null
         this.newStageSegment = null
         this.yRoadStartSegment = null
+        this.gameImage = new ImageData(STANDARD_WIDTH, STANDARD_HEIGHT)
     }
 
     // Função principal para renderizar os elementos do canvas
@@ -33,24 +34,31 @@ class Game {
                 game.road.render(ctx, canvas.width, canvas.height)
                 game.player.render(ctx, canvas);
                 game.UI.renderGameUI(ctx, canvas)
+                game.gameImage = ctx.getImageData(0, 0, STANDARD_WIDTH, STANDARD_HEIGHT)
                 break;
             case PAUSE_STATE:
+                ctx.clearRect(0, 0, STANDARD_WIDTH, STANDARD_HEIGHT)
+                ctx.putImageData(game.gameImage, 0,0)
                 game.UI.renderPauseUI(ctx, canvas)
                 break;
             case CONFIG_STATE:
+                ctx.clearRect(0, 0, STANDARD_WIDTH, STANDARD_HEIGHT)
+                ctx.putImageData(game.gameImage, 0,0)
                 game.UI.renderConfigUI(ctx, canvas)
                 break;
             case GAME_OVER_STATE:
+                ctx.clearRect(0, 0, STANDARD_WIDTH, STANDARD_HEIGHT)
+                ctx.putImageData(game.gameImage, 0,0)
                 game.UI.renderGameOverUI(ctx, canvas)
                 break;
         }
     }
 
     // função principal para atualizar os estados dos elementos do jogo
-    update(game, dt, difficulty, playerColor, audioCtx) {
+    update(game, dt, difficulty, playerColor, audioCtx, canvas) {
         switch(game.gameState){
             case LOADING_STATE:
-                game.settings = new Settings()
+                game.settings = new Settings(canvas, audioCtx)
                 game.gameCamera = new Camera(game);
                 game.road = new Road(game)
                 game.player = new Player(game, playerColor, difficulty)
@@ -89,7 +97,7 @@ class Game {
         if (game.playingMusic && game.currentMusic !== null && game.settings.music && !game.player.gameOver) {
             game.currentMusic.onended = () => {
                 game.musicName = stageObjects[game.currentStage].MUSIC[randomIntFromInterval(0, 3)]
-                game.currentMusic = playMusic(contextSounds[game.musicName], audioCtx, game.settings.music)
+                game.currentMusic = playMusic(contextSounds[game.musicName], audioCtx, game.settings.music, game.settings.musicNode)
             }
         }
     }
@@ -98,7 +106,7 @@ class Game {
         if (!game.playingMusic && game.settings.music && !game.player.gameOver) {
             game.musicName = stageObjects[game.currentStage].MUSIC[randomIntFromInterval(0, 3)]
             if (contextSounds[game.musicName] !== null && contextSounds[game.musicName] !== undefined) {
-                game.currentMusic = playMusic(contextSounds[game.musicName], audioCtx, game.settings.music)
+                game.currentMusic = playMusic(contextSounds[game.musicName], audioCtx, game.settings.music, game.settings.musicNode)
                 game.playingMusic = true
             }
         }
@@ -144,7 +152,7 @@ let GameEngine = {
             }
             if (udt > updateStep) {
                 udt = udt - updateStep;
-                update(game, updateStep, DIFFICULTIES_SETS[difficulty], playerColor, audioCtx);
+                update(game, updateStep, DIFFICULTIES_SETS[difficulty], playerColor, audioCtx, canvas);
             }
             requestAnimationFrame(frame);
         }
