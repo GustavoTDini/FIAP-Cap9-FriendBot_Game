@@ -317,7 +317,7 @@ class UI {
         switch (this.game.gameState){
             case (PAUSE_STATE):
                 if (getMouseCanvasArea(x,y, STANDARD_CENTER_X - 250, STANDARD_CENTER_Y - 80 ,100,100, fullscreen)){
-                    this.game.gameState = LOADING_STATE
+                    Menu.returnToMenu()
                 }
                 if (getMouseCanvasArea(x,y, STANDARD_CENTER_X + 150, STANDARD_CENTER_Y-20 ,100,100, fullscreen)){
                     this.game.gameState = CONFIG_STATE

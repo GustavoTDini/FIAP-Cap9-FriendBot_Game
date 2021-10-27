@@ -5,9 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Isaac Game</title>
-    <link href="styles/make.css" rel="stylesheet" />
+    <link href="styles/style.css" rel="stylesheet" />
     <script type="text/javascript" src="javascript/Constants.js"></script>
-    <script src="javascript/menu.js"></script>
+    <script src="javascript/Menu.js"></script>
     <script type="text/javascript" src="./javascript/HelperMethods.js"></script>
     <script type="text/javascript" src="./javascript/Settings.js"></script>
     <script type="text/javascript" src="./javascript/Road.js"></script>
@@ -31,42 +31,143 @@
     <script type="text/javascript" src="javascript/Main.js"></script>
 </head>
 <body>
-    <div id="canvas_div">
+<div id="canvas_div">
+    <img id="loading" src="image/loading.gif" alt="Imagem de Loading">
     <canvas id="game_canvas"></canvas>
+</div>
+<h1 id="title">Isaac Runs</h1>
+<div id="main_menu" class="menu_box">
+    <button class="btn_green" onclick="Menu.goToPlay()">Jogar</button>
+    <button class="btn_red" onclick="Menu.goToAbout()">Sobre</button>
+    <button class="btn_blue" onclick="Menu.goToInstructions()">Instruções</button>
+    <button class="btn_orange" onclick="Menu.goToCredits()">Créditos</button>
+</div>
+<div id="sobre" style="display: none">
+    <div id="about_box" class="menu_box">
+        <h2>Sobre</h2>
+        <h3>Game 3D que foi desenvolvido usando HTML, CSS e JavaScript pelo grupo Turing com o objetivo avançar na etapa de conclusão do curso de sistemas de Informação.
+            O game foi projetado para rodar em dispositivos mobile, será controlado através do touch e terá interatividade com o FriendBot</h3>
+        <h3>O nosso jogo se caracteriza como um jogo de corrida infinita, sendo assim o objetivo é correr o maximo que puder alcançando cada vez mais pontos que representam a distancia percorrida e moedas para trocas em uma futura atualização</h3>
+        <h3>
+            A aventura começa quando Isaac, um simpático carrinho azul de corrida que vivia em uma comunidade pobre no Brasil, resolve desbravar o mundo em busca do maior de todos os prêmios: “O Troféu da vida!” Nosso amigo vai precisar passar por diversas pistas de corrida em montanhas, florestas e cavernas. Nesse desafio, ele vai contar com a ajuda de dois amigos fiéis, Tom o esperto carrinho verde e Lara, sua melhor amiga que adorava mostrar a sua pintura cor de rosa para os amigos.
+            A trajetória não será fácil, e diversos obstáculos deverão ser enfrentados até o fim da jornada. Nas pistas, os desafios vão se tornando mais complicados conforme se avança, mas o personagem pode contar com itens que o tornarão mais forte e capacitado para o próximo nível. O jogador pode sempre contar com seus amigos quando precisar dar aquele boost na velocidade, melhorar a sua proteção ou aprender algo novo que o ajude a vencer alguma etapa.
+            Por fim, contamos com a energia positiva do FriendBot (Isaac) que vai reagir com expressões e movimentos à cada vitória dos nossos amigos corredores em busca do troféu da vida. E claro que o jogador, se quiser, também terá a oportunidade de controlar o robô através do tablet, andando com ele por onde quiser.
+        </h3>
+        <button class="btn_red" onclick="Menu.returnToMenu()">Voltar</button>
     </div>
-<!--    <h1>Isaac Runs</h1>-->
-<!--    <div id="menu">-->
-<!--        <label id="levelLabel" for="level">Escolha o Level</label>-->
-<!--        <select name="level" id= "levelSelect">-->
-<!--                <option value="EASY" >Fácil</option>-->
-<!--                <option value="MEDIUM">Médio</option>-->
-<!--                <option value="HARD">Difícil</option>-->
-<!--        </select>-->
-<!--        <label id="colorLabel" for="level">Escolha o Jogador</label>-->
-<!--        <select name="color" id= "colorSelect" onchange="pandaColor()">-->
-<!--            <option value="GREEN" selected>Verde</option>-->
-<!--            <option value="BLUE">Azul</option>-->
-<!--            <option value="RED">Vermelho</option>-->
-<!--        </select>-->
-<!--        <a href="index.html" id="back">Voltar</a>-->
-<!--        <button id="startButton" onclick="startGame()" >Jogar</button>-->
-<!--        <button class="btn btn-green" onclick="myFunctionG()" id="btVerd">Iniciar</button>-->
-<!--        <input type="image" src="./image/panda.png" id="panda">-->
-<!--        <button class="btn btn-purple" onclick="myFunctionP()"id="btRoxo">Sobre</button>        -->
-<!--        <div id="sobre">-->
-<!--        <h3>Primeira versão do game 3D que foi desenvolvido usando HTML, CSS e JavaScript pelo grupo Turing com o objetivo avançar na etapa de conclusão do curso de sistemas de Informação. </h3>-->
-<!--        <h2>Grupo:</h2>-->
-<!--        <ul>-->
-<!--            <li>Fábio de Lima Bandeira</li>-->
-<!--            <li>Gustavo Trevisan DIni </li>-->
-<!--            <li>Gustavo Bonet</li>-->
-<!--            <li>Lorenzo Magalhães Furuli</li>-->
-<!--            <li>Rafael Antonio Ramos Alves</li>-->
-<!--        </ul>-->
-<!--        </div>-->
-<!--        <button class="btn btn-red" onclick="myFunctionR()"id="btVerm">Manual</button>-->
-<!--        <h3 id="manual">O game foi projetado para rodar em dispositivos mobile, será controlado através do touch e terá interatividade com o FriendBot</h3>-->
-<!--    </div> -->
+</div>
 
+<div id="instrucoes" style="display: none">
+    <div id="instruction_box" class="menu_box">
+        <h2>Instruções do jogo</h2>
+        <h3>
+            Para o controle do nosso personagem, poderemos utilizar o teclado, superficie Touch e os botoes da tela, tanto com o mouse como com touch
+        </h3>
+        <img src="image/move_instructions.png" alt="imagens dos controles laterais">
+        <h3>
+            Botões de seta, esquerda e direita, botões laterais da tela, ou deslizar a tela para esquerda ou direita, movimentará o carrinho para o respectivo lado
+        </h3>
+        <img src="image/jump_instructions.png" alt="imagens dos controles de pulo">
+        <h3>
+            Botões de seta para cima, botão na tela de pular, ou deslizar para cima, fará o personagem pular
+        </h3>
+        <img src="image/pause_instructions.png" alt="imagens dos controles de pausa">
+        <h3>
+            Botão de espaço, botão na tela de pausa, ou deslizar para baixo, e o jogo entrará em modo pause
+        </h3>
+        <img src="image/screen_instructions.png" alt="imagens da tela do jogo">
+        <h3>
+            Durante o jogo, o jogador precisará desviar dos obstaculos, na tela de jogo, ele contará com os controles, alem de verificar a gasolina, os pontos e moedas atuais, e contará com um mapa para verificar os perigos a frente.
+        </h3>
+        <img src="image/pause_menu_instructions.png" alt="imagens do menu de pausa">
+        <h3>
+            Ao pausar, o jogador, poderá retornar ao jogo, reiniciar ou ver as configurações.
+        </h3>
+        <img src="image/config_instructions.png" alt="imagens do menu de configurações">
+        <h3>
+            Nas configurações, temos os controles de volume e mute de som e música, o controle de resolução e textura da pista, caso o jogo esteja lento, aqui poderemos melhorar a velocidade diminuindo a resolução, ou retirando a textura, por fim, podemos tirar os controles de tela, para quem gosta de uma tela mais limpa!
+        </h3>
+        <img src="image/racers_instructions.png" alt="imagens dos corredores">
+        <h3>
+            Durante sua corrida, você encontrará outros corredores, porem eles não tem motores tão bons quanto o seu, mas cuidado, apesar de serem mais lentos, eles poderão trocar de faixa sem aviso prévio.
+        </h3>
+        <img src="image/traffic_instructions.png" alt="imagens dos carros">
+        <h3>
+            Também haverá outros carros passeando na rua, eles estarão sempre vindo na sua direção, e não mudarão de faixa a menos que veja um obstáculo.
+        </h3>
+        <img src="image/animals_instructions.png" alt="imagens dos animais">
+        <h3>
+            Cuidado com os animais que estarão passeando na estrada, eles se movimentarão de um lado ao outro.
+        </h3>
+        <img src="image/obstacle_instructions.png" alt="imagens dos obstáculos">
+        <h3>
+            Na estrada teremos obstáculos no caminho, eles não se movem, porem você não poderá pula-los, pois eles são muito altos.
+        </h3>
+        <img src="image/items_instructions.gif" alt="imagens dos itens">
+        <h3>
+            No caminho pegue as moedas para aumentar sua pontuação, e não se esqueça de manter sempre o tanque cheio, caso ele chegue a zero, é Game Over
+        </h3>
+        <img src="image/powerup_instructions.png" alt="imagens dos poderes">
+        <h3>
+            Duranto o jogo, poderemos pegar items que nos ajudarão:
+            <ul>
+                <li>Raio: Deixará o jogador invisível por um período, não atingirá os obstáculos</li>
+                <li>Roda: Dará um turbo por um tempo, cuidado, voce irá muito rápido e poderá atingir os inimigos mais facilmente </li>
+                <li>Escudo: Eliminará os obstaculos do seu caminho, empurrando-os para os lados</li>
+                <li>Moeda: Dobrará as suas moedas coletadas</li>
+            </ul>
+        </h3>
+        <button class="btn_blue" onclick="Menu.returnToMenu()">Voltar</button>
+    </div>
+</div>
+<div id="creditos" style="display: none">
+    <div id="credits_box" class="menu_box">
+        <h2>Créditos do jogo</h2>
+        <h3>Grupo:
+            <ul>
+                <li>Fábio de Lima Bandeira</li>
+                <li>Gustavo Trevisan Dini </li>
+                <li>Gustavo Bonet</li>
+                <li>Lorenzo Magalhães Furuli</li>
+                <li>Rafael Antonio Ramos Alves</li>
+            </ul>
+        </h3>
+        <h3>
+            Sons e músicas disponíveis em Orange Free Sounds!<br>
+            <a href="https://orangefreesounds.com/">Orange Free Sounds</a>
+        </h3>
+        <h3>
+            Gráficos do Jogo Obtidos em Craftpix.net<br>
+            <a href="https://craftpix.net/">Craftpix</a>
+        </h3>
+        <h3>
+            Imagens de Animais obtidos em DevianArt - Agradecimentos a Daieny<br>
+            <a href="https://www.deviantart.com/daieny">DevianArt - Daieny Schuttz</a>
+        </h3>
+        <h3>
+            Locução por Aimee Smith, disponível em OpenGameArt<br>
+            <a href="https://opengameart.org/content/announcer-voice-pack-racing-female">OpenGameArt</a>
+            <a href="https://www.aimeesmithva.com/">Aimee Smith</a>
+        </h3>
+        <button class="btn_orange" onclick="Menu.returnToMenu()">Voltar</button>
+    </div>
+</div>
+<div id="jogar" style="display: none">
+    <div id="play_box" class="menu_box">
+        <h3>Selecione o Jogador e Dificuldade</h3>
+        <div class="selector">
+            <img class ="arrow" src="image/character_selector_left.png" onclick="Menu.setCharacter(1)">
+            <img id ="personagem" src="image/isaac.png">
+            <img class ="arrow" src="image/character_selector_right.png" onclick="Menu.setCharacter(-1)">
+        </div>
+        <div class="selector">
+            <img class ="arrow" src="image/difficulty_selector_left.png" onclick="Menu.setDifficulty(-1)">
+            <img id ="dificuldade" src="image/medio.png">
+            <img class ="arrow" src="image/difficulty_selector_right.png" onclick="Menu.setDifficulty(1)">
+        </div>
+        <button class="btn_green" onclick="playGame(Menu.characters[Menu.selectedCharacter].game, Menu.difficulties[Menu.selectedDifficulty].game)">Jogar</button>
+        <button class="btn_red" onclick="Menu.returnToMenu()">Voltar</button>
+    </div>
+</div>
 </body>
 </html>

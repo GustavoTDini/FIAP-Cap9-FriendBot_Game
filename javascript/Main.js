@@ -1,16 +1,29 @@
-window.onload = async function () {
-    // TODO - Add HTML Page
+playGame = async function (character, difficulty) {
+    document.getElementById("main_menu").style.display = "none";
+    document.getElementById("sobre").style.display = "none";
+    document.getElementById("instrucoes").style.display = "none";
+    document.getElementById("creditos").style.display = "none";
+    document.getElementById("jogar").style.display = "none";
+    document.getElementById("title").style.display = "none";
+    document.getElementById("loading").style.display = "flex";
+    document.getElementById("canvas_div").style.display = "flex"
+    let GAME_CANVAS = document.getElementById("game_canvas")
+    GAME_CANVAS.style.display = "none"
+    toggleFullScreen(GAME_CANVAS)
     let audioContext = new (window.AudioContext || window.webkitAudioContext)()
     await preloadImages(images)
     await preloadSounds(sounds, audioContext)
-    const GAME_CANVAS = document.getElementById("game_canvas")
-    document.getElementById("canvas_div").style.display = "flex"
+
     GAME_CANVAS.width = 800;
     GAME_CANVAS.height = 480;
+
+    //toggleFullScreen(GAME_CANVAS)
     let game = new Game()
+    GAME_CANVAS.style.display = "block"
+    document.getElementById("loading").style.display = "none";
     // Listener para clique das teclas
     document.addEventListener('keyup', function (e) {
-        toggleFullScreen(GAME_CANVAS)
+
         game.player.handleInputUp(ALLOWED_KEYS[e.code], audioContext);
     });
     GAME_CANVAS.addEventListener("touchstart", function (e) {
@@ -63,8 +76,8 @@ window.onload = async function () {
         render: game.render,
         game: game,
         update: game.update,
-        playerColor: BLUE,
-        difficulty: HARD
+        playerColor: character,
+        difficulty: difficulty
     })
 }
 
