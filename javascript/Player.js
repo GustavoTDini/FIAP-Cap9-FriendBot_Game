@@ -119,7 +119,7 @@ class Player {
         this.countPowerUps()
         this.selectCountDown()
         this.SettingJumpingY(dt)
-        //this.checkCollidingGameOver(audioCtx)
+        this.checkCollidingGameOver(audioCtx)
         this.checkCollidingCoins(audioCtx)
         this.checkCollidingPowerUp(audioCtx)
         this.checkCollidingFuel(audioCtx)
@@ -610,9 +610,9 @@ class Player {
                 this.speed -= this.acceleration
             }
         }
-        // if (this.speed > 0 && this.turbo === 0 && !this.changingStage) {
-        //     this.fuel -= dt * this.speed / (1000 * this.difficulty.GAS_CORRECTION)
-        // }
+        if (this.speed > 0 && this.turbo === 0 && !this.changingStage) {
+            this.fuel -= dt * this.speed / (1000 * this.difficulty.GAS_CORRECTION)
+        }
         if (this.fuel < 0 && !this.gameOver) {
             this.setGameOverStatus()
         }
