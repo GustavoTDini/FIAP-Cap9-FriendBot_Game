@@ -3,7 +3,7 @@ class Coins extends RoadObjects{
 
     frame = 0;
     currentSprite = 0;
-    coinSprites = [coin1, coin2, coin3, coin4, coin5, coin6]
+    coinSprites = [Images.coin1, Images.coin2, Images.coin3, Images.coin4, Images.coin5, Images.coin6]
 
     constructor(sprite, x, y, z, spriteSize, road) {
         super(sprite, x, y, z, spriteSize, road);

@@ -19,38 +19,40 @@ class Background {
     }
 
     render(ctx, canvasWidth, canvasHeight){
+        let HMDraw = HelperMethods.draw
+        let HMMath = HelperMethods.math
         let BC1Correction = 0.00002
         let BC2Correction = 0.00004
         let BC3Correction = 0.00006
-        let BC1X = setMaxMin(this.offSetX*BC1Correction*this.game.player.speed, STANDARD_WIDTH, 0)
-        let BC1Y = setMaxMin(-20 + this.offSetY*BC1Correction, 0, -50)
-        let BC2X = setMaxMin(this.offSetX*BC2Correction*this.game.player.speed, STANDARD_WIDTH, 0)
-        let BC2Y = setMaxMin(-20 + this.offSetY*BC2Correction, 0, -50)
-        let BC3X = setMaxMin(this.offSetX*BC3Correction*this.game.player.speed, STANDARD_WIDTH, 0)
-        let BC3Y = setMaxMin(-20 + this.offSetY*BC3Correction, 0, -50)
-        this.sky !== null && drawSpriteWithAlpha(ctx, this.sky, 0, 0,STANDARD_WIDTH, STANDARD_HEIGHT, this.currentAlpha, canvasWidth, canvasHeight)
-        this.nextSky !== null && drawSpriteWithAlpha(ctx, this.nextSky, 0, 0,STANDARD_WIDTH, STANDARD_HEIGHT, this.nextAlpha, canvasWidth, canvasHeight)
-        this.BC1 !== null && drawSpriteWithAlpha(ctx, this.BC1, STANDARD_CENTER_X - BC1X, BC1Y,this.BC1.width, this.BC1.height, this.currentAlpha, canvasWidth, canvasHeight)
-        this.BC1 !== null && drawSpriteWithAlpha(ctx, this.BC1, STANDARD_CENTER_X- this.BC1.width - BC1X, BC1Y,this.BC1.width, this.BC1.height, this.currentAlpha, canvasWidth, canvasHeight)
-        this.nextBC1 !== null && drawSpriteWithAlpha(ctx, this.nextBC1, STANDARD_CENTER_X - BC1X, BC1Y,this.nextBC1.width, this.nextBC1.height, this.nextAlpha, canvasWidth, canvasHeight)
-        this.nextBC1 !== null && drawSpriteWithAlpha(ctx, this.nextBC1, STANDARD_CENTER_X- this.nextBC1.width - BC1X, BC1Y,this.nextBC1.width, this.nextBC1.height, this.nextAlpha, canvasWidth, canvasHeight)
-        this.BC2 !== null && drawSpriteWithAlpha(ctx, this.BC2, STANDARD_CENTER_X- this.BC2.width - BC2X, BC2Y,this.BC2.width, this.BC2.height, this.currentAlpha, canvasWidth, canvasHeight)
-        this.BC2 !== null && drawSpriteWithAlpha(ctx, this.BC2, STANDARD_CENTER_X - BC2X, BC2Y,this.BC2.width, this.BC2.height, this.currentAlpha, canvasWidth, canvasHeight)
-        this.nextBC2 !== null && drawSpriteWithAlpha(ctx, this.nextBC2, STANDARD_CENTER_X- this.nextBC2.width - BC2X, BC2Y,this.nextBC2.width, this.nextBC2.height, this.nextAlpha, canvasWidth, canvasHeight)
-        this.nextBC2 !== null && drawSpriteWithAlpha(ctx, this.nextBC2, STANDARD_CENTER_X - BC2X, BC2Y,this.nextBC2.width, this.nextBC2.height, this.nextAlpha, canvasWidth, canvasHeight)
-        this.BC3 !== null && drawSpriteWithAlpha(ctx, this.BC3, STANDARD_CENTER_X - BC3X, BC3Y,this.BC3.width, this.BC3.height, this.currentAlpha, canvasWidth, canvasHeight)
-        this.BC3 !== null && drawSpriteWithAlpha(ctx, this.BC3, STANDARD_CENTER_X- this.BC3.width - BC3X, BC3Y,this.BC3.width, this.BC3.height, this.currentAlpha, canvasWidth, canvasHeight)
-        this.nextBC3 !== null && drawSpriteWithAlpha(ctx, this.nextBC3, STANDARD_CENTER_X - BC3X, BC3Y,this.nextBC3.width, this.nextBC3.height, this.nextAlpha, canvasWidth, canvasHeight)
-        this.nextBC3 !== null && drawSpriteWithAlpha(ctx, this.nextBC3, STANDARD_CENTER_X- this.nextBC3.width - BC3X, BC3Y,this.nextBC3.width, this.nextBC3.height, this.nextAlpha, canvasWidth, canvasHeight)
+        let BC1X = HMMath.setMaxMin(this.offSetX*BC1Correction*this.game.player.speed, Game.STANDARD_WIDTH, 0)
+        let BC1Y = HMMath.setMaxMin(-20 + this.offSetY*BC1Correction, 0, -50)
+        let BC2X = HMMath.setMaxMin(this.offSetX*BC2Correction*this.game.player.speed, Game.STANDARD_WIDTH, 0)
+        let BC2Y = HMMath.setMaxMin(-20 + this.offSetY*BC2Correction, 0, -50)
+        let BC3X = HMMath.setMaxMin(this.offSetX*BC3Correction*this.game.player.speed, Game.STANDARD_WIDTH, 0)
+        let BC3Y = HMMath.setMaxMin(-20 + this.offSetY*BC3Correction, 0, -50)
+        this.sky !== null && HMDraw.drawSpriteWithAlpha(ctx, this.sky, 0, 0,Game.STANDARD_WIDTH, Game.STANDARD_HEIGHT, this.currentAlpha, canvasWidth, canvasHeight)
+        this.nextSky !== null && HMDraw.drawSpriteWithAlpha(ctx, this.nextSky, 0, 0,Game.STANDARD_WIDTH, Game.STANDARD_HEIGHT, this.nextAlpha, canvasWidth, canvasHeight)
+        this.BC1 !== null && HMDraw.drawSpriteWithAlpha(ctx, this.BC1, Game.STANDARD_CENTER_X - BC1X, BC1Y,this.BC1.width, this.BC1.height, this.currentAlpha, canvasWidth, canvasHeight)
+        this.BC1 !== null && HMDraw.drawSpriteWithAlpha(ctx, this.BC1, Game.STANDARD_CENTER_X- this.BC1.width - BC1X, BC1Y,this.BC1.width, this.BC1.height, this.currentAlpha, canvasWidth, canvasHeight)
+        this.nextBC1 !== null && HMDraw.drawSpriteWithAlpha(ctx, this.nextBC1, Game.STANDARD_CENTER_X - BC1X, BC1Y,this.nextBC1.width, this.nextBC1.height, this.nextAlpha, canvasWidth, canvasHeight)
+        this.nextBC1 !== null && HMDraw.drawSpriteWithAlpha(ctx, this.nextBC1, Game.STANDARD_CENTER_X- this.nextBC1.width - BC1X, BC1Y,this.nextBC1.width, this.nextBC1.height, this.nextAlpha, canvasWidth, canvasHeight)
+        this.BC2 !== null && HMDraw.drawSpriteWithAlpha(ctx, this.BC2, Game.STANDARD_CENTER_X- this.BC2.width - BC2X, BC2Y,this.BC2.width, this.BC2.height, this.currentAlpha, canvasWidth, canvasHeight)
+        this.BC2 !== null && HMDraw.drawSpriteWithAlpha(ctx, this.BC2, Game.STANDARD_CENTER_X - BC2X, BC2Y,this.BC2.width, this.BC2.height, this.currentAlpha, canvasWidth, canvasHeight)
+        this.nextBC2 !== null && HMDraw.drawSpriteWithAlpha(ctx, this.nextBC2, Game.STANDARD_CENTER_X- this.nextBC2.width - BC2X, BC2Y,this.nextBC2.width, this.nextBC2.height, this.nextAlpha, canvasWidth, canvasHeight)
+        this.nextBC2 !== null && HMDraw.drawSpriteWithAlpha(ctx, this.nextBC2, Game.STANDARD_CENTER_X - BC2X, BC2Y,this.nextBC2.width, this.nextBC2.height, this.nextAlpha, canvasWidth, canvasHeight)
+        this.BC3 !== null && HMDraw.drawSpriteWithAlpha(ctx, this.BC3, Game.STANDARD_CENTER_X - BC3X, BC3Y,this.BC3.width, this.BC3.height, this.currentAlpha, canvasWidth, canvasHeight)
+        this.BC3 !== null && HMDraw.drawSpriteWithAlpha(ctx, this.BC3, Game.STANDARD_CENTER_X- this.BC3.width - BC3X, BC3Y,this.BC3.width, this.BC3.height, this.currentAlpha, canvasWidth, canvasHeight)
+        this.nextBC3 !== null && HMDraw.drawSpriteWithAlpha(ctx, this.nextBC3, Game.STANDARD_CENTER_X - BC3X, BC3Y,this.nextBC3.width, this.nextBC3.height, this.nextAlpha, canvasWidth, canvasHeight)
+        this.nextBC3 !== null && HMDraw.drawSpriteWithAlpha(ctx, this.nextBC3, Game.STANDARD_CENTER_X- this.nextBC3.width - BC3X, BC3Y,this.nextBC3.width, this.nextBC3.height, this.nextAlpha, canvasWidth, canvasHeight)
 
     }
 
-    update(dt){
+    update(){
         if (this.sky === null || this.BC1 === null || this.BC2 === null || this.BC3 === null){
             this.changeBackground(this.game.currentStage, false);
         }
         if (this.nextAlpha < 1 ){
-            if (this.game.road.findSegment(this.game.player.z - SEGMENT_LENGTH) !== this.game.player.currentSegment){
+            if (this.game.road.findSegment(this.game.player.z - Game.SEGMENT_LENGTH) !== this.game.player.currentSegment){
                 this.currentAlpha -= 0.025
                 this.nextAlpha += 0.025
             }
@@ -71,35 +73,35 @@ class Background {
     changeBackground(stage, next) {
         let sky, BC1, BC2, BC3
         switch (stage) {
-            case SUBURB:
-                sky = subBackgrounds[0]
-                BC1 = subBackgrounds[1]
-                BC2 = subBackgrounds[2]
-                BC3 = subBackgrounds[3]
+            case Game.SUBURB:
+                sky = Images.subBackgrounds[0]
+                BC1 = Images.subBackgrounds[1]
+                BC2 = Images.subBackgrounds[2]
+                BC3 = Images.subBackgrounds[3]
                 break
-            case CITY:
-                sky = cityBackgrounds[0]
-                BC1 = cityBackgrounds[1]
-                BC2 = cityBackgrounds[2]
-                BC3 = cityBackgrounds[3]
+            case Game.CITY:
+                sky = Images.cityBackgrounds[0]
+                BC1 = Images.cityBackgrounds[1]
+                BC2 = Images.cityBackgrounds[2]
+                BC3 = Images.cityBackgrounds[3]
                 break
-            case FARM:
-                sky = farmBackgrounds[0]
-                BC1 = farmBackgrounds[1]
-                BC2 = farmBackgrounds[2]
-                BC3 = farmBackgrounds[3]
+            case Game.FARM:
+                sky = Images.farmBackgrounds[0]
+                BC1 = Images.farmBackgrounds[1]
+                BC2 = Images.farmBackgrounds[2]
+                BC3 = Images.farmBackgrounds[3]
                 break
-            case FOREST:
-                sky = forestBackgrounds[0]
-                BC1 = forestBackgrounds[1]
-                BC2 = forestBackgrounds[2]
-                BC3 = forestBackgrounds[3]
+            case Game.FOREST:
+                sky = Images.forestBackgrounds[0]
+                BC1 = Images.forestBackgrounds[1]
+                BC2 = Images.forestBackgrounds[2]
+                BC3 = Images.forestBackgrounds[3]
                 break
-            case BEACH:
-                sky = beachBackgrounds[0]
-                BC1 = beachBackgrounds[1]
-                BC2 = beachBackgrounds[2]
-                BC3 = beachBackgrounds[3]
+            case Game.BEACH:
+                sky = Images.beachBackgrounds[0]
+                BC1 = Images.beachBackgrounds[1]
+                BC2 = Images.beachBackgrounds[2]
+                BC3 = Images.beachBackgrounds[3]
                 break
             default:
                 sky = null

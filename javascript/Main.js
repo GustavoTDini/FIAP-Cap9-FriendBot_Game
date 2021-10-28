@@ -9,11 +9,10 @@ playGame = async function (character, difficulty) {
     document.getElementById("canvas_div").style.display = "flex"
     let GAME_CANVAS = document.getElementById("game_canvas")
     GAME_CANVAS.style.display = "none"
-    toggleFullScreen(GAME_CANVAS)
+    HelperMethods.fullscreen.toggleFullScreen(GAME_CANVAS)
     let audioContext = new (window.AudioContext || window.webkitAudioContext)()
-    await preloadImages(images)
-    await preloadSounds(sounds, audioContext)
-
+    await HelperMethods.draw.preloadImages(Images.imageFiles)
+    await HelperMethods.sound.preloadSounds(Sounds.sounds, audioContext)
     GAME_CANVAS.width = 800;
     GAME_CANVAS.height = 480;
 
@@ -23,18 +22,17 @@ playGame = async function (character, difficulty) {
     document.getElementById("loading").style.display = "none";
     // Listener para clique das teclas
     document.addEventListener('keyup', function (e) {
-
-        game.player.handleInputUp(ALLOWED_KEYS[e.code], audioContext);
+        game.player.handleInputUp(Game.ALLOWED_KEYS[e.code], audioContext);
     });
     GAME_CANVAS.addEventListener("touchstart", function (e) {
         let rect = GAME_CANVAS.getBoundingClientRect();
-        let fullScreen = isGameInFullscreen(GAME_CANVAS.nodeName)
+        let fullScreen = HelperMethods.fullscreen.isGameInFullscreen(GAME_CANVAS.nodeName)
         let x = e.clientX - rect.left;
         let y = e.clientY - rect.top;
         console.log(x,y)
         game.UI.handleMouseDown(x, y, audioContext, fullScreen)
-    }, false);
-    swipeDetect(GAME_CANVAS, function(swipeDir){
+    }, Modernizr.passiveeventlisteners ? {passive: true} : false);
+    HelperMethods.mouseTouch.swipeDetect(GAME_CANVAS, function(swipeDir){
         if (swipeDir === 'right'){
             game.player.moveLeftRight(audioContext,1)
         }
@@ -47,10 +45,10 @@ playGame = async function (character, difficulty) {
         if (swipeDir === 'down'){
             game.player.setPause(audioContext)
         }
-    })
+    }, Modernizr.passiveeventlisteners ? {passive: true} : false)
     GAME_CANVAS.addEventListener("touchend", function (e) {
         let rect = GAME_CANVAS.getBoundingClientRect();
-        let fullScreen = isGameInFullscreen(GAME_CANVAS.nodeName)
+        let fullScreen = HelperMethods.fullscreen.isGameInFullscreen(GAME_CANVAS.nodeName)
         let x = e.pageX -  rect.left
         let y = e.pageY -  rect.top
         console.log(x,y)
@@ -58,14 +56,14 @@ playGame = async function (character, difficulty) {
     }, false);
     GAME_CANVAS.addEventListener("mouseup", function (e) {
         let rect = GAME_CANVAS.getBoundingClientRect();
-        let fullScreen = isGameInFullscreen(GAME_CANVAS.nodeName)
+        let fullScreen = HelperMethods.fullscreen.isGameInFullscreen(GAME_CANVAS.nodeName)
         let x = e.pageX -  rect.left
         let y = e.pageY -  rect.top
         game.UI.handleMouseUp(x, y, audioContext, fullScreen)
     }, false);
     GAME_CANVAS.addEventListener("mousedown", function (e) {
         let rect = GAME_CANVAS.getBoundingClientRect();
-        let fullScreen = isGameInFullscreen(GAME_CANVAS.nodeName)
+        let fullScreen = HelperMethods.fullscreen.isGameInFullscreen(GAME_CANVAS.nodeName)
         let x = e.clientX - rect.left;
         let y = e.clientY - rect.top;
         game.UI.handleMouseDown(x, y, audioContext, fullScreen)

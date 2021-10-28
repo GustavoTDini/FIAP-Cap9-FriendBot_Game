@@ -3,7 +3,7 @@ class Fuel extends RoadObjects{
 
     frame = 0;
     currentSprite = 0;
-    coinSprites = [gas1, gas2, gas3, gas4, gas5, gas6]
+    coinSprites = [Images.gas1, Images.gas2, Images.gas3, Images.gas4, Images.gas5, Images.gas6]
 
     constructor(sprite, x, y, z, spriteSize, road) {
         super(sprite, x, y, z, spriteSize, road);

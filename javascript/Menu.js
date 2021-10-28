@@ -1,17 +1,13 @@
 class Menu{
 
-  static characters = [{imagem: '/image/isaac.png', game: "GREEN"},
-                {imagem: '/image/lara.png', game: "PINK"},
-                {imagem: '/image/tom.png', game: "BLUE"}]
+  constructor() {
+    this.selectedCharacter = 0
+    this.selectedDifficulty = 0
+    this.characters = ["GREEN","PINK","BLUE"]
+    this.difficulties = ["EASY","MEDIUM","HARD"]
+  }
 
-  static difficulties = [{imagem: '/image/facil.png', game: "EASY"},
-                  {imagem: '/image/medio.png', game: "MEDIUM"},
-                  {imagem: '/image/dificil.png', game: "HARD"}]
-
-  static selectedCharacter = 0
-  static selectedDifficulty = 1
-
-  static returnToMenu(){
+  returnToMenu(){
     document.getElementById("main_menu").style.display = "flex";
     document.getElementById("title").style.display = "block";
     document.getElementById("sobre").style.display = "none";
@@ -21,7 +17,7 @@ class Menu{
     document.getElementById("canvas_div").style.display = "none";
   }
 
-  static goToAbout(){
+  goToAbout(){
     document.getElementById("main_menu").style.display = "none";
     document.getElementById("title").style.display = "block";
     document.getElementById("sobre").style.display = "flex";
@@ -30,7 +26,7 @@ class Menu{
     document.getElementById("jogar").style.display = "none";
     document.getElementById("canvas_div").style.display = "none";
   }
-  static goToInstructions(){
+  goToInstructions(){
     document.getElementById("main_menu").style.display = "none";
     document.getElementById("title").style.display = "block";
     document.getElementById("sobre").style.display = "none";
@@ -39,7 +35,7 @@ class Menu{
     document.getElementById("jogar").style.display = "none";
     document.getElementById("canvas_div").style.display = "none";
   }
-  static goToCredits(){
+  goToCredits(){
     document.getElementById("main_menu").style.display = "none";
     document.getElementById("title").style.display = "block";
     document.getElementById("sobre").style.display = "none";
@@ -48,7 +44,7 @@ class Menu{
     document.getElementById("jogar").style.display = "none";
     document.getElementById("canvas_div").style.display = "none";
   }
-  static goToPlay(){
+  goToPlay(){
     document.getElementById("main_menu").style.display = "none";
     document.getElementById("title").style.display = "block";
     document.getElementById("sobre").style.display = "none";
@@ -58,29 +54,30 @@ class Menu{
     document.getElementById("canvas_div").style.display = "none";
   }
 
-  static setDifficulty(dir){
-    Menu.selectedDifficulty += dir
-      if (Menu.selectedDifficulty > 3){
-        Menu.selectedDifficulty = 0
+  setDifficulty(dir){
+    let liEls = document.getElementById('dificuldade').getElementsByTagName("li");
+    this.selectedDifficulty += dir
+      if (this.selectedDifficulty > 2){
+        this.selectedDifficulty = 0
       }
-      if (Menu.selectedDifficulty < 0){
-        Menu.selectedDifficulty = 2
+      if (this.selectedDifficulty < 0){
+        this.selectedDifficulty = 2
     }
-    document.getElementById("dificuldade").src = Menu.difficulties[Menu.selectedDifficulty].imagem;
+    liEls[this.selectedDifficulty].scrollIntoView({behavior: 'smooth'});
   }
 
-  static setCharacter(dir){
-    Menu.selectedCharacter += dir
-    if (Menu.selectedCharacter > 3){
-      Menu.selectedCharacter = 0
+  setCharacter(dir){
+    let liEls = document.getElementById('personagem').getElementsByTagName("li");
+    this.selectedCharacter += dir
+    if (this.selectedCharacter > 2){
+      this.selectedCharacter = 0
     }
-    if (Menu.selectedCharacter < 0){
-      Menu.selectedCharacter = 2
+    if (this.selectedCharacter < 0){
+      this.selectedCharacter = 2
     }
-    document.getElementById("personagem").src = Menu.characters[Menu.selectedCharacter].imagem;
-  }
-
-
+    liEls[this.selectedCharacter].scrollIntoView({behavior: 'smooth'});
+    }
 }
 
+let menu = new Menu()
 

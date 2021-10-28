@@ -1,5 +1,4 @@
 class RoadObjects {
-    sound;
 
     constructor(sprite, x, y, z, spriteSize, road){
         this.sprite = sprite
@@ -13,9 +12,10 @@ class RoadObjects {
         this.mask = {x:this.x, z:this.z, w:0.2, s: 100}
         this.segment = null
         this.dir = 1;
-        this.nextX
+        this.nextX = null
         this.tunnel = null
         this.dodgeble = false
+        this.sound = null
     }
 
     render(ctx, maxDrawLine, canvasWidth, canvasHeight) {
@@ -44,44 +44,44 @@ class RoadObjects {
     }
 
     hitByShield(audioCtx){
-        playTrack(contextSounds["shield_hit"], audioCtx, this.road.game.settings.sounds, this.road.game.settings.soundVolume)
+        HelperMethods.sound.playTrack(Sounds.contextSounds["shield_hit"], audioCtx, this.road.game.settings.sounds, this.road.game.settings.soundVolume)
         if (this.road.game.player.currentLane === 0){
             if (this instanceof Cars){
-                this.nextX = ROAD_LANES[1]
+                this.nextX = Road.ROAD_LANES[1]
             }
-            this.x = ROAD_LANES[1]
+            this.x = Road.ROAD_LANES[1]
         }
         if (this.road.game.player.currentLane === 1){
             if (Math.random() < 0.5){
                 if (this instanceof Cars){
-                    this.nextX = ROAD_LANES[0]
+                    this.nextX = Road.ROAD_LANES[0]
                 }
-                this.x = ROAD_LANES[0]
+                this.x = Road.ROAD_LANES[0]
             } else{
                 if (this instanceof Cars){
-                    this.nextX = ROAD_LANES[2]
+                    this.nextX = Road.ROAD_LANES[2]
                 }
-                this.x = ROAD_LANES[2]
+                this.x = Road.ROAD_LANES[2]
             }
         }
         if (this.road.game.player.currentLane === 2){
             if (Math.random() < 0.5){
                 if (this instanceof Cars){
-                    this.nextX = ROAD_LANES[1]
+                    this.nextX = Road.ROAD_LANES[1]
                 }
-                this.x = ROAD_LANES[1]
+                this.x = Road.ROAD_LANES[1]
             } else{
                 if (this instanceof Cars){
-                    this.nextX = ROAD_LANES[3]
+                    this.nextX = Road.ROAD_LANES[3]
                 }
-                this.x = ROAD_LANES[3]
+                this.x = Road.ROAD_LANES[3]
             }
         }
         if (this.road.game.player.currentLane === 3){
             if (this instanceof Cars){
-                this.nextX = ROAD_LANES[2]
+                this.nextX = Road.ROAD_LANES[2]
             }
-            this.x = ROAD_LANES[2]
+            this.x = Road.ROAD_LANES[2]
         }
     }
 
@@ -100,17 +100,17 @@ class RoadObjects {
                     if (this.willCollide(this.road.segments[n].inRoadObjects[obstacle],dir)){
                         console.log("Collide")
                         switch (this.x){
-                            case ROAD_LANES[0]:
-                                this.nextX =  ROAD_LANES[1]
+                            case Road.ROAD_LANES[0]:
+                                this.nextX =  Road.ROAD_LANES[1]
                                 break
-                            case ROAD_LANES[1]:
-                                this.nextX = Math.random() < 0.5 ? ROAD_LANES[0]: ROAD_LANES[2]
+                            case Road.ROAD_LANES[1]:
+                                this.nextX = Math.random() < 0.5 ? Road.ROAD_LANES[0]: Road.ROAD_LANES[2]
                                 break
-                            case ROAD_LANES[2]:
-                                this.nextX = Math.random() < 0.5 ? ROAD_LANES[1]: ROAD_LANES[3]
+                            case Road.ROAD_LANES[2]:
+                                this.nextX = Math.random() < 0.5 ? Road.ROAD_LANES[1]: Road.ROAD_LANES[3]
                                 break
-                            case ROAD_LANES[3]:
-                                this.nextX =  ROAD_LANES[2]
+                            case Road.ROAD_LANES[3]:
+                                this.nextX =  Road.ROAD_LANES[2]
                                 break
 
                         }
@@ -160,28 +160,25 @@ class RoadObjects {
 
     playSound(audioCtx, sound){
         if (this.road.findSegment(this.z).index === this.road.game.player.currentSegment.index){
-            playTrack(sound, audioCtx, this.road.game.settings.sounds, this.road.game.settings.soundVolume)
+            HelperMethods.sound.playTrack(sound, audioCtx, this.road.game.settings.sounds, this.road.game.settings.soundVolume)
     }
 
 }
-
-
-
     project3D(canvasWidth, canvasHeight){
         this.segment = this.road.findSegment(this.z)
         let camera = this.road.game.gameCamera
         // definimos as distancias em relação a camera
         let transY = this.y - camera.y
         let transZ = this.z - camera.z;
-        // escalamos com base nos triangulos iguais
+        // escalamos com base nos triângulos iguais
         let scale = camera.distToPlane/transZ;
 
         // definimos esses pontos no plano cartesiano utilizando a escala
-        let projectedW = scale * MAX_ROAD_WIDTH;
+        let projectedW = scale * Game.MAX_ROAD_WIDTH;
         let projectedY = scale * transY;
         let projectedSize = scale * this.spriteSize;
 
-        // utilizando a pontos do plano, o tamanho da tela  e o segmento atual- dfinimos os pontos do sprite
+        // utilizando a pontos do plano, o tamanho da tela  e o segmento atual- definimos os pontos do sprite
         let w = projectedW * canvasWidth/2 * this.x
         let spriteSize = projectedSize * canvasWidth
         let y = (1-projectedY) * canvasHeight/2 - spriteSize

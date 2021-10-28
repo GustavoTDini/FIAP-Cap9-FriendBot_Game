@@ -1,32 +1,30 @@
 // Classe com os atributos de cada segmento da estrada a serem renderizados
 class Animals extends RoadObjects{
 
-    guaraSpritesLeft = [guara1Left, guara2Left, guara3Left, guara4Left, guaraStopped]
-    guaraSpritesRight = [guara1Right, guara2Right, guara3Right, guara4Right, guaraStopped]
-    jaguarSpritesLeft = [jaguar1Left, jaguar2Left, jaguar3Left, jaguar4Left, jaguarStopped]
-    jaguarSpritesRight = [jaguar1Right, jaguar2Right, jaguar3Right, jaguar4Right, jaguarStopped]
-    turtleSpritesLeft = [turtle1Left, turtle2Left, turtle3Left, turtle4Left, turtleStopped]
-    turtleSpritesRight = [turtle1Right, turtle2Right, turtle3Right, turtle4Right, turtleStopped]
-    beachDogSpritesLeft = [beachDog1Left, beachDog2Left, beachDog3Left, beachDog4Left, beachDogStopped]
-    beachDogSpritesRight = [beachDog1Right, beachDog2Right, beachDog3Right, beachDog4Right, beachDogStopped]
-    suburbDogSpritesLeft = [suburbDog1Left, suburbDog2Left, suburbDog3Left, suburbDog4Left, suburbDogStopped]
-    suburbDogSpritesRight = [suburbDog1Right, suburbDog2Right, suburbDog3Right, suburbDog4Right, suburbDogStopped]
-    catSpritesLeft = [cat1Left, cat2Left, cat3Left, cat4Left, catStopped]
-    catSpritesRight = [cat1Right, cat2Right, cat3Right, cat4Right, catStopped]
-    bullSpritesLeft = [bull1Left, bull2Left, bull3Left, bull4Left, bullStopped]
-    bullSpritesRight = [bull1Right, bull2Right, bull3Right, bull4Right, bullStopped]
-    horseSpritesLeft = [horse1Left, horse2Left, horse3Left, horse4Left, horseStopped]
-    horseSpritesRight = [horse1Right, horse2Right, horse3Right, horse4Right, horseStopped]
-    cityDogSpritesLeft = [cityDog1Left, cityDog2Left, cityDog3Left, cityDog4Left, cityDogStopped]
-    cityDogSpritesRight = [cityDog1Right, cityDog2Right, cityDog3Right, cityDog4Right, cityDogStopped]
-    capivaraSpritesLeft = [capivara1Left, capivara2Left, capivara3Left, capivara4Left, capivaraStopped]
-    capivaraSpritesRight = [capivara1Right, capivara2Right, capivara3Right, capivara4Right, capivaraStopped]
+    guaraSpritesLeft = [ Images.guara1Left, Images.guara2Left, Images.guara3Left, Images.guara4Left, Images.guaraStopped]
+    guaraSpritesRight = [ Images.guara1Right, Images.guara2Right, Images.guara3Right, Images.guara4Right, Images.guaraStopped]
+    jaguarSpritesLeft = [ Images.jaguar1Left, Images.jaguar2Left, Images.jaguar3Left, Images.jaguar4Left, Images.jaguarStopped]
+    jaguarSpritesRight = [ Images.jaguar1Right, Images.jaguar2Right, Images.jaguar3Right, Images.jaguar4Right, Images.jaguarStopped]
+    turtleSpritesLeft = [ Images.turtle1Left, Images.turtle2Left, Images.turtle3Left, Images.turtle4Left, Images.turtleStopped]
+    turtleSpritesRight = [ Images.turtle1Right, Images.turtle2Right, Images.turtle3Right, Images.turtle4Right, Images.turtleStopped]
+    beachDogSpritesLeft = [ Images.beachDog1Left, Images.beachDog2Left, Images.beachDog3Left, Images.beachDog4Left, Images.beachDogStopped]
+    beachDogSpritesRight = [ Images.beachDog1Right, Images.beachDog2Right, Images.beachDog3Right, Images.beachDog4Right, Images.beachDogStopped]
+    suburbDogSpritesLeft = [ Images.suburbDog1Left, Images.suburbDog2Left, Images.suburbDog3Left, Images.suburbDog4Left, Images.suburbDogStopped]
+    suburbDogSpritesRight = [ Images.suburbDog1Right, Images.suburbDog2Right, Images.suburbDog3Right, Images.suburbDog4Right, Images.suburbDogStopped]
+    catSpritesLeft = [ Images.cat1Left, Images.cat2Left, Images.cat3Left, Images.cat4Left, Images.catStopped]
+    catSpritesRight = [ Images.cat1Right, Images.cat2Right, Images.cat3Right, Images.cat4Right, Images.catStopped]
+    bullSpritesLeft = [ Images.bull1Left, Images.bull2Left, Images.bull3Left, Images.bull4Left, Images.bullStopped]
+    bullSpritesRight = [ Images.bull1Right, Images.bull2Right, Images.bull3Right, Images.bull4Right, Images.bullStopped]
+    horseSpritesLeft = [ Images.horse1Left, Images.horse2Left, Images.horse3Left, Images.horse4Left, Images.horseStopped]
+    horseSpritesRight = [ Images.horse1Right, Images.horse2Right, Images.horse3Right, Images.horse4Right, Images.horseStopped]
+    cityDogSpritesLeft = [ Images.cityDog1Left, Images.cityDog2Left, Images.cityDog3Left, Images.cityDog4Left, Images.cityDogStopped]
+    cityDogSpritesRight = [ Images.cityDog1Right, Images.cityDog2Right, Images.cityDog3Right, Images.cityDog4Right, Images.cityDogStopped]
+    capivaraSpritesLeft = [ Images.capivara1Left, Images.capivara2Left, Images.capivara3Left, Images.capivara4Left, Images.capivaraStopped]
+    capivaraSpritesRight = [ Images.capivara1Right, Images.capivara2Right, Images.capivara3Right, Images.capivara4Right, Images.capivaraStopped]
     frame = 0;
     currentSprite = 0;
-    hit = false
     slowSpeed = 0.01
     fastSpeed = 0.03
-    sound = null
 
     constructor(sprite, x, y, z, spriteSize, road, type) {
         super(sprite, x, y, z, spriteSize, road);
@@ -35,6 +33,8 @@ class Animals extends RoadObjects{
         this.sprite = this.sprites[0]
         this.speed = this.setSpeed()
         this.dodgeble = true
+        this.hit = false
+        this.sound = null
     }
 
     walkAndReturn(){
@@ -85,7 +85,6 @@ class Animals extends RoadObjects{
             this.speed = 0
             this.sprite = this.sprites[4]
         }
-
     }
 
     setSpeed(){
@@ -107,16 +106,16 @@ class Animals extends RoadObjects{
 
     setAnimalType(){
         switch (this.road.game.currentStage) {
-            case (SUBURB):
+            case (Game.SUBURB):
                 if (this.type === 0 ){
-                    this.sound = contextSounds["suburb_dog_sound"]
+                    this.sound = Sounds.contextSounds["suburb_dog_sound"]
                     if (this.speed > 0){
                         return this.suburbDogSpritesRight
                     } else{
                         return this.suburbDogSpritesLeft
                     }
                 } else if (this.type === 1){
-                    this.sound = contextSounds["cat_sound"]
+                    this.sound = Sounds.contextSounds["cat_sound"]
                     if (this.speed > 0){
                         return this.catSpritesRight
                     } else{
@@ -124,16 +123,16 @@ class Animals extends RoadObjects{
                     }
                 }
                 break
-            case (CITY):
+            case (Game.CITY):
                 if (this.type === 0 ){
-                    this.sound = contextSounds["city_dog_sound"]
+                    this.sound = Sounds.contextSounds["city_dog_sound"]
                     if (this.speed > 0){
                         return this.cityDogSpritesRight
                     } else{
                         return this.cityDogSpritesLeft
                     }
                 } else if (this.type === 1){
-                    this.sound = contextSounds["capivara_sound"]
+                    this.sound = Sounds.contextSounds["capivara_sound"]
                     if (this.speed > 0){
                         return this.capivaraSpritesRight
                     } else{
@@ -141,16 +140,16 @@ class Animals extends RoadObjects{
                     }
                 }
                 break
-            case (BEACH):
+            case (Game.BEACH):
                 if (this.type === 0 ){
-                    this.sound = contextSounds["turtle_sound"]
+                    this.sound = Sounds.contextSounds["turtle_sound"]
                     if (this.speed > 0){
                         return this.turtleSpritesRight
                     } else{
                         return this.turtleSpritesLeft
                     }
                 } else if (this.type === 1){
-                    this.sound = contextSounds["beach_dog_sound"]
+                    this.sound = Sounds.contextSounds["beach_dog_sound"]
                     if (this.speed > 0){
                         return this.beachDogSpritesRight
                     } else{
@@ -158,16 +157,16 @@ class Animals extends RoadObjects{
                     }
                 }
                 break
-            case (FOREST):
+            case (Game.FOREST):
                 if (this.type === 0 ){
-                    this.sound = contextSounds["guara_sound"]
+                    this.sound = Sounds.contextSounds["guara_sound"]
                     if (this.speed > 0){
                         return this.guaraSpritesRight
                     } else{
                         return this.guaraSpritesLeft
                     }
                 } else if (this.type === 1){
-                    this.sound = contextSounds["jaguar_sound"]
+                    this.sound = Sounds.contextSounds["jaguar_sound"]
                     if (this.speed > 0){
                         return this.jaguarSpritesRight
                     } else{
@@ -175,16 +174,16 @@ class Animals extends RoadObjects{
                     }
                 }
                 break
-            case (FARM):
+            case (Game.FARM):
                 if (this.type === 0 ){
-                    this.sound = contextSounds["bull_sound"]
+                    this.sound = Sounds.contextSounds["bull_sound"]
                     if (this.speed > 0){
                         return this.bullSpritesRight
                     } else{
                         return this.bullSpritesLeft
                     }
                 } else if (this.type === 1){
-                    this.sound = contextSounds["horse_sound"]
+                    this.sound = Sounds.contextSounds["horse_sound"]
                     if (this.speed > 0){
                         return this.horseSpritesRight
                     } else{

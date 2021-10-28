@@ -1,12 +1,20 @@
 // classe que define a estrada a ser percorrida
 class Road {
 
+    //Road Lanes
+    static ROAD_LANES = [-0.65, -0.2, 0.2, 0.65]
+
+    static START_COLORS = {
+        LIGHT:	{road: '#d0d2d3',oppositeRoad: '#222a2c', roadTexture: Images.imageFiles.start_road_sprite_1, shoulder: '#222a2c'},
+        DARK:	{road: '#222a2c',oppositeRoad: '#d0d2d3', roadTexture: Images.imageFiles.start_road_sprite_2, shoulder: '#222a2c'},
+    }
+
     constructor(game) {
         this.game = game
         this.segments = []
         this.totalSegments = null
         this.roadLength = null;
-        this.roadWidth = MAX_ROAD_WIDTH;
+        this.roadWidth = Game.MAX_ROAD_WIDTH;
         this.roadConstructor = new RoadConstructor(this, game)
         this.totalCars = [];
         this.totalTraffic = [];
@@ -18,15 +26,16 @@ class Road {
     }
 
     findSegment(z) {
-        return this.segments[Math.floor(z/SEGMENT_LENGTH) % this.segments.length];
+        return this.segments[Math.floor(z/Game.SEGMENT_LENGTH) % this.segments.length];
     }
 
     render(ctx, canvasWidth, canvasHeight) {
         let gameCamera = this.game.gameCamera
+        let HMMath = HelperMethods.math
 
         let baseSegment = this.findSegment(gameCamera.z);
         let baseSegmentIndex = baseSegment.index;
-        let basePercent   = percentageLeft(gameCamera.z, SEGMENT_LENGTH);
+        let basePercent   = HMMath.percentageLeft(gameCamera.z, Game.SEGMENT_LENGTH);
         let x  = 0;
         let dx = - (baseSegment.curve * basePercent);
         let maxBottomLine = canvasHeight;
@@ -57,9 +66,9 @@ class Road {
                     let currSegmentCounter = currSegment.YRoadCounter
                     let lastSegmentCounter = this.segments[currIndex-1].YRoadCounter ? this.segments[currIndex-1].YRoadCounter:0
                     let dir = currSegment.curve > 0? 1:-1
-                    let curve = ROAD.CURVE.HARD*dir
-                    let lastX = lastScreenPoints.x + smoothIn(lastSegmentCounter*dir, curve, lastSegmentCounter/101)
-                    let currX = screenPoints.x + smoothIn(currSegmentCounter*dir, curve, currSegmentCounter/101)
+                    let curve = RoadConstructor.ROAD_SIZES.CURVE.HARD*dir
+                    let lastX = lastScreenPoints.x + HMMath.smoothIn(lastSegmentCounter*dir, curve, lastSegmentCounter/101)
+                    let currX = screenPoints.x + HMMath.smoothIn(currSegmentCounter*dir, curve, currSegmentCounter/101)
                     if (Math.abs(currX - screenPoints.x) <= Math.abs(lastScreenPoints.w)){
                         this.renderSegment(
                             lastScreenPoints.x, lastScreenPoints.y, lastScreenPoints.w,
@@ -261,74 +270,78 @@ class Road {
     }
 
     renderYSegment(x1, otherRoadX1, y1, w1, x2, otherRoadX2, y2, w2, color, ctx, stage, texture, dir){
+        let HMDraw = HelperMethods.draw
+        let HMMatrix = HelperMethods.matrix
         let linesWidth1 = w1/12
         let linesWidth2 = w2/12
         let lineDistance1 = w1/2.5
         let lineDistance2 = w2/2.5
-        let roadTexture = stageObjects[stage].ROAD_TEXTURES[texture]
+        let roadTexture = Game.stageObjects[stage].ROAD_TEXTURES[texture]
         if (dir < 0){
-            drawPolygon(x1 - w1, y1, otherRoadX1 + w1, y1, otherRoadX2 + w2, y2, x2 - w2, y2, color.road, ctx)
-            this.game.settings.threeD && create3dRoad(roadTexture, x1, y1, w1, x2, y2, w2, ctx);
-            this.game.settings.threeD && create3dRoad(roadTexture, otherRoadX1, y1, w1, otherRoadX2, y2, w2, ctx);
-            drawPolygon(x1-w1, y1,	x1-w1+linesWidth1, y1, x2-w2+linesWidth2, y2, x2-w2, y2, color.shoulder, ctx);
-            drawPolygon(otherRoadX1+w1+linesWidth1, y1,	otherRoadX1+w1, y1, otherRoadX2+w2, y2, otherRoadX2+w2+linesWidth2, y2, color.shoulder, ctx);
+            HMDraw.drawPolygon(x1 - w1, y1, otherRoadX1 + w1, y1, otherRoadX2 + w2, y2, x2 - w2, y2, color.road, ctx)
+            this.game.settings.threeD && HMMatrix.create3dRoad(roadTexture, x1, y1, w1, x2, y2, w2, ctx);
+            this.game.settings.threeD && HMMatrix.create3dRoad(roadTexture, otherRoadX1, y1, w1, otherRoadX2, y2, w2, ctx);
+            HMDraw.drawPolygon(x1-w1, y1,	x1-w1+linesWidth1, y1, x2-w2+linesWidth2, y2, x2-w2, y2, color.shoulder, ctx);
+            HMDraw.drawPolygon(otherRoadX1+w1+linesWidth1, y1,	otherRoadX1+w1, y1, otherRoadX2+w2, y2, otherRoadX2+w2+linesWidth2, y2, color.shoulder, ctx);
         } else {
-            drawPolygon(otherRoadX1 - w1, y1, x1 + w1, y1, x2 + w2, y2, otherRoadX2 - w2, y2, color.road, ctx)
-            this.game.settings.threeD && create3dRoad(roadTexture, x1, y1, w1, x2, y2, w2, ctx);
-            this.game.settings.threeD && create3dRoad(roadTexture, otherRoadX1, y1, w1, otherRoadX2, y2, w2, ctx);
-            drawPolygon(otherRoadX1-w1, y1,	otherRoadX1-w1+linesWidth1, y1, otherRoadX2-w2+linesWidth2, y2, otherRoadX2-w2, y2, color.shoulder, ctx);
-            drawPolygon(x1+w1+linesWidth1, y1,	x1+w1, y1, x2+w2, y2, x2+w2+linesWidth2, y2, color.shoulder, ctx);
+            HMDraw.drawPolygon(otherRoadX1 - w1, y1, x1 + w1, y1, x2 + w2, y2, otherRoadX2 - w2, y2, color.road, ctx)
+            this.game.settings.threeD && HMMatrix.create3dRoad(roadTexture, x1, y1, w1, x2, y2, w2, ctx);
+            this.game.settings.threeD && HMMatrix.create3dRoad(roadTexture, otherRoadX1, y1, w1, otherRoadX2, y2, w2, ctx);
+            HMDraw.drawPolygon(otherRoadX1-w1, y1,	otherRoadX1-w1+linesWidth1, y1, otherRoadX2-w2+linesWidth2, y2, otherRoadX2-w2, y2, color.shoulder, ctx);
+            HMDraw.drawPolygon(x1+w1+linesWidth1, y1,	x1+w1, y1, x2+w2, y2, x2+w2+linesWidth2, y2, color.shoulder, ctx);
         }
         if (color.lane){
-            drawPolygon(x1+(linesWidth1/2), y1,	x1-(linesWidth1/2), y1, x2-(linesWidth2/2), y2, x2+(linesWidth2/2), y2, color.lane, ctx);
-            drawPolygon(x1+lineDistance1, y1,	x1+lineDistance1+linesWidth1, y1, x2+lineDistance2+linesWidth2, y2, x2+lineDistance2, y2, color.lane, ctx);
-            drawPolygon(x1-lineDistance1, y1,	x1-lineDistance1-linesWidth1, y1, x2-lineDistance2-linesWidth2, y2, x2-lineDistance2, y2, color.lane, ctx);
-            drawPolygon(otherRoadX1+(linesWidth1/2), y1,	otherRoadX1-(linesWidth1/2), y1, otherRoadX2-(linesWidth2/2), y2, otherRoadX2+(linesWidth2/2), y2, color.lane, ctx);
-            drawPolygon(otherRoadX1+lineDistance1, y1,	otherRoadX1+lineDistance1+linesWidth1, y1, otherRoadX2+lineDistance2+linesWidth2, y2, otherRoadX2+lineDistance2, y2, color.lane, ctx);
-            drawPolygon(otherRoadX1-lineDistance1, y1,	otherRoadX1-lineDistance1-linesWidth1, y1, otherRoadX2-lineDistance2-linesWidth2, y2, otherRoadX2-lineDistance2, y2, color.lane, ctx);
+            HMDraw.drawPolygon(x1+(linesWidth1/2), y1,	x1-(linesWidth1/2), y1, x2-(linesWidth2/2), y2, x2+(linesWidth2/2), y2, color.lane, ctx);
+            HMDraw.drawPolygon(x1+lineDistance1, y1,	x1+lineDistance1+linesWidth1, y1, x2+lineDistance2+linesWidth2, y2, x2+lineDistance2, y2, color.lane, ctx);
+            HMDraw.drawPolygon(x1-lineDistance1, y1,	x1-lineDistance1-linesWidth1, y1, x2-lineDistance2-linesWidth2, y2, x2-lineDistance2, y2, color.lane, ctx);
+            HMDraw.drawPolygon(otherRoadX1+(linesWidth1/2), y1,	otherRoadX1-(linesWidth1/2), y1, otherRoadX2-(linesWidth2/2), y2, otherRoadX2+(linesWidth2/2), y2, color.lane, ctx);
+            HMDraw.drawPolygon(otherRoadX1+lineDistance1, y1,	otherRoadX1+lineDistance1+linesWidth1, y1, otherRoadX2+lineDistance2+linesWidth2, y2, otherRoadX2+lineDistance2, y2, color.lane, ctx);
+            HMDraw.drawPolygon(otherRoadX1-lineDistance1, y1,	otherRoadX1-lineDistance1-linesWidth1, y1, otherRoadX2-lineDistance2-linesWidth2, y2, otherRoadX2-lineDistance2, y2, color.lane, ctx);
         }
     }
 
     renderSegment(x1, y1, w1, x2, y2, w2, color, ctx, stage, texture, index){
+        let HMDraw = HelperMethods.draw
+        let HMMatrix = HelperMethods.matrix
         let linesWidth1 = w1/12
         let linesWidth2 = w2/12
         let lineDistance1 = w1/2.5
         let lineDistance2 = w2/2.5
         let squareWidth1 = w1/4
         let squareWidth2 = w2/4
-        let roadTexture = stageObjects[stage].ROAD_TEXTURES[texture]
+        let roadTexture = Game.stageObjects[stage].ROAD_TEXTURES[texture]
         if (index <= 25) {
             if (index % 2 === 0) {
-                roadTexture = START_COLORS.DARK.roadTexture
-                color = START_COLORS.DARK
+                roadTexture = Road.START_COLORS.DARK.roadTexture
+                color = Road.START_COLORS.DARK
             } else {
-                roadTexture = START_COLORS.LIGHT.roadTexture
-                color = START_COLORS.LIGHT
+                roadTexture = Road.START_COLORS.LIGHT.roadTexture
+                color = Road.START_COLORS.LIGHT
             }
         }
-        drawPolygon(x1-w1, y1,	x1+w1, y1, x2+w2, y2, x2-w2, y2, color.road, ctx);
+        HMDraw.drawPolygon(x1-w1, y1,	x1+w1, y1, x2+w2, y2, x2-w2, y2, color.road, ctx);
         if (color.oppositeRoad){
-            drawPolygon(x1-w1 + 0.5*squareWidth1, y1,	x1+w1 - 0.5*squareWidth1, y1, x2+w2 - 0.5*squareWidth2, y2, x2-w2 + 0.5*squareWidth2, y2, color.oppositeRoad, ctx);
-            drawPolygon(x1-w1 + squareWidth1, y1,	x1+w1 - squareWidth1, y1, x2+w2 - squareWidth2, y2, x2-w2 + squareWidth2, y2, color.road, ctx);
-            drawPolygon(x1-w1 + 1.5*squareWidth1, y1,	x1+w1 - 1.5*squareWidth1, y1, x2+w2 - 1.5*squareWidth2, y2, x2-w2 + 1.5*squareWidth2, y2, color.oppositeRoad, ctx);
-            drawPolygon(x1-w1 + 2*squareWidth1, y1,	x1+w1 - 2*squareWidth1, y1, x2+w2 - 2*squareWidth2, y2, x2-w2 + 2*squareWidth2, y2, color.road, ctx);
-            drawPolygon(x1-w1 + 2.5*squareWidth1, y1,	x1+w1 - 2.5*squareWidth1, y1, x2+w2 - 2.5*squareWidth2, y2, x2-w2 + 2.5*squareWidth2, y2, color.oppositeRoad, ctx);
-            drawPolygon(x1-w1 + 3*squareWidth1, y1,	x1+w1 - 3*squareWidth1, y1, x2+w2 - 3*squareWidth2, y2, x2-w2 + 3*squareWidth2, y2, color.road, ctx);
-            drawPolygon(x1-w1 + 3.5*squareWidth1, y1,	x1+w1 - 3.5*squareWidth1, y1, x2+w2 - 3.5*squareWidth2, y2, x2-w2 + 3.5*squareWidth2, y2, color.oppositeRoad, ctx);
-            drawPolygon(x1-w1 + 3.85*squareWidth1, y1,	x1+w1 - 3.85*squareWidth1, y1, x2+w2 - 3.85*squareWidth2, y2, x2-w2 + 3.85*squareWidth2, y2, color.road, ctx);
+            HMDraw.drawPolygon(x1-w1 + 0.5*squareWidth1, y1,	x1+w1 - 0.5*squareWidth1, y1, x2+w2 - 0.5*squareWidth2, y2, x2-w2 + 0.5*squareWidth2, y2, color.oppositeRoad, ctx);
+            HMDraw.drawPolygon(x1-w1 + squareWidth1, y1,	x1+w1 - squareWidth1, y1, x2+w2 - squareWidth2, y2, x2-w2 + squareWidth2, y2, color.road, ctx);
+            HMDraw.drawPolygon(x1-w1 + 1.5*squareWidth1, y1,	x1+w1 - 1.5*squareWidth1, y1, x2+w2 - 1.5*squareWidth2, y2, x2-w2 + 1.5*squareWidth2, y2, color.oppositeRoad, ctx);
+            HMDraw.drawPolygon(x1-w1 + 2*squareWidth1, y1,	x1+w1 - 2*squareWidth1, y1, x2+w2 - 2*squareWidth2, y2, x2-w2 + 2*squareWidth2, y2, color.road, ctx);
+            HMDraw.drawPolygon(x1-w1 + 2.5*squareWidth1, y1,	x1+w1 - 2.5*squareWidth1, y1, x2+w2 - 2.5*squareWidth2, y2, x2-w2 + 2.5*squareWidth2, y2, color.oppositeRoad, ctx);
+            HMDraw.drawPolygon(x1-w1 + 3*squareWidth1, y1,	x1+w1 - 3*squareWidth1, y1, x2+w2 - 3*squareWidth2, y2, x2-w2 + 3*squareWidth2, y2, color.road, ctx);
+            HMDraw.drawPolygon(x1-w1 + 3.5*squareWidth1, y1,	x1+w1 - 3.5*squareWidth1, y1, x2+w2 - 3.5*squareWidth2, y2, x2-w2 + 3.5*squareWidth2, y2, color.oppositeRoad, ctx);
+            HMDraw.drawPolygon(x1-w1 + 3.85*squareWidth1, y1,	x1+w1 - 3.85*squareWidth1, y1, x2+w2 - 3.85*squareWidth2, y2, x2-w2 + 3.85*squareWidth2, y2, color.road, ctx);
         }
-        this.game.settings.threeD && create3dRoad(roadTexture, x1, y1, w1, x2, y2, w2, ctx);
-        drawPolygon(x1-w1, y1,	x1-w1+linesWidth1, y1, x2-w2+linesWidth2, y2, x2-w2, y2, color.shoulder, ctx);
-        drawPolygon(x1+w1+linesWidth1, y1,	x1+w1, y1, x2+w2, y2, x2+w2+linesWidth2, y2, color.shoulder, ctx);
+        this.game.settings.threeD && HMMatrix.create3dRoad(roadTexture, x1, y1, w1, x2, y2, w2, ctx);
+        HMDraw.drawPolygon(x1-w1, y1,	x1-w1+linesWidth1, y1, x2-w2+linesWidth2, y2, x2-w2, y2, color.shoulder, ctx);
+        HMDraw.drawPolygon(x1+w1+linesWidth1, y1,	x1+w1, y1, x2+w2, y2, x2+w2+linesWidth2, y2, color.shoulder, ctx);
         if (color.lane && index > 10){
-            drawPolygon(x1+(linesWidth1/2), y1,	x1-(linesWidth1/2), y1, x2-(linesWidth2/2), y2, x2+(linesWidth2/2), y2, color.lane, ctx);
-            drawPolygon(x1+lineDistance1, y1,	x1+lineDistance1+linesWidth1, y1, x2+lineDistance2+linesWidth2, y2, x2+lineDistance2, y2, color.lane, ctx);
-            drawPolygon(x1-lineDistance1, y1,	x1-lineDistance1-linesWidth1, y1, x2-lineDistance2-linesWidth2, y2, x2-lineDistance2, y2, color.lane, ctx);
+            HMDraw.drawPolygon(x1+(linesWidth1/2), y1,	x1-(linesWidth1/2), y1, x2-(linesWidth2/2), y2, x2+(linesWidth2/2), y2, color.lane, ctx);
+            HMDraw.drawPolygon(x1+lineDistance1, y1,	x1+lineDistance1+linesWidth1, y1, x2+lineDistance2+linesWidth2, y2, x2+lineDistance2, y2, color.lane, ctx);
+            HMDraw.drawPolygon(x1-lineDistance1, y1,	x1-lineDistance1-linesWidth1, y1, x2-lineDistance2-linesWidth2, y2, x2-lineDistance2, y2, color.lane, ctx);
         }
     }
 
     renderGrass(ctx, stage, color, y2, y1, canvasWidth) {
-        ctx.fillStyle = ctx.createPattern(stageObjects[stage].SIDE_TEXTURES[color.grassTextures], "repeat")
+        ctx.fillStyle = ctx.createPattern(Game.stageObjects[stage].SIDE_TEXTURES[color.grassTextures], "repeat")
         ctx.fillRect(0, y2 - 1, canvasWidth, y1 - y2);
     }
 }

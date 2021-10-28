@@ -26,7 +26,7 @@ class Player {
         this.sprites = null
         this.screen = {x:0, y:0, w:0, h:0}
         this.speed = 0;
-        this.lanes = ROAD_LANES
+        this.lanes = Road.ROAD_LANES
         this.currentLane = 1
         this.score = 0;
         this.coins = 0;
@@ -41,22 +41,22 @@ class Player {
         this.ySpeed = 0;
         this.segmentCounter = 0
         this.currentSegment = null
-        this.acceleration = MAX_SPEED/20;
+        this.acceleration = Game.MAX_SPEED/20;
         this.mask = {x:this.x, y:this.y, w:this.w, s: 200}
-        this.spriteHeight = SPRITE_SIZE
+        this.spriteHeight = Images.SPRITE_SIZE
         this.start = true
         this.startCounter = this.MAX_EVENTS_COUNTER
         this.gameOver = false
         this.gameOverCounter = 0;
         this.turboEffect = null
         this.turboEffect2 = null
-        this.getReadyEffect = new Effects(GET_READY, STANDARD_CENTER_X - 337, STANDARD_CENTER_Y - 75)
-        this.gameOverEffect = new Effects(GAME_OVER, STANDARD_CENTER_X - 337, STANDARD_CENTER_Y - 75)
-        this.glitterEffect = new Effects(GLITTER, this.screen.x, this.screen.y)
-        this.explosionEffect = new Effects(EXPLOSION, this.screen.x, this.screen.y)
-        this.shieldEffect = new Effects(SHIELD_EFFECT, this.screen.x, this.screen.y)
-        this.starEffect = new Effects(STAR, this.screen.x, this.screen.y)
-        this.gotEffect = new Effects(GOT_ITEM, this.screen.x, this.screen.y)
+        this.getReadyEffect = new Effects(Effects.GET_READY, Game.STANDARD_CENTER_X - 337, Game.STANDARD_CENTER_Y - 75)
+        this.gameOverEffect = new Effects(Effects.GAME_OVER, Game.STANDARD_CENTER_X - 337, Game.STANDARD_CENTER_Y - 75)
+        this.glitterEffect = new Effects(Effects.GLITTER, this.screen.x, this.screen.y)
+        this.explosionEffect = new Effects(Effects.EXPLOSION, this.screen.x, this.screen.y)
+        this.shieldEffect = new Effects(Effects.SHIELD_EFFECT, this.screen.x, this.screen.y)
+        this.starEffect = new Effects(Effects.STAR, this.screen.x, this.screen.y)
+        this.gotEffect = new Effects(Effects.GOT_ITEM, this.screen.x, this.screen.y)
         this.turboEffectCorrector = 0
         this.changingStage = false
         this.selectCounter = 0;
@@ -65,12 +65,12 @@ class Player {
 
     init(){
         // set the player screen size
-        this.screen.w = SPRITE_SIZE;
-        this.screen.h = SPRITE_SIZE;
+        this.screen.w = Images.SPRITE_SIZE;
+        this.screen.h = Images.SPRITE_SIZE;
 
         // set the player screen position
-        this.screen.x = STANDARD_CENTER_X - SPRITE_SIZE/2
-        this.screen.y = STANDARD_HEIGHT - this.screen.h;
+        this.screen.x = Game.STANDARD_CENTER_X - Images.SPRITE_SIZE/2
+        this.screen.y = Game.STANDARD_HEIGHT - this.screen.h;
 
         // set the player Colors
         this.sprites = this.setSpritesColor(this.color)
@@ -86,19 +86,19 @@ class Player {
 
     setSpritesColor(color){
         switch (color){
-            case BLUE: {
-                this.turboEffect = new Effects(FIRE, this.screen.x, this.screen.y)
-                this.turboEffect2 = new Effects(FIRE, this.screen.x, this.screen.y)
-                return  bluePlayerSprites
+            case Game.BLUE: {
+                this.turboEffect = new Effects(Effects.FIRE, this.screen.x, this.screen.y)
+                this.turboEffect2 = new Effects(Effects.FIRE, this.screen.x, this.screen.y)
+                return  Images.bluePlayerSprites
             }
-            case PINK: {
-                this.turboEffect = new Effects(TURBO_EFFECT, this.screen.x, this.screen.y)
-                return  pinkPlayerSprites
+            case Game.PINK: {
+                this.turboEffect = new Effects(Effects.TURBO_EFFECT, this.screen.x, this.screen.y)
+                return  Images.pinkPlayerSprites
             }
-            case GREEN: {
-                this.turboEffect = new Effects(FIRE, this.screen.x, this.screen.y)
-                this.turboEffect2 = new Effects(FIRE, this.screen.x, this.screen.y)
-                return  greenPlayerSprites
+            case Game.GREEN: {
+                this.turboEffect = new Effects(Effects.FIRE, this.screen.x, this.screen.y)
+                this.turboEffect2 = new Effects(Effects.FIRE, this.screen.x, this.screen.y)
+                return  Images.greenPlayerSprites
             }
         }
     }
@@ -142,15 +142,15 @@ class Player {
     countPowerUps(){
         if (this.turbo > 0){
             this.turbo--
-            if (this.color === GREEN){
+            if (this.color === Game.GREEN){
                 this.turboEffect.setXY(this.screen.x + 20 + this.turboEffectCorrector, this.screen.y + 60)
                 this.turboEffect2.setXY(this.screen.x + 50 + this.turboEffectCorrector, this.screen.y + 60)
             }
-            if (this.color === BLUE){
+            if (this.color === Game.BLUE){
                 this.turboEffect.setXY(this.screen.x + 20 + this.turboEffectCorrector, this.screen.y + 30)
                 this.turboEffect2.setXY(this.screen.x + 50 + this.turboEffectCorrector, this.screen.y + 30)
             }
-            if (this.color === PINK){
+            if (this.color === Game.PINK){
                 this.turboEffect.setXY(this.screen.x + 32 + this.turboEffectCorrector, this.screen.y + 65)
             }
         }
@@ -178,6 +178,7 @@ class Player {
     render(ctx, canvas) {
         let road = this.game.road
         let playerSegmentCurve = road.findSegment(this.z).curve;
+        let HMDraw = HelperMethods.draw
         this.gotEffect.render(ctx, canvas)
         this.startRender(ctx, canvas)
         this.gameOverRender(ctx, canvas)
@@ -185,69 +186,69 @@ class Player {
         if (this.transparent > 0 && this.transparent %2 === 0){
             return
         }
-        let shadowScale = SPRITE_SIZE*this.screen.y/586
-        drawShadow(this.screen.x,  STANDARD_HEIGHT - this.screen.h, shadowScale, ctx, canvas)
+        let shadowScale = Images.SPRITE_SIZE*this.screen.y/586
+        HMDraw.drawShadow(this.screen.x,  Game.STANDARD_HEIGHT - this.screen.h, shadowScale, ctx, canvas)
         if (playerSegmentCurve >= 4 ){
             if (this.movingLane){
                 if (this.nextLane > this.currentLane){
-                    drawToCanvas(canvas, ctx, this.sprites.maxRight[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                    HMDraw.drawToCanvas(canvas, ctx, this.sprites.maxRight[this.currentSprite], this.screen.x, this.screen.y, Images.SPRITE_SIZE, this.spriteHeight)
                     this.turboEffectCorrector = -24
                 } else if (this.nextLane < this.currentLane){
-                    drawToCanvas(canvas, ctx, this.sprites.right[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                    HMDraw.drawToCanvas(canvas, ctx, this.sprites.right[this.currentSprite], this.screen.x, this.screen.y, Images.SPRITE_SIZE, this.spriteHeight)
                     this.turboEffectCorrector = -8
                 }
             }  else {
-                drawToCanvas(canvas, ctx, this.sprites.maxRight[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                HMDraw.drawToCanvas(canvas, ctx, this.sprites.maxRight[this.currentSprite], this.screen.x, this.screen.y, Images.SPRITE_SIZE, this.spriteHeight)
                 this.turboEffectCorrector = -24
             }
         } else if ( playerSegmentCurve  < 4 && playerSegmentCurve > 2){
             if (this.movingLane){
                 if (this.nextLane > this.currentLane){
-                    drawToCanvas(canvas, ctx, this.sprites.maxRight[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                    HMDraw.drawToCanvas(canvas, ctx, this.sprites.maxRight[this.currentSprite], this.screen.x, this.screen.y, Images.SPRITE_SIZE, this.spriteHeight)
                     this.turboEffectCorrector = -24
                 } else if (this.nextLane < this.currentLane){
-                    drawToCanvas(canvas, ctx, this.sprites.center[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                    HMDraw.drawToCanvas(canvas, ctx, this.sprites.center[this.currentSprite], this.screen.x, this.screen.y, Images.SPRITE_SIZE, this.spriteHeight)
                     this.turboEffectCorrector = 0
                 }
             }  else {
-                drawToCanvas(canvas, ctx, this.sprites.right[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                HMDraw.drawToCanvas(canvas, ctx, this.sprites.right[this.currentSprite], this.screen.x, this.screen.y, Images.SPRITE_SIZE, this.spriteHeight)
                 this.turboEffectCorrector = -8
             }
         } else if ( playerSegmentCurve  < -2 && playerSegmentCurve > -4) {
             if (this.movingLane){
                 if (this.nextLane > this.currentLane){
-                    drawToCanvas(canvas, ctx, this.sprites.center[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                    HMDraw.drawToCanvas(canvas, ctx, this.sprites.center[this.currentSprite], this.screen.x, this.screen.y, Images.SPRITE_SIZE, this.spriteHeight)
                     this.turboEffectCorrector = 0
                 } else if (this.nextLane < this.currentLane){
-                    drawToCanvas(canvas, ctx, this.sprites.maxLeft[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                    HMDraw.drawToCanvas(canvas, ctx, this.sprites.maxLeft[this.currentSprite], this.screen.x, this.screen.y, Images.SPRITE_SIZE, this.spriteHeight)
                     this.turboEffectCorrector = 8
                 }
             }  else {
-                drawToCanvas(canvas, ctx, this.sprites.left[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                HMDraw.drawToCanvas(canvas, ctx, this.sprites.left[this.currentSprite], this.screen.x, this.screen.y, Images.SPRITE_SIZE, this.spriteHeight)
                 this.turboEffectCorrector = 30
             }
         } else if  ( playerSegmentCurve  <= -4) {
             if (this.movingLane){
                 if (this.nextLane > this.currentLane){
-                    drawToCanvas(canvas, ctx, this.sprites.left[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                    HMDraw.drawToCanvas(canvas, ctx, this.sprites.left[this.currentSprite], this.screen.x, this.screen.y, Images.SPRITE_SIZE, this.spriteHeight)
                     this.turboEffectCorrector = 8
                 } else if (this.nextLane < this.currentLane){
-                    drawToCanvas(canvas, ctx, this.sprites.maxLeft[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                    HMDraw.drawToCanvas(canvas, ctx, this.sprites.maxLeft[this.currentSprite], this.screen.x, this.screen.y, Images.SPRITE_SIZE, this.spriteHeight)
                     this.turboEffectCorrector = 30
                 }
             }  else {
-                drawToCanvas(canvas, ctx, this.sprites.maxLeft[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                HMDraw.drawToCanvas(canvas, ctx, this.sprites.maxLeft[this.currentSprite], this.screen.x, this.screen.y, Images.SPRITE_SIZE, this.spriteHeight)
                 this.turboEffectCorrector = 30
             }
         } else {
             if (this.nextLane > this.currentLane){
-                drawToCanvas(canvas, ctx, this.sprites.right[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                HMDraw.drawToCanvas(canvas, ctx, this.sprites.right[this.currentSprite], this.screen.x, this.screen.y, Images.SPRITE_SIZE, this.spriteHeight)
                 this.turboEffectCorrector = -8
             } else if (this.nextLane < this.currentLane){
-                drawToCanvas(canvas, ctx, this.sprites.left[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                HMDraw.drawToCanvas(canvas, ctx, this.sprites.left[this.currentSprite], this.screen.x, this.screen.y, Images.SPRITE_SIZE, this.spriteHeight)
                 this.turboEffectCorrector = 8
             } else if (!this.movingLane){
-                drawToCanvas(canvas, ctx, this.sprites.center[this.currentSprite], this.screen.x, this.screen.y, SPRITE_SIZE, this.spriteHeight)
+                HMDraw.drawToCanvas(canvas, ctx, this.sprites.center[this.currentSprite], this.screen.x, this.screen.y, Images.SPRITE_SIZE, this.spriteHeight)
                 this.turboEffectCorrector = 0
             }
         }
@@ -274,23 +275,24 @@ class Player {
     // ---------------------------------------------------------------------------------
 
     startCountDown(audioCtx){
+        let HMSound = HelperMethods.sound
         if (this.start){
             this.startCounter--
             if (!this.getReadyEffect.play){
                 this.getReadyEffect.setPlay()
             }
             if (this.startCounter === 160){
-                playTrack(contextSounds["start_your_engines"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                HMSound.playTrack(Sounds.contextSounds["start_your_engines"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
             }
             if (this.startCounter === 70 || this.startCounter === 55 || this.startCounter === 40 ){
-                playTrack(contextSounds["light_1"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                HMSound.playTrack(Sounds.contextSounds["light_1"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
             }
             if (this.startCounter === 25){
                 this.currentSpeed = this.difficulty.START_SPEED
-                playTrack(contextSounds["light_2"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                HMSound.playTrack(Sounds.contextSounds["light_2"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
             }
             if (this.startCounter === 25 || this.startCounter === 18 || this.startCounter === 10){
-                playTrack(contextSounds["go"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                HMSound.playTrack(Sounds.contextSounds["go"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
             }
             if (this.startCounter === 0){
                 this.start = false
@@ -299,6 +301,7 @@ class Player {
     }
 
     startRender(ctx, canvas){
+        let HMDraw = HelperMethods.draw
         if (this.start){
             if (this.startCounter <= 180 && this.startCounter > 100){
                 this.getReadyEffect.render(ctx, canvas)
@@ -307,35 +310,35 @@ class Player {
                 this.getReadyEffect.setStop()
             }
             if (this.startCounter < 100 && this.startCounter >= 70){
-                drawToCanvas(canvas, ctx, lights_out, STANDARD_CENTER_X - 400, STANDARD_CENTER_Y - 150, 200, 350)
-                drawToCanvas(canvas, ctx, lights_out, STANDARD_CENTER_X - 100, STANDARD_CENTER_Y - 150, 200, 350)
-                drawToCanvas(canvas, ctx, lights_out, STANDARD_CENTER_X + 200, STANDARD_CENTER_Y - 150, 200, 350)
+                HMDraw.drawToCanvas(canvas, ctx, Images.lights_out, Game.STANDARD_CENTER_X - 400, Game.STANDARD_CENTER_Y - 150, 200, 350)
+                HMDraw.drawToCanvas(canvas, ctx, Images.lights_out, Game.STANDARD_CENTER_X - 100, Game.STANDARD_CENTER_Y - 150, 200, 350)
+                HMDraw.drawToCanvas(canvas, ctx, Images.lights_out, Game.STANDARD_CENTER_X + 200, Game.STANDARD_CENTER_Y - 150, 200, 350)
             }
             if (this.startCounter < 70 && this.startCounter >= 55){
-                drawToCanvas(canvas, ctx, lights_red, STANDARD_CENTER_X - 400, STANDARD_CENTER_Y - 150, 200, 350)
-                drawToCanvas(canvas, ctx, lights_out, STANDARD_CENTER_X - 100, STANDARD_CENTER_Y - 150, 200, 350)
-                drawToCanvas(canvas, ctx, lights_out, STANDARD_CENTER_X + 200, STANDARD_CENTER_Y - 150, 200, 350)
+                HMDraw.drawToCanvas(canvas, ctx, Images.lights_red, Game.STANDARD_CENTER_X - 400, Game.STANDARD_CENTER_Y - 150, 200, 350)
+                HMDraw.drawToCanvas(canvas, ctx, Images.lights_out, Game.STANDARD_CENTER_X - 100, Game.STANDARD_CENTER_Y - 150, 200, 350)
+                HMDraw.drawToCanvas(canvas, ctx, Images.lights_out, Game.STANDARD_CENTER_X + 200, Game.STANDARD_CENTER_Y - 150, 200, 350)
             }
             if (this.startCounter < 55 && this.startCounter >= 40){
-                drawToCanvas(canvas, ctx, lights_red, STANDARD_CENTER_X - 400, STANDARD_CENTER_Y - 150, 200, 350)
-                drawToCanvas(canvas, ctx, lights_red, STANDARD_CENTER_X - 100, STANDARD_CENTER_Y - 150, 200, 350)
-                drawToCanvas(canvas, ctx, lights_out, STANDARD_CENTER_X + 200, STANDARD_CENTER_Y - 150, 200, 350)
+                HMDraw.drawToCanvas(canvas, ctx, Images.lights_red, Game.STANDARD_CENTER_X - 400, Game.STANDARD_CENTER_Y - 150, 200, 350)
+                HMDraw.drawToCanvas(canvas, ctx, Images.lights_red, Game.STANDARD_CENTER_X - 100, Game.STANDARD_CENTER_Y - 150, 200, 350)
+                HMDraw.drawToCanvas(canvas, ctx, Images.lights_out, Game.STANDARD_CENTER_X + 200, Game.STANDARD_CENTER_Y - 150, 200, 350)
             }
             if (this.startCounter < 40 && this.startCounter >= 25){
-                drawToCanvas(canvas, ctx, lights_red, STANDARD_CENTER_X - 400, STANDARD_CENTER_Y - 150, 200, 350)
-                drawToCanvas(canvas, ctx, lights_red, STANDARD_CENTER_X - 100, STANDARD_CENTER_Y - 150, 200, 350)
-                drawToCanvas(canvas, ctx, lights_red, STANDARD_CENTER_X + 200, STANDARD_CENTER_Y - 150, 200, 350)
+                HMDraw.drawToCanvas(canvas, ctx, Images.lights_red, Game.STANDARD_CENTER_X - 400, Game.STANDARD_CENTER_Y - 150, 200, 350)
+                HMDraw.drawToCanvas(canvas, ctx, Images.lights_red, Game.STANDARD_CENTER_X - 100, Game.STANDARD_CENTER_Y - 150, 200, 350)
+                HMDraw.drawToCanvas(canvas, ctx, Images.lights_red, Game.STANDARD_CENTER_X + 200, Game.STANDARD_CENTER_Y - 150, 200, 350)
             }
             if (this.startCounter < 25 && this.startCounter > 0){
-                drawToCanvas(canvas, ctx, lights_green, STANDARD_CENTER_X - 400, STANDARD_CENTER_Y - 150, 200, 350)
-                drawToCanvas(canvas, ctx, lights_green, STANDARD_CENTER_X - 100, STANDARD_CENTER_Y - 150, 200, 350)
-                drawToCanvas(canvas, ctx, lights_green, STANDARD_CENTER_X + 200, STANDARD_CENTER_Y - 150, 200, 350)
+                HMDraw.drawToCanvas(canvas, ctx, Images.lights_green, Game.STANDARD_CENTER_X - 400, Game.STANDARD_CENTER_Y - 150, 200, 350)
+                HMDraw.drawToCanvas(canvas, ctx, Images.lights_green, Game.STANDARD_CENTER_X - 100, Game.STANDARD_CENTER_Y - 150, 200, 350)
+                HMDraw.drawToCanvas(canvas, ctx, Images.lights_green, Game.STANDARD_CENTER_X + 200, Game.STANDARD_CENTER_Y - 150, 200, 350)
             }
             if (this.startCounter < 20 && this.startCounter > 0){
                 if (this.startCounter %2 === 0){
-                    drawToCanvas(canvas, ctx, go1, STANDARD_CENTER_X - 350, STANDARD_CENTER_Y - 220, 700, 100)
+                    HMDraw.drawToCanvas(canvas, ctx, Images.go1, Game.STANDARD_CENTER_X - 350, Game.STANDARD_CENTER_Y - 220, 700, 100)
                 } else {
-                    drawToCanvas(canvas, ctx, go2, STANDARD_CENTER_X - 350, STANDARD_CENTER_Y - 220, 700, 100)
+                    HMDraw.drawToCanvas(canvas, ctx, Images.go2, Game.STANDARD_CENTER_X - 350, Game.STANDARD_CENTER_Y - 220, 700, 100)
                 }
             }
         }
@@ -353,6 +356,7 @@ class Player {
     }
 
     selectRender(ctx, canvas){
+        let HMDraw = HelperMethods.draw
         if (this.selectCounter > 0){
             if ((this.selectCounter < 180 && this.selectCounter >= 160) ||
                 (this.selectCounter < 140 && this.selectCounter >= 120) ||
@@ -361,17 +365,17 @@ class Player {
                 (this.selectCounter < 20 && this.selectCounter >= 0)){
                 if (this.changingStage){
                     if (this.game.nextStage === this.game.nextLeft){
-                        drawToCanvas(canvas, ctx, turnLeftSign, STANDARD_CENTER_X - 500, STANDARD_CENTER_Y - 200, 250, 250)
-                        drawToCanvas(canvas, ctx, stageObjects[this.game.nextLeft].GUI_SIGN, STANDARD_CENTER_X - 500, STANDARD_CENTER_Y + 100, 250, 60)
+                        HMDraw.drawToCanvas(canvas, ctx, Images.turnLeftSign, Game.STANDARD_CENTER_X - 500, Game.STANDARD_CENTER_Y - 200, 250, 250)
+                        HMDraw.drawToCanvas(canvas, ctx, Game.stageObjects[this.game.nextLeft].GUI_SIGN, Game.STANDARD_CENTER_X - 500, Game.STANDARD_CENTER_Y + 100, 250, 60)
                     } else if (this.game.nextStage === this.game.nextLeft){
-                        drawToCanvas(canvas, ctx, turnRightSign, STANDARD_CENTER_X + 250, STANDARD_CENTER_Y - 200, 250, 250)
-                        drawToCanvas(canvas, ctx, stageObjects[this.game.nextRight].GUI_SIGN, STANDARD_CENTER_X + 250, STANDARD_CENTER_Y + 100, 250, 60)
+                        HMDraw.drawToCanvas(canvas, ctx, Images.turnRightSign, Game.STANDARD_CENTER_X + 250, Game.STANDARD_CENTER_Y - 200, 250, 250)
+                        HMDraw.drawToCanvas(canvas, ctx, Game.stageObjects[this.game.nextRight].GUI_SIGN, Game.STANDARD_CENTER_X + 250, Game.STANDARD_CENTER_Y + 100, 250, 60)
                     }
                 } else {
-                    drawToCanvas(canvas, ctx, turnLeftSign, STANDARD_CENTER_X - 500, STANDARD_CENTER_Y - 200, 250, 250)
-                    drawToCanvas(canvas, ctx, stageObjects[this.game.nextLeft].GUI_SIGN, STANDARD_CENTER_X - 500, STANDARD_CENTER_Y + 100, 250, 60)
-                    drawToCanvas(canvas, ctx, turnRightSign, STANDARD_CENTER_X + 250, STANDARD_CENTER_Y - 200, 250, 250)
-                    drawToCanvas(canvas, ctx, stageObjects[this.game.nextRight].GUI_SIGN, STANDARD_CENTER_X + 250, STANDARD_CENTER_Y + 100, 250, 60)
+                    HMDraw.drawToCanvas(canvas, ctx, Images.turnLeftSign, Game.STANDARD_CENTER_X - 500, Game.STANDARD_CENTER_Y - 200, 250, 250)
+                    HMDraw.drawToCanvas(canvas, ctx, Game.stageObjects[this.game.nextLeft].GUI_SIGN, Game.STANDARD_CENTER_X - 500, Game.STANDARD_CENTER_Y + 100, 250, 60)
+                    HMDraw.drawToCanvas(canvas, ctx, Images.turnRightSign, Game.STANDARD_CENTER_X + 250, Game.STANDARD_CENTER_Y - 200, 250, 250)
+                    HMDraw.drawToCanvas(canvas, ctx, Game.stageObjects[this.game.nextRight].GUI_SIGN, Game.STANDARD_CENTER_X + 250, Game.STANDARD_CENTER_Y + 100, 250, 60)
                 }
 
             }
@@ -394,7 +398,7 @@ class Player {
         this.shield = 0
         this.game.stopMusic(this.game)
         if (z){
-            this.z = z-SEGMENT_LENGTH
+            this.z = z-Game.SEGMENT_LENGTH
         }
 
     }
@@ -404,13 +408,13 @@ class Player {
             this.gameOverCounter--
             if (this.gameOverCounter === 179){
                 this.game.currentMusic.stop()
-                playTrack(contextSounds["lose"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                HelperMethods.sound.playTrack(Sounds.contextSounds["lose"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                 this.explosionEffect.setXY(this.screen.x - 64, this.screen.y-64)
                 this.jumping = true
                 this.ySpeed = -10
             }
             if (this.gameOverCounter === 100){
-                playTrack(contextSounds["game_over"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                HelperMethods.sound.playTrack(Sounds.contextSounds["game_over"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
             }
             if (!this.gameOverEffect.play){
                 this.gameOverEffect.setPlay()
@@ -423,7 +427,7 @@ class Player {
             }
             this.starEffect.setXY(this.screen.x + 32, this.screen.y - 20)
             if (this.gameOverCounter === 0){
-                this.game.gameState = GAME_OVER_STATE
+                this.game.gameState = Game.GAME_OVER_STATE
             }
         }
     }
@@ -447,7 +451,7 @@ class Player {
 
     isColliding(object) {
         let thisZ = this.mask.z
-        if (object.z > thisZ - 500 && object.z < thisZ + this.game.gameCamera.drawDistance * SEGMENT_LENGTH){
+        if (object.z > thisZ - 500 && object.z < thisZ + this.game.gameCamera.drawDistance * Game.SEGMENT_LENGTH){
         let thisX = this.mask.x
         let objectX = object.mask.x
         let objectZ = object.mask.z
@@ -476,7 +480,7 @@ class Player {
                     this.coins++
                     this.score++
                 }
-                playTrack(contextSounds["coin"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                HelperMethods.sound.playTrack(Sounds.contextSounds["coin"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
             }
         }
     }
@@ -488,38 +492,39 @@ class Player {
                 this.gotEffect.setXY(this.screen.x, this.screen.y -64)
                 this.gotEffect.setPlay()
                 this.fuel = this.MAX_FUEL
-                playTrack(contextSounds["bubbles"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                HelperMethods.sound.playTrack(Sounds.contextSounds["bubbles"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
             }
         }
     }
 
     checkCollidingPowerUp(audioCtx){
+        let HMSound = HelperMethods.sound
         for (let n = 0; n < this.game.road.totalPowerUps.length; n++){
             if (this.isColliding(this.game.road.totalPowerUps[n]) && !this.over){
                 this.gotEffect.setXY(this.screen.x, this.screen.y -64)
                 this.gotEffect.setPlay()
                 switch (this.game.road.totalPowerUps[n].type){
-                    case (TURBO):
+                    case (PowerUps.TURBO):
                         this.turbo = this.MAX_POWER_UP_COUNTER
-                        playTrack(contextSounds["turbo"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                        HMSound.playTrack(Sounds.contextSounds["turbo"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                         this.turboEffect.setPlay()
                         if (this.turboEffect2 !== null){
                             this.turboEffect2.setPlay()
                         }
                         this.speed = this.turboSpeed
                         break;
-                    case (BOLT):
+                    case (PowerUps.BOLT):
                         this.transparent = this.MAX_POWER_UP_COUNTER
-                        playTrack(contextSounds["vanish"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                        HMSound.playTrack(Sounds.contextSounds["vanish"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                         break;
-                    case (DOUBLE):
+                    case (PowerUps.DOUBLE):
                         this.double = this.MAX_POWER_UP_COUNTER
-                        playTrack(contextSounds["bell"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                        HMSound.playTrack(Sounds.contextSounds["bell"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                         this.glitterEffect.setPlay()
                         break;
-                    case (SHIELD):
+                    case (PowerUps.SHIELD):
                         this.shield = this.MAX_POWER_UP_COUNTER
-                        playTrack(contextSounds["get_shield"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                        HMSound.playTrack(Sounds.contextSounds["get_shield"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                         this.shieldEffect.setPlay()
                         break;
                 }
@@ -529,6 +534,7 @@ class Player {
     }
 
     checkCollidingGameOver(audioCtx){
+        let HMSound = HelperMethods.sound
         for (let n = 0; n < this.game.road.totalTraffic.length; n++){
             if (this.isColliding(this.game.road.totalTraffic[n]) && this.transparent  === 0 && !this.gameOver  && !this.over){
                 if (this.shield > 0){
@@ -536,7 +542,7 @@ class Player {
                 } else{
                     this.setGameOverStatus(this.game.road.totalTraffic[n].z)
                     this.game.road.totalTraffic[n].speed = 0
-                    playTrack(contextSounds["crash"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                    HMSound.playTrack(Sounds.contextSounds["crash"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                 }
             }
         }
@@ -547,7 +553,7 @@ class Player {
                 } else{
                     this.setGameOverStatus(this.game.road.totalCars[n].z)
                     this.game.road.totalCars[n].speed = 0
-                    playTrack(contextSounds["crash"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                    HMSound.playTrack(Sounds.contextSounds["crash"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                 }
             }
         }
@@ -557,7 +563,7 @@ class Player {
                     this.game.road.totalObstacles[n].hitByShield(audioCtx)
                 } else {
                     this.setGameOverStatus(this.game.road.totalObstacles[n].z)
-                    playTrack(contextSounds["crash"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                    HMSound.playTrack(Sounds.contextSounds["crash"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                 }
             }
         }
@@ -568,8 +574,8 @@ class Player {
                     this.game.road.totalAnimals[n].hitByShield(audioCtx)
                 } else {
                     this.setGameOverStatus(this.game.road.totalAnimals[n].z)
-                    playTrack(this.game.road.totalAnimals[n].sound, audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
-                    playTrack(contextSounds["crash"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                    HMSound.playTrack(this.game.road.totalAnimals[n].sound, audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+                    HMSound.playTrack(Sounds.contextSounds["crash"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                 }
             }
         }
@@ -594,7 +600,7 @@ class Player {
             }
         }
         if (this.segmentCounter > 2000) {
-            this.currentSpeed += MAX_SPEED / 20
+            this.currentSpeed += Game.MAX_SPEED / 20
             if (this.currentSpeed > this.difficulty.MAX_SPEED) {
                 this.currentSpeed = this.difficulty.MAX_SPEED
             }
@@ -645,18 +651,18 @@ class Player {
     }
 
     SettingJumpingY(){
-        this.spriteHeight = SPRITE_SIZE - this.ySpeed*1.5
+        this.spriteHeight = Images.SPRITE_SIZE - this.ySpeed*1.5
         if (!this.start){
             if (!this.jumping){
                 this.ySpeed = 0;
                 this.y = this.currentSegment.worldPoints.y
                 if (!this.gameOver){
-                    this.screen.y = STANDARD_HEIGHT - this.screen.h + Math.floor((Math.random()*5))-10
+                    this.screen.y = Game.STANDARD_HEIGHT - this.screen.h + Math.floor((Math.random()*5))-10
                 }
             } else {
                 this.screen.y += this.ySpeed
                 this.ySpeed += this.gravity
-                if (this.screen.y > STANDARD_HEIGHT - this.screen.h){
+                if (this.screen.y > Game.STANDARD_HEIGHT - this.screen.h){
                     this.jumping = false
                 }
             }
@@ -668,9 +674,9 @@ class Player {
         let centrifugal = 30;
         let currentCurve = this.currentSegment.curve
         if (currentCurve) {
-            this.screen.x = STANDARD_CENTER_X - SPRITE_SIZE / 2 + currentCurve * centrifugal
+            this.screen.x = Game.STANDARD_CENTER_X - Images.SPRITE_SIZE / 2 + currentCurve * centrifugal
         } else {
-            this.screen.x = STANDARD_CENTER_X - SPRITE_SIZE / 2
+            this.screen.x = Game.STANDARD_CENTER_X - Images.SPRITE_SIZE / 2
         }
     }
 
@@ -699,27 +705,27 @@ class Player {
     }
 
     setPause(audioCtx) {
-        if (this.game.gameState === PLAY_STATE && !this.gameOver && !this.start) {
-            this.game.gameState = PAUSE_STATE
-        } else if (this.game.gameState === PAUSE_STATE) {
-            this.game.gameState = PLAY_STATE
+        if (this.game.gameState === Game.PLAY_STATE && !this.gameOver && !this.start) {
+            this.game.gameState = Game.PAUSE_STATE
+        } else if (this.game.gameState === Game.PAUSE_STATE) {
+            this.game.gameState = Game.PLAY_STATE
         }
-        playTrack(contextSounds["pause"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+        HelperMethods.sound.playTrack(Sounds.contextSounds["pause"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
     }
 
     setJump(audioCtx) {
-        if (!this.movingLane && !this.jumping && this.game.gameState === PLAY_STATE && !this.start) {
-            playTrack(contextSounds["jump"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+        if (!this.movingLane && !this.jumping && this.game.gameState === Game.PLAY_STATE && !this.start) {
+            HelperMethods.sound.playTrack(Sounds.contextSounds["jump"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
             this.jumping = true
             this.ySpeed = this.jumpSpeed
         }
     }
 
     moveLeftRight(audioCtx, dir) {
-        if (!this.jumping && this.game.gameState === PLAY_STATE && !this.gameOver && !this.start) {
-            this.nextLane = limitMaxMin(this.currentLane, this.currentLane + dir, 3, 0)
+        if (!this.jumping && this.game.gameState === Game.PLAY_STATE && !this.gameOver && !this.start) {
+            this.nextLane = HelperMethods.math.limitMaxMin(this.currentLane, this.currentLane + dir, 3, 0)
             audioCtx.gain = 1
-            playTrack(contextSounds["tire"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
+            HelperMethods.sound.playTrack(Sounds.contextSounds["tire"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
             if (this.nextLane !== this.currentLane) {
                 this.movingLane = true
             }

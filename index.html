@@ -2,12 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="X-UA-Compatible">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Isaac Game</title>
-    <link href="styles/style.css" rel="stylesheet" />
-    <script type="text/javascript" src="javascript/Constants.js"></script>
-    <script src="javascript/Menu.js"></script>
+    <link href="./styles/style.css" rel="stylesheet" />
+    <script src="./javascript/Menu.js"></script>
+    <script type="text/javascript" src="./javascript/modernizr-custom.js"></script>
+    <script type="text/javascript" src="./javascript/Images.js"></script>
+    <script type="text/javascript" src="./javascript/Sounds.js"></script>
+    <script type="text/javascript" src="./javascript/Game.js"></script>
     <script type="text/javascript" src="./javascript/HelperMethods.js"></script>
     <script type="text/javascript" src="./javascript/Settings.js"></script>
     <script type="text/javascript" src="./javascript/Road.js"></script>
@@ -15,32 +18,32 @@
     <script type="text/javascript" src="./javascript/Effects.js"></script>
     <script type="text/javascript" src="./javascript/Background.js"></script>
     <script type="text/javascript" src="./javascript/Segment.js"></script>
+    <script type="text/javascript" src="./javascript/CanvasText.js"></script>
     <script type="text/javascript" src="./javascript/RoadConstructor.js"></script>
-    <script type="text/javascript" src="javascript/Player.js"></script>
-    <script type="text/javascript" src="javascript/RoadObjects.js"></script>
-    <script type="text/javascript" src="javascript/Animals.js"></script>
-    <script type="text/javascript" src="javascript/Cars.js"></script>
-    <script type="text/javascript" src="javascript/Coins.js"></script>
-    <script type="text/javascript" src="javascript/Fuel.js"></script>
-    <script type="text/javascript" src="javascript/Obstacles.js"></script>
-    <script type="text/javascript" src="javascript/PowerUps.js"></script>
-    <script type="text/javascript" src="javascript/SideObjects.js"></script>
-    <script type="text/javascript" src="javascript/Traffic.js"></script>
-    <script type="text/javascript" src="javascript/UI.js"></script>
-    <script type="text/javascript" src="javascript/Game.js"></script>
-    <script type="text/javascript" src="javascript/Main.js"></script>
+    <script type="text/javascript" src="./javascript/Player.js"></script>
+    <script type="text/javascript" src="./javascript/RoadObjects.js"></script>
+    <script type="text/javascript" src="./javascript/Animals.js"></script>
+    <script type="text/javascript" src="./javascript/Cars.js"></script>
+    <script type="text/javascript" src="./javascript/Coins.js"></script>
+    <script type="text/javascript" src="./javascript/Fuel.js"></script>
+    <script type="text/javascript" src="./javascript/Obstacles.js"></script>
+    <script type="text/javascript" src="./javascript/PowerUps.js"></script>
+    <script type="text/javascript" src="./javascript/SideObjects.js"></script>
+    <script type="text/javascript" src="./javascript/Traffic.js"></script>
+    <script type="text/javascript" src="./javascript/UI.js"></script>
+    <script type="text/javascript" src="./javascript/Main.js"></script>
 </head>
 <body>
 <div id="canvas_div">
-    <img id="loading" src="image/loading.gif" alt="Imagem de Loading">
+    <img id="loading" src="./image/loading.gif" alt="Imagem de Loading">
     <canvas id="game_canvas"></canvas>
 </div>
 <h1 id="title">Isaac Runs</h1>
 <div id="main_menu" class="menu_box">
-    <button class="btn_green" onclick="Menu.goToPlay()">Jogar</button>
-    <button class="btn_red" onclick="Menu.goToAbout()">Sobre</button>
-    <button class="btn_blue" onclick="Menu.goToInstructions()">Instruções</button>
-    <button class="btn_orange" onclick="Menu.goToCredits()">Créditos</button>
+    <button class="btn_green" onclick="menu.goToPlay()">Jogar</button>
+    <button class="btn_red" onclick="menu.goToAbout()">Sobre</button>
+    <button class="btn_blue" onclick="menu.goToInstructions()">Instruções</button>
+    <button class="btn_orange" onclick="menu.goToCredits()">Créditos</button>
 </div>
 <div id="sobre" style="display: none">
     <div id="about_box" class="menu_box">
@@ -53,7 +56,7 @@
             A trajetória não será fácil, e diversos obstáculos deverão ser enfrentados até o fim da jornada. Nas pistas, os desafios vão se tornando mais complicados conforme se avança, mas o personagem pode contar com itens que o tornarão mais forte e capacitado para o próximo nível. O jogador pode sempre contar com seus amigos quando precisar dar aquele boost na velocidade, melhorar a sua proteção ou aprender algo novo que o ajude a vencer alguma etapa.
             Por fim, contamos com a energia positiva do FriendBot (Isaac) que vai reagir com expressões e movimentos à cada vitória dos nossos amigos corredores em busca do troféu da vida. E claro que o jogador, se quiser, também terá a oportunidade de controlar o robô através do tablet, andando com ele por onde quiser.
         </h3>
-        <button class="btn_red" onclick="Menu.returnToMenu()">Voltar</button>
+        <button class="btn_red" onclick="menu.returnToMenu()">Voltar</button>
     </div>
 </div>
 
@@ -108,22 +111,21 @@
             No caminho pegue as moedas para aumentar sua pontuação, e não se esqueça de manter sempre o tanque cheio, caso ele chegue a zero, é Game Over
         </h3>
         <img src="image/powerup_instructions.png" alt="imagens dos poderes">
-        <h3>
-            Duranto o jogo, poderemos pegar items que nos ajudarão:
+        <h3>Durante o jogo, poderemos pegar items que nos ajudarão:</h3>
             <ul>
                 <li>Raio: Deixará o jogador invisível por um período, não atingirá os obstáculos</li>
                 <li>Roda: Dará um turbo por um tempo, cuidado, voce irá muito rápido e poderá atingir os inimigos mais facilmente </li>
                 <li>Escudo: Eliminará os obstaculos do seu caminho, empurrando-os para os lados</li>
                 <li>Moeda: Dobrará as suas moedas coletadas</li>
             </ul>
-        </h3>
-        <button class="btn_blue" onclick="Menu.returnToMenu()">Voltar</button>
+
+        <button class="btn_blue" onclick="menu.returnToMenu()">Voltar</button>
     </div>
 </div>
 <div id="creditos" style="display: none">
     <div id="credits_box" class="menu_box">
         <h2>Créditos do jogo</h2>
-        <h3>Grupo:
+        <h3>Grupo:</h3>
             <ul>
                 <li>Fábio de Lima Bandeira</li>
                 <li>Gustavo Trevisan Dini </li>
@@ -131,7 +133,6 @@
                 <li>Lorenzo Magalhães Furuli</li>
                 <li>Rafael Antonio Ramos Alves</li>
             </ul>
-        </h3>
         <h3>
             Sons e músicas disponíveis em Orange Free Sounds!<br>
             <a href="https://orangefreesounds.com/">Orange Free Sounds</a>
@@ -149,24 +150,33 @@
             <a href="https://opengameart.org/content/announcer-voice-pack-racing-female">OpenGameArt</a>
             <a href="https://www.aimeesmithva.com/">Aimee Smith</a>
         </h3>
-        <button class="btn_orange" onclick="Menu.returnToMenu()">Voltar</button>
+        <button class="btn_orange" onclick="menu.returnToMenu()">Voltar</button>
     </div>
 </div>
 <div id="jogar" style="display: none">
     <div id="play_box" class="menu_box">
-        <h3>Selecione o Jogador e Dificuldade</h3>
+        <h2>Selecione o Jogador e Dificuldade</h2>
         <div class="selector">
-            <img class ="arrow" src="image/character_selector_left.png" onclick="Menu.setCharacter(1)">
-            <img id ="personagem" src="image/isaac.png">
-            <img class ="arrow" src="image/character_selector_right.png" onclick="Menu.setCharacter(-1)">
+            <img class ="arrow" src="image/character_selector_left.png" onclick="menu.setCharacter(-1)" alt="Character Left Arrow">
+            <ul id="personagem">
+                <li><img class="carrousel" src="image/isaac.png" alt="Isaac Character"></li>
+                <li><img class="carrousel" src="image/lara.png" alt="lara Character"></li>
+                <li><img class="carrousel" src="image/tom.png" alt="tom Character"></li>
+            </ul>
+            <img class ="arrow" src="image/character_selector_right.png" onclick="menu.setCharacter(1)" alt="Character Right Arrow">
         </div>
+
         <div class="selector">
-            <img class ="arrow" src="image/difficulty_selector_left.png" onclick="Menu.setDifficulty(-1)">
-            <img id ="dificuldade" src="image/medio.png">
-            <img class ="arrow" src="image/difficulty_selector_right.png" onclick="Menu.setDifficulty(1)">
+            <img class ="arrow" src="image/difficulty_selector_left.png" onclick="menu.setDifficulty(-1)" alt="Difficulty Left Arrow">
+            <ul id="dificuldade">
+                <li><img class="carrousel" src="image/facil.png" alt="selecionar facil"></li>
+                <li><img class="carrousel" src="image/medio.png" alt="selecionar medio"></li>
+                <li><img class="carrousel" src="image/dificil.png" alt="selecionar dificil"></li>
+            </ul>
+            <img class ="arrow" src="image/difficulty_selector_right.png" onclick="menu.setDifficulty(1)" alt="Difficulty Right Arrow">
         </div>
-        <button class="btn_green" onclick="playGame(Menu.characters[Menu.selectedCharacter].game, Menu.difficulties[Menu.selectedDifficulty].game)">Jogar</button>
-        <button class="btn_red" onclick="Menu.returnToMenu()">Voltar</button>
+        <button class="btn_green" onclick="playGame(menu.characters[menu.selectedCharacter], menu.difficulties[menu.selectedDifficulty])">Jogar</button>
+        <button class="btn_red" onclick="menu.returnToMenu()">Voltar</button>
     </div>
 </div>
 </body>
