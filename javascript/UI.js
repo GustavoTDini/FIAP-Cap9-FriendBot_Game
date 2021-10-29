@@ -327,6 +327,7 @@ class UI {
         switch (this.game.gameState){
             case (Game.PAUSE_STATE):
                 if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 250, Game.STANDARD_CENTER_Y - 80 ,100,100, canvasWidth, canvasHeight)){
+                    this.game.gameState = Game.END_STATE
                     menu.returnToMenu()
                 }
                 if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 150, Game.STANDARD_CENTER_Y-20 ,100,100, canvasWidth, canvasHeight)){

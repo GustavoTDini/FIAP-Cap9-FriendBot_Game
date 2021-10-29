@@ -22,6 +22,7 @@ class Game {
     static PAUSE_STATE = 3;
     static CONFIG_STATE = 4;
     static GAME_OVER_STATE = 5;
+    static END_STATE = 6;
 
 //Player Colors
     static GREEN = "GREEN";
@@ -350,7 +351,6 @@ class Game {
             case Game.LOADING_STATE:
                 game.settings = game.settings === null? new Settings(canvas, audioCtx): game.settings
                 game.gameCamera = new Camera(game);
-                game.YRoad = new Road(game)
                 game.road = new Road(game)
                 game.player = new Player(game, playerColor, difficulty)
                 game.background = new Background(game)
@@ -383,6 +383,16 @@ class Game {
                 break;
             case Game.GAME_OVER_STATE:
                 break;
+            case Game.END_STATE:
+                game.stopMusic(game)
+                game.settings = null
+                game.gameCamera = null
+                game.road = null
+                game.player = null
+                game.background = null
+                game.UI = null
+                game = null
+                break
         }
     }
 
