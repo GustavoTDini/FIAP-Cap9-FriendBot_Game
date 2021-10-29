@@ -60,10 +60,10 @@ class Menu{
       if (this.selectedDifficulty > 2){
         this.selectedDifficulty = 0
       }
-      if (this.selectedDifficulty < 0){
+      if (this.selectedDifficulty < 0) {
         this.selectedDifficulty = 2
-    }
-    list[this.selectedDifficulty].scrollIntoView({behavior: 'smooth'});
+      }
+      list[this.selectedDifficulty].scrollIntoView({behavior: 'smooth', block: 'nearest'});
   }
 
   setCharacter(dir){
@@ -75,7 +75,7 @@ class Menu{
     if (this.selectedCharacter < 0){
       this.selectedCharacter = 2
     }
-    list[this.selectedCharacter].scrollIntoView({behavior: 'smooth'});
+    list[this.selectedCharacter].scrollIntoView({behavior: 'smooth', block: 'nearest'});
     }
 }
 

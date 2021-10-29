@@ -217,43 +217,43 @@ class UI {
 }
 
 
-    handleMouseDown(x, y, audioCtx, fullscreen) {
+    handleMouseDown(x, y, audioCtx, canvasWidth, canvasHeight) {
         let HMMouse = HelperMethods.mouseTouch
         let HMSound = HelperMethods.sound
         switch (this.game.gameState){
             case (Game.PLAY_STATE):
                 if (this.game.settings.controls && !this.game.player.start && !this.game.player.gameOver){
-                    if (HMMouse.getMouseCanvasArea(x,y, 200, 10 ,100,100, fullscreen)){
+                    if (HMMouse.getMouseCanvasArea(x,y, 200, 10 ,100,100, canvasWidth, canvasHeight)){
                         this.game.player.setPause(audioCtx)
                     }
-                    if (HMMouse.getMouseCanvasArea(x,y, 10, Game.STANDARD_HEIGHT-130 ,120,120, fullscreen)){
+                    if (HMMouse.getMouseCanvasArea(x,y, 10, Game.STANDARD_HEIGHT-130 ,120,120, canvasWidth, canvasHeight)){
                         this.game.player.moveLeftRight(audioCtx, -1)
                     }
-                    if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_WIDTH-130, Game.STANDARD_HEIGHT-130 ,120,120, fullscreen)){
+                    if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_WIDTH-130, Game.STANDARD_HEIGHT-130 ,120,120, canvasWidth, canvasHeight)){
                         this.game.player.moveLeftRight(audioCtx, 1)
                     }
-                    if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_WIDTH - 130, Game.STANDARD_HEIGHT-260 ,120,120, fullscreen)){
+                    if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_WIDTH - 130, Game.STANDARD_HEIGHT-260 ,120,120, canvasWidth, canvasHeight)){
                         this.game.player.setJump(audioCtx)
                     }
                 }
 
                 break
             case (Game.PAUSE_STATE):
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 100, Game.STANDARD_CENTER_Y - 80 ,200,200, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 100, Game.STANDARD_CENTER_Y - 80 ,200,200, canvasWidth, canvasHeight)){
                     this.game.player.setPause(audioCtx)
                     this.game.settings.setNewResolution()
                 }
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 250, Game.STANDARD_CENTER_Y - 80 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 250, Game.STANDARD_CENTER_Y - 80 ,100,100, canvasWidth, canvasHeight)){
                     HMSound.playTrack(Sounds.contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.homeIcon = this.UIHomeIcon[1]
                 }
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 150, Game.STANDARD_CENTER_Y-20 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 150, Game.STANDARD_CENTER_Y-20 ,100,100, canvasWidth, canvasHeight)){
                     HMSound.playTrack(Sounds.contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.configIcon = this.UIConfigIcon[1]
                 }
                 break
             case (Game.CONFIG_STATE):
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 270, Game.STANDARD_CENTER_Y - 210 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 270, Game.STANDARD_CENTER_Y - 210 ,100,100, canvasWidth, canvasHeight)){
                     HMSound.playTrack(Sounds.contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     if (this.game.settings.music){
                         this.game.stopMusic(this.game)
@@ -262,49 +262,49 @@ class UI {
                     }
                     this.game.settings.music = !this.game.settings.music
                 }
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 170, Game.STANDARD_CENTER_Y - 200 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 170, Game.STANDARD_CENTER_Y - 200 ,100,100, canvasWidth, canvasHeight)){
                     HMSound.playTrack(Sounds.contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.musicMinusIcon = this.UIMinusIcon[1]
                 }
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 230, Game.STANDARD_CENTER_Y - 200 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 230, Game.STANDARD_CENTER_Y - 200 ,100,100, canvasWidth, canvasHeight)){
                     HMSound.playTrack(Sounds.contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.musicPlusIcon = this.UIPlusIcon[1]
                 }
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 290, Game.STANDARD_CENTER_Y - 80 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 290, Game.STANDARD_CENTER_Y - 80 ,100,100, canvasWidth, canvasHeight)){
                     HMSound.playTrack(Sounds.contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.game.settings.sounds = !this.game.settings.sounds
                 }
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 190, Game.STANDARD_CENTER_Y - 70 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 190, Game.STANDARD_CENTER_Y - 70 ,100,100, canvasWidth, canvasHeight)){
                     HMSound.playTrack(Sounds.contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.soundMinusIcon = this.UIMinusIcon[1]
                 }
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 210, Game.STANDARD_CENTER_Y - 70 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 210, Game.STANDARD_CENTER_Y - 70 ,100,100, canvasWidth, canvasHeight)){
                     HMSound.playTrack(Sounds.contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.soundPlusIcon = this.UIPlusIcon[1]
                 }
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 210, Game.STANDARD_CENTER_Y + 60 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 210, Game.STANDARD_CENTER_Y + 60 ,100,100, canvasWidth, canvasHeight)){
                     HMSound.playTrack(Sounds.contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.resMinusIcon = this.UIMinusIcon[1]
                 }
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 190, Game.STANDARD_CENTER_Y +60 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 190, Game.STANDARD_CENTER_Y +60 ,100,100, canvasWidth, canvasHeight)){
                     HMSound.playTrack(Sounds.contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.resPlusIcon = this.UIPlusIcon[1]
                 }
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X -260, Game.STANDARD_CENTER_Y +160 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X -260, Game.STANDARD_CENTER_Y +160 ,100,100, canvasWidth, canvasHeight)){
                     HMSound.playTrack(Sounds.contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.game.settings.controls = !this.game.settings.controls
                 }
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 140, Game.STANDARD_CENTER_Y +160 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 140, Game.STANDARD_CENTER_Y +160 ,100,100, canvasWidth, canvasHeight)){
                     HMSound.playTrack(Sounds.contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.game.settings.threeD = !this.game.settings.threeD
                 }
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 70, Game.STANDARD_CENTER_Y +180 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 70, Game.STANDARD_CENTER_Y +180 ,100,100, canvasWidth, canvasHeight)){
                     HMSound.playTrack(Sounds.contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.returnIcon = this.UIReturnIcon[1]
                 }
                 break
             case (Game.GAME_OVER_STATE):
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 100, Game.STANDARD_CENTER_Y - 55 ,200,200, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 100, Game.STANDARD_CENTER_Y - 55 ,200,200, canvasWidth, canvasHeight)){
                     HMSound.playTrack(Sounds.contextSounds["click"], audioCtx, this.game.settings.sounds, this.game.settings.soundVolume)
                     this.game.gameState = Game.LOADING_STATE
                 }
@@ -313,7 +313,7 @@ class UI {
 
     }
 
-    handleMouseUp(x, y, audioCtx, fullscreen) {
+    handleMouseUp(x, y, audioCtx, canvasWidth, canvasHeight) {
         let HMMouse = HelperMethods.mouseTouch
         this.homeIcon = this.UIHomeIcon[0]
         this.configIcon = this.UIConfigIcon[0]
@@ -326,54 +326,54 @@ class UI {
         this.resMinusIcon = this.UIMinusIcon[0]
         switch (this.game.gameState){
             case (Game.PAUSE_STATE):
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 250, Game.STANDARD_CENTER_Y - 80 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 250, Game.STANDARD_CENTER_Y - 80 ,100,100, canvasWidth, canvasHeight)){
                     menu.returnToMenu()
                 }
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 150, Game.STANDARD_CENTER_Y-20 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 150, Game.STANDARD_CENTER_Y-20 ,100,100, canvasWidth, canvasHeight)){
                     this.game.gameState = Game.CONFIG_STATE
                 }
                 break
             case (Game.CONFIG_STATE):
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 170, Game.STANDARD_CENTER_Y - 200 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 170, Game.STANDARD_CENTER_Y - 200 ,100,100, canvasWidth, canvasHeight)){
                     this.game.settings.musicVolume -= 0.2
                     if (this.game.settings.musicVolume < 0){
                         this.game.settings.musicVolume = 0
                     }
                     this.game.settings.setMusicVolume()
                 }
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 230, Game.STANDARD_CENTER_Y - 200 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 230, Game.STANDARD_CENTER_Y - 200 ,100,100, canvasWidth, canvasHeight)){
                     this.game.settings.musicVolume += 0.2
                     if (this.game.settings.musicVolume > 2){
                         this.game.settings.musicVolume = 2
                     }
                     this.game.settings.setMusicVolume()
                 }
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 190, Game.STANDARD_CENTER_Y - 70 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 190, Game.STANDARD_CENTER_Y - 70 ,100,100, canvasWidth, canvasHeight)){
                     this.game.settings.soundVolume -= 0.2
                     if (this.game.settings.soundVolume < 0){
                         this.game.settings.soundVolume = 0
                     }
                 }
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 210, Game.STANDARD_CENTER_Y - 70 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 210, Game.STANDARD_CENTER_Y - 70 ,100,100, canvasWidth, canvasHeight)){
                     this.game.settings.soundVolume += 0.2
                     if (this.game.settings.soundVolume > 2){
                         this.game.settings.soundVolume = 2
                     }
                 }
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 210, Game.STANDARD_CENTER_Y + 60 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 210, Game.STANDARD_CENTER_Y + 60 ,100,100, canvasWidth, canvasHeight)){
                     this.game.settings.resolution --;
                     if (this.game.settings.resolution < 0){
                         this.game.settings.resolution = 0
                     }
                 }
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 190, Game.STANDARD_CENTER_Y +60 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X + 190, Game.STANDARD_CENTER_Y +60 ,100,100, canvasWidth, canvasHeight)){
                     this.game.settings.resolution ++;
                     if (this.game.settings.resolution > 3){
                         this.game.settings.resolution = 3
                     }
                 }
 
-                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 70, Game.STANDARD_CENTER_Y +180 ,100,100, fullscreen)){
+                if (HMMouse.getMouseCanvasArea(x,y, Game.STANDARD_CENTER_X - 70, Game.STANDARD_CENTER_Y +180 ,100,100, canvasWidth, canvasHeight)){
                     this.game.gameState = Game.PAUSE_STATE
                 }
                 break

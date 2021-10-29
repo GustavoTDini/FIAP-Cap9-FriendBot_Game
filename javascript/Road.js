@@ -190,7 +190,6 @@ class Road {
         for (let i = 0; i < this.totalObstacles.length; i++) {
             let obstaclesSegment = this.findSegment(this.totalObstacles[i].z)
             obstaclesSegment.inRoadObjects.push(this.totalObstacles[i])
-            console.log(obstaclesSegment)
             this.totalObstacles[i].update(dt)
         }
         for (let i = 0; i < this.totalAnimals.length; i++) {

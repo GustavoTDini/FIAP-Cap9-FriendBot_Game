@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Racing+Sans+One&display=swap');
 
 html {
-    min-width: 760px;
-    max-width: 1400px;
+    min-width: 480px;
+    max-width: 1600px;
 }
 
 body {
@@ -221,16 +221,16 @@ h2{
 }
 
 #canvas_div {
-    width: 1280px;
-    height: 100%;
+    width: 95vw;
+    height: 95vh;
     display: none;
     margin: auto;
     flex-direction: column;
 }
 
 #game_canvas {
-    height: 720px;
-    width: 1280px;
+    height: 90vh;
+    width: 90vw;
     background-color: black;
     margin: auto;
 }

@@ -319,28 +319,20 @@ class HelperMethods {
 
     static mouseTouch = {
         // função para escalar o ponto de toque em relação a tela cheia ou não, pela altura
-        scaleXPoint: function(currentValue) {
-            let width = window.innerWidth
-                || document.documentElement.clientWidth
-                || document.body.clientWidth;
+        scaleXPoint: function(currentValue, width) {
             return width * currentValue / Game.STANDARD_WIDTH
         },
         // função para escalar o ponto de toque em relação a tela cheia ou não, pela largura
-        scaleYPoint: function(currentValue) {
-            let height = window.innerHeight
-                || document.documentElement.clientHeight
-                || document.body.clientHeight;
+        scaleYPoint: function(currentValue, height) {
             return height * currentValue / Game.STANDARD_HEIGHT
         },
         // função para definir o ponto de toque a ser considerado para um toque oou clique no canvas
-        getMouseCanvasArea: function(mouseX, mouseY, x, y, width, height, fullScreen) {
-            if (fullScreen) {
-                x = HelperMethods.mouseTouch.scaleXPoint(x)
-                y = HelperMethods.mouseTouch.scaleYPoint(y)
-                width = HelperMethods.mouseTouch.scaleXPoint(width)
-                height = HelperMethods.mouseTouch.scaleYPoint(height)
-            }
-
+        getMouseCanvasArea: function(mouseX, mouseY, x, y, width, height, canvasWidth, canvasHeight) {
+                x = HelperMethods.mouseTouch.scaleXPoint(x, canvasWidth)
+                y = HelperMethods.mouseTouch.scaleYPoint(y, canvasHeight)
+                width = HelperMethods.mouseTouch.scaleXPoint(width, canvasWidth)
+                height = HelperMethods.mouseTouch.scaleYPoint(height, canvasHeight)
+            console.log(x, y)
             return ((mouseX > x) && (mouseX < x + width) && (mouseY > y) && (mouseY < y + height));
         },
         // função para detectar um deslizar na tela e retornar a direção
@@ -411,17 +403,22 @@ class HelperMethods {
             } else {
                 if (element.exitFullscreen) {
                     element.exitFullscreen().then(r => console.log(r));
+                } else if (element.mozExitFullScreen) {
+                    element.mozExitFullScreen();
+                } else if (element.webkitExitFullScreen) {
+                    element.webkitExitFullScreen(Element);
+                } else if (element.msExitFullscreen) {
+                    element.msRequestFullscreen();
                 }
             }
         },
         // função para verificar se está em tela cheia
         isGameInFullscreen: function(elementNodeName) {
-            return document.fullscreenElement && document.fullscreenElement.nodeName === elementNodeName;
+            if (document.fullscreenElement && document.fullscreenElement.nodeName === elementNodeName){
+                return true
+            } else{
+                return false
+            }
         }
     }
-
-
-
-
-
 }
