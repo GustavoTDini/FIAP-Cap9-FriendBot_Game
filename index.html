@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Isaac Game</title>
     <link href="./styles/style.css" rel="stylesheet" />
-    <script src="./javascript/Menu.js"></script>
-    <script type="text/javascript" src="./javascript/modernizr-custom.js"></script>
+    <script type="text/javascript" src="./javascript/Menu.js"></script>
     <script type="text/javascript" src="./javascript/Images.js"></script>
     <script type="text/javascript" src="./javascript/Sounds.js"></script>
     <script type="text/javascript" src="./javascript/Game.js"></script>
@@ -38,7 +37,7 @@
     <img id="loading" src="./image/loading.gif" alt="Imagem de Loading">
     <canvas id="game_canvas"></canvas>
 </div>
-<h1 id="title">Isaac Runs</h1>
+<h1 id="title">Isaac<br>Run</h1>
 <div id="main_menu" class="menu_box">
     <button class="btn_green" onclick="menu.goToPlay()">Jogar</button>
     <button class="btn_red" onclick="menu.goToAbout()">Sobre</button>
@@ -48,13 +47,14 @@
 <div id="sobre" style="display: none">
     <div id="about_box" class="menu_box">
         <h2>Sobre</h2>
-        <h3>Game 3D que foi desenvolvido usando HTML, CSS e JavaScript pelo grupo Turing com o objetivo avançar na etapa de conclusão do curso de sistemas de Informação.
-            O game foi projetado para rodar em dispositivos mobile, será controlado através do touch e terá interatividade com o FriendBot</h3>
-        <h3>O nosso jogo se caracteriza como um jogo de corrida infinita, sendo assim o objetivo é correr o maximo que puder alcançando cada vez mais pontos que representam a distancia percorrida e moedas para trocas em uma futura atualização</h3>
+        <h3>Game 3D que foi desenvolvido usando HTML, CSS e JavaScript pelo grupo Turing com o objetivo avançar na etapa de conclusão do curso de sistemas de Informação.<br>
+            O game foi projetado para rodar em dispositivos mobile, será controlado através do touch e terá interatividade com o FriendBot
+        </h3>
+        <h3>O nosso jogo se caracteriza como um jogo de corrida infinita, sendo assim o objetivo é correr o máximo que puder alcançando cada vez mais pontos que representam a distância percorrida e moedas para trocas em uma futura atualização.</h3>
         <h3>
-            A aventura começa quando Isaac, um simpático carrinho azul de corrida que vivia em uma comunidade pobre no Brasil, resolve desbravar o mundo em busca do maior de todos os prêmios: “O Troféu da vida!” Nosso amigo vai precisar passar por diversas pistas de corrida em montanhas, florestas e cavernas. Nesse desafio, ele vai contar com a ajuda de dois amigos fiéis, Tom o esperto carrinho verde e Lara, sua melhor amiga que adorava mostrar a sua pintura cor de rosa para os amigos.
-            A trajetória não será fácil, e diversos obstáculos deverão ser enfrentados até o fim da jornada. Nas pistas, os desafios vão se tornando mais complicados conforme se avança, mas o personagem pode contar com itens que o tornarão mais forte e capacitado para o próximo nível. O jogador pode sempre contar com seus amigos quando precisar dar aquele boost na velocidade, melhorar a sua proteção ou aprender algo novo que o ajude a vencer alguma etapa.
-            Por fim, contamos com a energia positiva do FriendBot (Isaac) que vai reagir com expressões e movimentos à cada vitória dos nossos amigos corredores em busca do troféu da vida. E claro que o jogador, se quiser, também terá a oportunidade de controlar o robô através do tablet, andando com ele por onde quiser.
+            A aventura começa quando Isaac, um simpático carrinho verde de corrida que vivia em uma comunidade pobre no Brasil, resolve desbravar o mundo em busca do maior de todos os prêmios: “O Troféu da vida!” Nosso amigo vai precisar passar por diversas estradas em praias, florestas e cidades. Nesse desafio, ele vai contar com a ajuda de dois amigos fiéis, Tom o esperto carrinho azul e Lara, sua melhor amiga que adorava mostrar a sua pintura cor de rosa para os amigos.<br>
+            A trajetória não será fácil, e diversos obstáculos deverão ser enfrentados até o fim da jornada. Nas pistas, os desafios vão se tornando mais complicados conforme se avança, mas o personagem pode contar com itens que o tornarão mais forte e capacitado para o próximo nível. O jogador pode sempre contar com seus amigos quando precisar dar aquele boost na velocidade, melhorar a sua proteção ou aprender algo novo que o ajude a vencer alguma etapa.<br>
+            Por fim, contamos com a energia positiva do FriendBot (Isaac) que vai reagir com expressões e movimentos à cada vitória dos nossos amigos corredores em busca do troféu da vida. É claro que o jogador, se quiser, também terá a oportunidade de controlar o robô através do tablet, andando com ele por onde quiser.
         </h3>
         <button class="btn_red" onclick="menu.returnToMenu()">Voltar</button>
     </div>
@@ -64,7 +64,7 @@
     <div id="instruction_box" class="menu_box">
         <h2>Instruções do jogo</h2>
         <h3>
-            Para o controle do nosso personagem, poderemos utilizar o teclado, superficie Touch e os botoes da tela, tanto com o mouse como com touch
+            Para o controle do nosso personagem, poderemos utilizar o teclado, superfície Touch e os botões da tela, tanto com o mouse como com touch.
         </h3>
         <img src="image/move_instructions.png" alt="imagens dos controles laterais">
         <h3>
@@ -80,7 +80,7 @@
         </h3>
         <img src="image/screen_instructions.png" alt="imagens da tela do jogo">
         <h3>
-            Durante o jogo, o jogador precisará desviar dos obstaculos, na tela de jogo, ele contará com os controles, alem de verificar a gasolina, os pontos e moedas atuais, e contará com um mapa para verificar os perigos a frente.
+            Durante o jogo, o jogador precisará desviar dos obstáculos, na tela de jogo, ele contará além dos controles, um marcador para verificar a gasolina, os pontos e moedas atuais, e contará com um mapa para verificar os perigos a frente.
         </h3>
         <img src="image/pause_menu_instructions.png" alt="imagens do menu de pausa">
         <h3>
@@ -88,44 +88,44 @@
         </h3>
         <img src="image/config_instructions.png" alt="imagens do menu de configurações">
         <h3>
-            Nas configurações, temos os controles de volume e mute de som e música, o controle de resolução e textura da pista, caso o jogo esteja lento, aqui poderemos melhorar a velocidade diminuindo a resolução, ou retirando a textura, por fim, podemos tirar os controles de tela, para quem gosta de uma tela mais limpa!
+            Nas configurações, temos os controles de volume e mute de som e música, o controle de resolução e textura da pista, para melhorar a performance do jogo, caso o jogo esteja lento, podemos diminuir a resolução ou desligar a textura da pista, por fim, podemos tirar os controles de tela, para quem gosta de uma tela mais limpa!
         </h3>
         <img src="image/racers_instructions.png" alt="imagens dos corredores">
         <h3>
-            Durante sua corrida, você encontrará outros corredores, porem eles não tem motores tão bons quanto o seu, mas cuidado, apesar de serem mais lentos, eles poderão trocar de faixa sem aviso prévio.
+            Durante sua corrida, você encontrará outros corredores, porém eles não têm motores tão bons quanto o seu então serão mais lentos, mas cuidado, eles não são bons pilotos e trocam de faixa a qualquer momento
         </h3>
         <img src="image/traffic_instructions.png" alt="imagens dos carros">
         <h3>
-            Também haverá outros carros passeando na rua, eles estarão sempre vindo na sua direção, e não mudarão de faixa a menos que veja um obstáculo.
+            Também haverá outros carros passeando na rua, eles estarão sempre vindos na sua direção, e não mudarão de faixa a menos que encontrem um obstáculo, infelizmente eles não consideram você um obstáculo, irão apenas buzinar para sair da frente.
         </h3>
         <img src="image/animals_instructions.png" alt="imagens dos animais">
         <h3>
-            Cuidado com os animais que estarão passeando na estrada, eles se movimentarão de um lado ao outro.
+            Cuidado com os animais que estão passeando pela estrada, eles andam de um lado ao outro desta, ainda bem que os freios do Issac e amigos são bons e eles freiam a tempo antes de atingi-los
         </h3>
         <img src="image/obstacle_instructions.png" alt="imagens dos obstáculos">
         <h3>
-            Na estrada teremos obstáculos no caminho, eles não se movem, porem você não poderá pula-los, pois eles são muito altos.
+            Na estrada teremos obstáculos no caminho, eles não se movem, porém você não poderá pula-los, pois eles são muito altos.
         </h3>
         <img src="image/items_instructions.gif" alt="imagens dos itens">
         <h3>
             No caminho pegue as moedas para aumentar sua pontuação, e não se esqueça de manter sempre o tanque cheio, caso ele chegue a zero, é Game Over
         </h3>
         <img src="image/powerup_instructions.png" alt="imagens dos poderes">
-        <h3>Durante o jogo, poderemos pegar items que nos ajudarão:</h3>
+        <h3>Durante o jogo, poderemos pegar itens que nos ajudarão:
             <ul>
                 <li>Raio: Deixará o jogador invisível por um período, não atingirá os obstáculos</li>
-                <li>Roda: Dará um turbo por um tempo, cuidado, voce irá muito rápido e poderá atingir os inimigos mais facilmente </li>
-                <li>Escudo: Eliminará os obstaculos do seu caminho, empurrando-os para os lados</li>
+                <li>Roda: Dará um turbo por um tempo, cuidado, você irá muito rápido e poderá atingir os inimigos mais facilmente</li>
+                <li>Escudo: Eliminará os obstáculos do seu caminho, empurrando-os para os lados</li>
                 <li>Moeda: Dobrará as suas moedas coletadas</li>
             </ul>
-
+        </h3>
         <button class="btn_blue" onclick="menu.returnToMenu()">Voltar</button>
     </div>
 </div>
 <div id="creditos" style="display: none">
     <div id="credits_box" class="menu_box">
         <h2>Créditos do jogo</h2>
-        <h3>Grupo:</h3>
+        <h3>Grupo:
             <ul>
                 <li>Fábio de Lima Bandeira</li>
                 <li>Gustavo Trevisan Dini </li>
@@ -133,14 +133,20 @@
                 <li>Lorenzo Magalhães Furuli</li>
                 <li>Rafael Antonio Ramos Alves</li>
             </ul>
+        </h3>
         <h3>
             Sons e músicas disponíveis em Orange Free Sounds!<br>
             <a href="https://orangefreesounds.com/">Orange Free Sounds</a>
         </h3>
         <h3>
-            Gráficos do Jogo Obtidos em Craftpix.net<br>
+            Principais gráficos do jogo obtidos em Craftpix.net<br>
             <a href="https://craftpix.net/">Craftpix</a>
         </h3>
+        <h3>
+            Gráficos complementares obtidos em OpenGameArt.org<br>
+            <a href="https://opengameart.org">OpenGameArts.org</a>
+        </h3>
+
         <h3>
             Imagens de Animais obtidos em DevianArt - Agradecimentos a Daieny<br>
             <a href="https://www.deviantart.com/daieny">DevianArt - Daieny Schuttz</a>
@@ -150,6 +156,11 @@
             <a href="https://opengameart.org/content/announcer-voice-pack-racing-female">OpenGameArt</a>
             <a href="https://www.aimeesmithva.com/">Aimee Smith</a>
         </h3>
+        <h3>
+            Imagens de Pixel Art de Carro obtidas em PixelCarArt<br>
+            <a href="http://www.pixelcarart.com/index.php">www.pixelcarart.com</a>
+        </h3>
+
         <button class="btn_orange" onclick="menu.returnToMenu()">Voltar</button>
     </div>
 </div>

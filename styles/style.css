@@ -34,17 +34,32 @@ button:active{
 }
 
 h1{
+    margin: 0;
     font-family: 'Racing Sans One', cursive;
+    color: #07f7ff;
+    text-shadow:
+    0 0 0 rgb(-2,238,246),
+    0 1px 0 rgb(-11,229,237),
+    0 2px 0 rgb(-21,219,227),
+    0 3px 0 rgb(-30,210,218),
+    0 4px 0 rgb(-39,201,209),
+    0 5px 0 rgb(-48,192,200),
+    0 6px 0 rgb(-57,183,191),
+    0 7px 0 rgb(-67,173,181),
+    0 8px 0 rgb(-76,164,172),
+    0 9px 0 rgb(-85,155,163),
+    0 10px  0 rgb(-94,146,154),
+    0 11px 10px rgba(0,0,0,0.86),
+    0 11px 1px rgba(0,0,0,0.5),
+    0 0 10px rgba(0,0,0,.2),
+    -17px 0 9px rgb(192, 255, 56) ;
     font-weight: bold;
     font-style: italic;
     text-transform: uppercase;
     text-align: center;
-    font-size: 90px;
+    font-size: 115px;
     letter-spacing: 3px;
     word-spacing: 2px;
-    color: rgb(0, 60, 255);
-    background-color: rgba(0, 0, 0, 0);
-    text-shadow: rgb(192, 255, 56) -17px 0 9px;
 }
 
 h2{

@@ -1,3 +1,4 @@
+// Classe com os efeitos que podem aparecer na tela, como explosões e textos
 class Effects{
 
     static STAR = 20

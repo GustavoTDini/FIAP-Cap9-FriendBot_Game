@@ -55,7 +55,7 @@ class Menu{
   }
 
   setDifficulty(dir){
-    let liEls = document.getElementById('dificuldade').getElementsByTagName("li");
+    let list = document.getElementById('dificuldade').getElementsByTagName("li");
     this.selectedDifficulty += dir
       if (this.selectedDifficulty > 2){
         this.selectedDifficulty = 0
@@ -63,11 +63,11 @@ class Menu{
       if (this.selectedDifficulty < 0){
         this.selectedDifficulty = 2
     }
-    liEls[this.selectedDifficulty].scrollIntoView({behavior: 'smooth'});
+    list[this.selectedDifficulty].scrollIntoView({behavior: 'smooth'});
   }
 
   setCharacter(dir){
-    let liEls = document.getElementById('personagem').getElementsByTagName("li");
+    let list = document.getElementById('personagem').getElementsByTagName("li");
     this.selectedCharacter += dir
     if (this.selectedCharacter > 2){
       this.selectedCharacter = 0
@@ -75,7 +75,7 @@ class Menu{
     if (this.selectedCharacter < 0){
       this.selectedCharacter = 2
     }
-    liEls[this.selectedCharacter].scrollIntoView({behavior: 'smooth'});
+    list[this.selectedCharacter].scrollIntoView({behavior: 'smooth'});
     }
 }
 

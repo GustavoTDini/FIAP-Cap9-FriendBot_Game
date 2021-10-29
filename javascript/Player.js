@@ -32,14 +32,13 @@ class Player {
         this.coins = 0;
         this.jumping = false;
         this.over = false;
-        this.turboSpeed =difficulty.MAX_SPEED*1.3
+        this.turboSpeed=(difficulty.START_SPEED + 5*difficulty.INCREMENT_SPEED) *1.3
         this.currentSpeed = this.speed
         this.transparent = 0;
         this.turbo = 0;
         this.double = 0;
         this.shield = 0;
         this.ySpeed = 0;
-        this.segmentCounter = 0
         this.currentSegment = null
         this.acceleration = Game.MAX_SPEED/20;
         this.mask = {x:this.x, y:this.y, w:this.w, s: 200}
@@ -60,7 +59,6 @@ class Player {
         this.turboEffectCorrector = 0
         this.changingStage = false
         this.selectCounter = 0;
-        this.stageCounter = 0
     }
 
     init(){
@@ -109,7 +107,8 @@ class Player {
 
     update(dt, audioCtx) {
         this.setMask(dt)
-        this.speedAndFuelControl(dt);
+        this.speedControl(dt);
+        this.fuelControl(dt)
         this.segmentCount();
         this.updateEffects()
         this.setPlayerXScreen()
@@ -176,8 +175,7 @@ class Player {
     }
 
     render(ctx, canvas) {
-        let road = this.game.road
-        let playerSegmentCurve = road.findSegment(this.z).curve;
+        let playerSegmentCurve = this.currentSegment.curve;
         let HMDraw = HelperMethods.draw
         this.gotEffect.render(ctx, canvas)
         this.startRender(ctx, canvas)
@@ -367,7 +365,7 @@ class Player {
                     if (this.game.nextStage === this.game.nextLeft){
                         HMDraw.drawToCanvas(canvas, ctx, Images.turnLeftSign, Game.STANDARD_CENTER_X - 500, Game.STANDARD_CENTER_Y - 200, 250, 250)
                         HMDraw.drawToCanvas(canvas, ctx, Game.stageObjects[this.game.nextLeft].GUI_SIGN, Game.STANDARD_CENTER_X - 500, Game.STANDARD_CENTER_Y + 100, 250, 60)
-                    } else if (this.game.nextStage === this.game.nextLeft){
+                    } else if (this.game.nextStage === this.game.nextRight){
                         HMDraw.drawToCanvas(canvas, ctx, Images.turnRightSign, Game.STANDARD_CENTER_X + 250, Game.STANDARD_CENTER_Y - 200, 250, 250)
                         HMDraw.drawToCanvas(canvas, ctx, Game.stageObjects[this.game.nextRight].GUI_SIGN, Game.STANDARD_CENTER_X + 250, Game.STANDARD_CENTER_Y + 100, 250, 60)
                     }
@@ -591,7 +589,6 @@ class Player {
         let currSegmentIndex = this.currentSegment.index
         if (thisSegmentIndex !== currSegmentIndex) {
             let delta = thisSegmentIndex - currSegmentIndex
-            this.segmentCounter += delta
             this.currentSegment = this.game.road.findSegment(this.z)
             this.currentSprite++;
             this.score += 0.1*delta
@@ -599,16 +596,9 @@ class Player {
                 this.currentSprite = 0;
             }
         }
-        if (this.segmentCounter > 2000) {
-            this.currentSpeed += Game.MAX_SPEED / 20
-            if (this.currentSpeed > this.difficulty.MAX_SPEED) {
-                this.currentSpeed = this.difficulty.MAX_SPEED
-            }
-            this.segmentCounter = 0;
-        }
     }
 
-    speedAndFuelControl(dt) {
+    speedControl(dt) {
         if (this.turbo === 0){
             if (this.speed < this.currentSpeed){
                 this.speed += this.acceleration
@@ -616,13 +606,17 @@ class Player {
                 this.speed -= this.acceleration
             }
         }
+        this.z += this.speed * dt
+    }
+
+
+    fuelControl(dt) {
         if (this.speed > 0 && this.turbo === 0 && !this.changingStage) {
             this.fuel -= dt * this.speed / (1000 * this.difficulty.GAS_CORRECTION)
         }
         if (this.fuel < 0 && !this.gameOver) {
             this.setGameOverStatus()
         }
-        this.z += this.speed * dt
     }
 
     setLanes(){

@@ -14,7 +14,7 @@ class RoadObjects {
         this.dir = 1;
         this.nextX = null
         this.tunnel = null
-        this.dodgeble = false
+        this.dodgeble = null
         this.sound = null
     }
 
@@ -86,19 +86,24 @@ class RoadObjects {
     }
 
     setMask(dt){
-        this.mask = {x:this.x, z:this.z, w:0.2, s: this.speed === 0? 100: this.speed*dt*100}
+        if (this.speed > 0 ){
+            this.mask = {x:this.x, z:this.z, w:0.2, s: this.speed*dt*100}
+        } else if (this.speed <0){
+            let thisZ = this.z + this.speed*dt*100
+            this.mask = {x:this.x, z:thisZ, w:0.2, s: Math.abs(this.speed*dt*100)}
+        } else if (this.speed === 0){
+            this.mask = {x:this.x, z:this.z, w:0.2, s: 100}
+        }
     }
 
-    // TODO - Fix dodge AI
-    dodgeOtherObjects(dir){
+    dodgeOtherObjects(){
         let thisSegment = this.segment.index
         let playerSegment = this.road.game.player.currentSegment.index
         let maxSegment = playerSegment + this.road.game.gameCamera.drawDistance
         if (thisSegment > playerSegment - 50 && thisSegment < maxSegment && thisSegment < this.road.totalSegments){
             for (let n = Math.max(playerSegment-50, 0); n < maxSegment; n ++){
                 for (let obstacle in this.road.segments[n].inRoadObjects){
-                    if (this.willCollide(this.road.segments[n].inRoadObjects[obstacle],dir)){
-                        console.log("Collide")
+                    if (this.willCollide(this.road.segments[n].inRoadObjects[obstacle])){
                         switch (this.x){
                             case Road.ROAD_LANES[0]:
                                 this.nextX =  Road.ROAD_LANES[1]
@@ -139,16 +144,24 @@ class RoadObjects {
 
 
     //função para definir uma colisão entre 2 objetos
-    willCollide(object, dir) {
+    willCollide(object) {
         if (object !== this && object.dodgeble){
-            let thisZ = dir === 1? this.mask.z : this.mask.z + this.mask.s*10
+            let thisZ, thisSize, objectSize, objectZ = 0
             let thisX = this.mask.x
             let thisWidth = this.mask.w
-            let thisSize = this.mask.s*10
-            let objectZ = object.mask.z
             let objectX = object.mask.x
             let objectWidth = object.mask.w
-            let objectSize = object.mask.s*10*dir
+            if (this.speed > 0){
+                thisZ = this.mask.z
+                thisSize = Math.abs(this.mask.s*20)
+                objectSize = Math.abs(this.mask.s*20)
+                objectZ = object.mask.z + Math.abs(this.mask.s*20)
+            } else if (this.speed <0){
+                thisZ = this.mask.z - Math.abs(this.mask.s*20)
+                thisSize = Math.abs(this.mask.s*20)
+                objectSize = Math.abs(object.mask.s*20)
+                objectZ = object.mask.z
+            }
             return ((thisX < objectX + objectWidth) &&
                 (thisX + thisWidth > objectX) &&
                 (thisZ < objectZ + objectSize) &&
@@ -160,7 +173,9 @@ class RoadObjects {
 
     playSound(audioCtx, sound){
         if (this.road.findSegment(this.z).index === this.road.game.player.currentSegment.index){
-            HelperMethods.sound.playTrack(sound, audioCtx, this.road.game.settings.sounds, this.road.game.settings.soundVolume)
+            if (Math.random() > 0.3){
+                HelperMethods.sound.playTrack(sound, audioCtx, this.road.game.settings.sounds, this.road.game.settings.soundVolume)
+            }
     }
 
 }

@@ -7,8 +7,6 @@ class Obstacles extends RoadObjects{
     }
 
     update(dt) {
-        this.segment = this.road.findSegment(this.z)
-        this.setMask()
         super.update(dt);
     }
 }

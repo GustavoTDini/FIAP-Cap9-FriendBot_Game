@@ -1,3 +1,4 @@
+// Classe com os métodos auxiliares para realizar diversas funções, como matemática e renderização
 class HelperMethods {
 
 // ---------------------------------------------------------------------------------
@@ -5,7 +6,7 @@ class HelperMethods {
 // ---------------------------------------------------------------------------------
     static math = {
         // função para calcular a porcentagem restante
-        percentageLeft: function(n, total) {
+        percentageLeft: function (n, total) {
             return (n % total) / total;
         },
         // função para tranformar um numero em Int
@@ -17,25 +18,25 @@ class HelperMethods {
             return HelperMethods.math.toInt(def, 0);
         },
         // função para fazer uma transição suave de entrada
-        smoothIn: function(a, b, percent) {
+        smoothIn: function (a, b, percent) {
             return a + (b - a) * Math.pow(percent, 2);
         },
         // função para fazer uma transição suave de entrada e saida
-        smoothInOut: function(a, b, percent) {
+        smoothInOut: function (a, b, percent) {
             return a + (b - a) * ((-Math.cos(percent * Math.PI) / 2) + 0.5);
         },
         //função para definir um limite em um incremento ou decremento
-        limitMaxMin: function(current, next, max, min) {
-                let result
-                if (next > current) {
-                    next > max ? result = max : result = next
-                } else {
-                    next < min ? result = min : result = next
-                }
-                return result
+        limitMaxMin: function (current, next, max, min) {
+            let result
+            if (next > current) {
+                next > max ? result = max : result = next
+            } else {
+                next < min ? result = min : result = next
+            }
+            return result
         },
         //função para definir um maximo e minimo de um numero
-        setMaxMin: function(current, max, min) {
+        setMaxMin: function (current, max, min) {
             if (current > max) {
                 return max
             } else if (current < min) {
@@ -44,21 +45,22 @@ class HelperMethods {
             return current
         },
         // função que retorna um inteiro randomico entre dois valores
-        randomIntFromInterval: function(min, max) {
+        randomIntFromInterval: function (min, max) {
             return Math.floor(Math.random() * (max - min + 1) + min)
         },
         // função para calcular o fatorial de um numero
-        fatorial: function(n) {
+        fatorial: function (n) {
             if (n === 0 || n === 1) {
                 return 1;
             }
             return n * HelperMethods.math.fatorial(n - 1);
         },
         // função para calcular uma interpolação entre 2 razões
-        interpolate: function(x1, x2, y1, y2, x) {
+        interpolate: function (x1, x2, y1, y2, x) {
             return y1 + (((x - x1) / (x2 - x1)) * (y2 - y1))
         }
     }
+
 
     // ---------------------------------------------------------------------------------
     // Matrix  & 3d Helpers
@@ -342,46 +344,50 @@ class HelperMethods {
             return ((mouseX > x) && (mouseX < x + width) && (mouseY > y) && (mouseY < y + height));
         },
         // função para detectar um deslizar na tela e retornar a direção
-        swipeDetect: function(el, callback) {
+        swipeDetect: function(el, callback){
+
             let touchSurface = el,
                 swipeDir,
                 startX,
                 startY,
                 distX,
                 distY,
-                threshold = 150, //distancia minima de um deslizar
-                restraint = 100, // distancia maxima na direção perpendicular
-                allowedTime = 300, // tempo maximo para percorrer essa distancia
+                threshold = 150, //required min distance traveled to be considered swipe
+                restraint = 100, // maximum distance allowed at the same time in perpendicular direction
+                allowedTime = 300, // maximum time allowed to travel that distance
                 elapsedTime,
                 startTime,
-                handleSwipe = callback || function (swipeDir) {
-                }
+                handleSwipe = callback || function(swipeDir){}
 
-            touchSurface.addEventListener('touchstart', function (e) {
+            touchSurface.addEventListener('touchstart', function(e){
                 let touchObj = e.changedTouches[0];
                 swipeDir = 'none'
                 startX = touchObj.pageX
                 startY = touchObj.pageY
-                startTime = new Date().getTime()
-            }, Modernizr.passiveeventlisteners ? {passive: true} : false)
+                startTime = new Date().getTime() // record time when finger first makes contact with surface
+                e.preventDefault()
+            }, false)
 
-            touchSurface.addEventListener('touchmove', function (e) {
-            }, Modernizr.passiveeventlisteners ? {passive: true} : false)
+            touchSurface.addEventListener('touchmove', function(e){
+                e.preventDefault() // prevent scrolling when inside DIV
+            }, false)
 
-            touchSurface.addEventListener('touchend', function (e) {
+            touchSurface.addEventListener('touchend', function(e){
                 let touchObj = e.changedTouches[0]
-                distX = touchObj.pageX - startX
-                distY = touchObj.pageY - startY
-                elapsedTime = new Date().getTime() - startTime
-                if (elapsedTime <= allowedTime) {
-                    if (Math.abs(distX) >= threshold && Math.abs(distY) <= restraint) {
-                        swipeDir = (distX < 0) ? 'left' : 'right'
-                    } else if (Math.abs(distY) >= threshold && Math.abs(distX) <= restraint) {
-                        swipeDir = (distY < 0) ? 'up' : 'down'
+                distX = touchObj.pageX - startX // get horizontal dist traveled by finger while in contact with surface
+                distY = touchObj.pageY - startY // get vertical dist traveled by finger while in contact with surface
+                elapsedTime = new Date().getTime() - startTime // get time elapsed
+                if (elapsedTime <= allowedTime){ // first condition for swipe met
+                    if (Math.abs(distX) >= threshold && Math.abs(distY) <= restraint){ // 2nd condition for horizontal swipe met
+                        swipeDir = (distX < 0)? 'left' : 'right' // if dist traveled is negative, it indicates left swipe
+                    }
+                    else if (Math.abs(distY) >= threshold && Math.abs(distX) <= restraint){ // 2nd condition for vertical swipe met
+                        swipeDir = (distY < 0)? 'up' : 'down' // if dist traveled is negative, it indicates up swipe
                     }
                 }
                 handleSwipe(swipeDir)
-            }, Modernizr.passiveeventlisteners ? {passive: true} : false)
+                e.preventDefault()
+            }, false)
         }
     }
 

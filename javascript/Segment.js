@@ -63,14 +63,14 @@ class Segment {
                         if (Math.random() > 0.1){
                             thisSprite = Game.stageObjects[this.stage].SIDE_SCENARIOS[HelperMethods.math.randomIntFromInterval(0, 3)]
                         } else{
-                            thisSprite = Images.billboards[HelperMethods.math.randomIntFromInterval(0, 2)]
+                            thisSprite = Images.billboards[HelperMethods.math.randomIntFromInterval(0, 3)]
                         }
                         objects.push(new SideObjects(thisSprite, sideRoad[places], this.worldPoints.y, this.worldPoints.z, Images.LARGE_SPRITE_SIZE, this.road,  false))
                     }
                 }
                 break
             case (Segment.BILLBOARDS):
-                thisSprite = Images.billboards[HelperMethods.math.randomIntFromInterval(0,2)]
+                thisSprite = Images.billboards[HelperMethods.math.randomIntFromInterval(0,3)]
                 this.twoSidesObject(objects, thisSprite, sideRoad, thisSprite,12)
                 break
             case (Segment.ANIMALS):

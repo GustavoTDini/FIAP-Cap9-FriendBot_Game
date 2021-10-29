@@ -1,3 +1,4 @@
+// Classe principal com a engine e os elementos criadores do jogo
 class Game {
 
     // Sizes
@@ -12,6 +13,7 @@ class Game {
     static SEGMENT_LENGTH = 100;
     static MAX_ROAD_WIDTH = 1000;
     static MAX_SPEED = (Game.SEGMENT_LENGTH/Game.UPDATE_STEP)*5;
+    static MAX_LEVEL = 5
 
 //States
     static LOADING_STATE = 0;
@@ -31,6 +33,7 @@ class Game {
     static MEDIUM = "MEDIUM";
     static HARD = "HARD";
 
+
 //Stages
     static SUBURB = "SUBURB";
     static CITY = "CITY";
@@ -38,35 +41,128 @@ class Game {
     static FOREST = "FOREST";
     static BEACH = "BEACH";
 
+    yRoadStartSegment = null;
+    gameImage;
+
 //Player Difficulties
 // TODO - Adjust Difficulties
     static DIFFICULTIES_SETS = {
         EASY: {
             START_SPEED: 0.1*Game.MAX_SPEED,
-            MAX_SPEED:  0.8*Game.MAX_SPEED,
-            MAX_CARS: 100,
-            MAX_OBSTACLES: 5,
-            MAX_POWER_UPS: 20,
+            INCREMENT_SPEED:  0.1*Game.MAX_SPEED,
             GAS_CORRECTION: 4,
-            MAX_CARS_SPEEDS: Game.MAX_SPEED/4
+            MAX_CARS_SPEEDS: Game.MAX_SPEED/4,
+            POWER_UPS_CHANCE: 0.75,
+            LEVELS:[
+                {
+                    ROAD_SEGMENTS: 2,
+                    MAX_CARS: 10,
+                    MAX_OBSTACLES: 4,
+                },
+                {
+                    ROAD_SEGMENTS: 4,
+                    MAX_CARS: 15,
+                    MAX_OBSTACLES: 6,
+                },
+                {
+                    ROAD_SEGMENTS: 6,
+                    MAX_CARS: 20,
+                    MAX_OBSTACLES: 8,
+                },
+                {
+                    ROAD_SEGMENTS: 8,
+                    MAX_CARS: 25,
+                    MAX_OBSTACLES: 10,
+                },
+                {
+                    ROAD_SEGMENTS: 10,
+                    MAX_CARS: 30,
+                    MAX_OBSTACLES: 12,
+                },
+                {
+                    ROAD_SEGMENTS: 12,
+                    MAX_CARS: 35,
+                    MAX_OBSTACLES: 14,
+                },
+            ]
         } ,
         MEDIUM: {
             START_SPEED: 0.2*Game.MAX_SPEED,
-            MAX_SPEED:  Game.MAX_SPEED,
-            MAX_CARS: 200,
-            MAX_OBSTACLES: 10,
-            MAX_POWER_UPS: 20,
+            INCREMENT_SPEED:  0.2*Game.MAX_SPEED,
             GAS_CORRECTION: 3,
-            MAX_CARS_SPEEDS: Game.MAX_SPEED/3
+            MAX_CARS_SPEEDS: Game.MAX_SPEED/4,
+            POWER_UPS_CHANCE: 0.85,
+            LEVELS:[
+                {
+                    ROAD_SEGMENTS: 2,
+                    MAX_CARS: 20,
+                    MAX_OBSTACLES: 6,
+                },
+                {
+                    ROAD_SEGMENTS: 4,
+                    MAX_CARS: 40,
+                    MAX_OBSTACLES: 10,
+                },
+                {
+                    ROAD_SEGMENTS: 6,
+                    MAX_CARS: 60,
+                    MAX_OBSTACLES: 14,
+                },
+                {
+                    ROAD_SEGMENTS: 8,
+                    MAX_CARS: 70,
+                    MAX_OBSTACLES: 18,
+                },
+                {
+                    ROAD_SEGMENTS: 10,
+                    MAX_CARS: 80,
+                    MAX_OBSTACLES: 22,
+                },
+                {
+                    ROAD_SEGMENTS: 12,
+                    MAX_CARS: 100,
+                    MAX_OBSTACLES: 25,
+                },
+            ]
         },
         HARD: {
             START_SPEED: 0.5*Game.MAX_SPEED,
-            MAX_SPEED:  1.5*Game.MAX_SPEED,
-            MAX_CARS: 300,
-            MAX_OBSTACLES: 15,
-            MAX_POWER_UPS: 20,
+            INCREMENT_SPEED:  0.3*Game.MAX_SPEED,
             GAS_CORRECTION: 2,
-            MAX_CARS_SPEEDS: Game.MAX_SPEED/2
+            MAX_CARS_SPEEDS: Game.MAX_SPEED/2,
+            POWER_UPS_CHANCE: 0.95,
+            LEVELS:[
+                {
+                    ROAD_SEGMENTS: 2,
+                    MAX_CARS: 40,
+                    MAX_OBSTACLES: 8,
+                },
+                {
+                    ROAD_SEGMENTS: 4,
+                    MAX_CARS: 80,
+                    MAX_OBSTACLES: 16,
+                },
+                {
+                    ROAD_SEGMENTS: 6,
+                    MAX_CARS: 120,
+                    MAX_OBSTACLES: 24,
+                },
+                {
+                    ROAD_SEGMENTS: 8,
+                    MAX_CARS: 160,
+                    MAX_OBSTACLES: 30,
+                },
+                {
+                    ROAD_SEGMENTS: 10,
+                    MAX_CARS: 200,
+                    MAX_OBSTACLES: 36,
+                },
+                {
+                    ROAD_SEGMENTS: 12,
+                    MAX_CARS: 240,
+                    MAX_OBSTACLES: 42,
+                },
+            ]
         },
     }
 
@@ -110,6 +206,9 @@ class Game {
                 DARK:	{road: '#5a5a5a', grass: '#e38b3a', grassTextures: 1, shoulder: '#ffcc00'},
                 DARKER:	{road: '#505050', grass: '#8d5313', grassTextures: 2, shoulder: '#078116'},
             },
+            LEFT_SIGN: Images.commonScenarioSuburbLeft,
+            RIGHT_SIGN: Images.commonScenarioSuburbRight,
+            GUI_SIGN: Images.suburbSign,
             TUNNEL: Images.commonScenarioCityTunnel
         },
         CITY:{
@@ -208,8 +307,8 @@ class Game {
         this.nextStage = null
         this.decideSegment = null
         this.newStageSegment = null
-        this.yRoadStartSegment = null
         this.gameImage = new ImageData(Game.STANDARD_WIDTH, Game.STANDARD_HEIGHT)
+        this.level = 0
     }
 
     // Função principal para renderizar os elementos do canvas
@@ -249,8 +348,9 @@ class Game {
     update(game, dt, difficulty, playerColor, audioCtx, canvas) {
         switch(game.gameState){
             case Game.LOADING_STATE:
-                game.settings = new Settings(canvas, audioCtx)
+                game.settings = game.settings === null? new Settings(canvas, audioCtx): game.settings
                 game.gameCamera = new Camera(game);
+                game.YRoad = new Road(game)
                 game.road = new Road(game)
                 game.player = new Player(game, playerColor, difficulty)
                 game.background = new Background(game)
@@ -259,7 +359,9 @@ class Game {
                 game.player.init()
                 game.gameState = Game.SET_STATE;
                 game.currentStage = Game.SUBURB
+                game.stopMusic(game)
                 game.currentMusic = null
+                game.level = 0
                 break;
             case Game.SET_STATE:
                 game.road.roadConstructor.createRoad()
@@ -285,7 +387,7 @@ class Game {
     }
 
     checkMusicEnd(game, audioCtx) {
-        if (game.playingMusic && game.currentMusic !== null && game.settings.music && !game.player.gameOver) {
+        if (game.playingMusic && game.currentMusic !== null && game.settings.music && !game.player.gameOver && game.gameState !== Game.GAME_OVER_STATE) {
             game.currentMusic.onended = () => {
                 game.musicName = Game.stageObjects[game.currentStage].MUSIC[HelperMethods.math.randomIntFromInterval(0, 3)]
                 game.currentMusic = HelperMethods.sound.playMusic(Sounds.contextSounds[game.musicName], audioCtx, game.settings.music, game.settings.musicNode)
@@ -294,7 +396,7 @@ class Game {
     }
 
     playMusic(game, audioCtx) {
-        if (!game.playingMusic && game.settings.music && !game.player.gameOver) {
+        if (!game.playingMusic && game.settings.music && !game.player.gameOver && game.gameState !== Game.GAME_OVER_STATE) {
             game.musicName = Game.stageObjects[game.currentStage].MUSIC[HelperMethods.math.randomIntFromInterval(0, 3)]
             if (Sounds.contextSounds[game.musicName] !== null && Sounds.contextSounds[game.musicName] !== undefined) {
                 game.currentMusic = HelperMethods.sound.playMusic(Sounds.contextSounds[game.musicName], audioCtx, game.settings.music, game.settings.musicNode)

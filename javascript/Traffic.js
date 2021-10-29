@@ -12,7 +12,7 @@ class Traffic extends RoadObjects{
         super.update(dt)
         this.setYZ()
         this.playSound(audioCtx, Sounds.contextSounds["horn"])
-        this.dodgeOtherObjects(1)
+        this.dodgeOtherObjects()
         this.setX()
 
     }

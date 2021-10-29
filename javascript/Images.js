@@ -1,3 +1,4 @@
+//Classe com os elementos de imagem e sprites
 class Images{
 
     static SPRITE_SIZE = 128;
@@ -545,15 +546,18 @@ class Images{
     static commonScenarioBillboardFiap = [Images.imageFiles.scenario_common_spritesheet, 0, 0, Images.LARGE_SPRITE_SIZE, Images.LARGE_SPRITE_SIZE]
     static commonScenarioBillboardTuring = [Images.imageFiles.scenario_common_spritesheet, 512, 0, Images.LARGE_SPRITE_SIZE, Images.LARGE_SPRITE_SIZE]
     static commonScenarioBillboardVacina = [Images.imageFiles.scenario_common_spritesheet, 1024, 0, Images.LARGE_SPRITE_SIZE, Images.LARGE_SPRITE_SIZE]
+    static commonScenarioBillboardRosaAzul = [Images.imageFiles.scenario_common_spritesheet, 2048, 0, Images.LARGE_SPRITE_SIZE, Images.LARGE_SPRITE_SIZE]
     static commonScenarioAnimalCrossingSign = [Images.imageFiles.scenario_common_spritesheet, 1536, 0, Images.LARGE_SPRITE_SIZE, Images.LARGE_SPRITE_SIZE]
     static commonScenarioCityLeft = [Images.imageFiles.scenario_common_spritesheet, 0, 512, Images.LARGE_SPRITE_SIZE, Images.LARGE_SPRITE_SIZE]
     static commonScenarioFarmLeft = [Images.imageFiles.scenario_common_spritesheet, 512, 512, Images.LARGE_SPRITE_SIZE, Images.LARGE_SPRITE_SIZE]
     static commonScenarioBeachLeft = [Images.imageFiles.scenario_common_spritesheet, 1024, 512, Images.LARGE_SPRITE_SIZE, Images.LARGE_SPRITE_SIZE]
     static commonScenarioForestLeft = [Images.imageFiles.scenario_common_spritesheet, 1536, 512, Images.LARGE_SPRITE_SIZE, Images.LARGE_SPRITE_SIZE]
+    static commonScenarioSuburbLeft = [Images.imageFiles.scenario_common_spritesheet, 2048, 512, Images.LARGE_SPRITE_SIZE, Images.LARGE_SPRITE_SIZE]
     static commonScenarioCityRight = [Images.imageFiles.scenario_common_spritesheet, 0, 1024, Images.LARGE_SPRITE_SIZE, Images.LARGE_SPRITE_SIZE]
     static commonScenarioFarmRight = [Images.imageFiles.scenario_common_spritesheet, 512, 1024, Images.LARGE_SPRITE_SIZE, Images.LARGE_SPRITE_SIZE]
     static commonScenarioBeachRight = [Images.imageFiles.scenario_common_spritesheet, 1024, 1024, Images.LARGE_SPRITE_SIZE, Images.LARGE_SPRITE_SIZE]
     static commonScenarioForestRight= [Images.imageFiles.scenario_common_spritesheet, 1536, 1024, Images.LARGE_SPRITE_SIZE, Images.LARGE_SPRITE_SIZE]
+    static commonScenarioSuburbRight = [Images.imageFiles.scenario_common_spritesheet, 2048, 1024, Images.LARGE_SPRITE_SIZE, Images.LARGE_SPRITE_SIZE]
     static commonScenarioCityTunnel = [Images.imageFiles.scenario_tunnel_spritesheet, 0, 0, 1280, 640]
     static commonScenarioGrassTunnel= [Images.imageFiles.scenario_tunnel_spritesheet, 0, 640, 1280, 640]
 
@@ -654,6 +658,7 @@ class Images{
     static forestSign = [Images.imageFiles.y_road_screen_signs, 250, 60, 250, 60]
     static farmSign = [Images.imageFiles.y_road_screen_signs, 250, 120, 250, 60]
     static citySign = [Images.imageFiles.y_road_screen_signs, 250, 180, 250, 60]
+    static suburbSign = [Images.imageFiles.y_road_screen_signs, 250, 240, 250, 60]
 
 // ---------------------------------------------------------------------------------
 // Sprites Groups
@@ -688,160 +693,5 @@ class Images{
     static shieldIcons = [Images.shieldIcon0, Images.shieldIcon1,Images.shieldIcon2,Images.shieldIcon3,Images.shieldIcon4,Images.shieldIcon5,Images.shieldIcon6,Images.shieldIcon7,Images.shieldIcon8,Images.shieldIcon9]
 
     static racers = [Images.racerShark, Images.racerGiraffe, Images.racerBear, Images.racerPolarBear, Images.racerMonkey, Images.racerPanda1, Images.racerPanda2, Images.racerPanda3]
-    static billboards = [Images.commonScenarioBillboardFiap, Images.commonScenarioBillboardTuring, Images.commonScenarioBillboardVacina]
+    static billboards = [Images.commonScenarioBillboardFiap, Images.commonScenarioBillboardTuring, Images.commonScenarioBillboardVacina, Images.commonScenarioBillboardRosaAzul]
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

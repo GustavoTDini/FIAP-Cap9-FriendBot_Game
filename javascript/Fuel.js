@@ -1,4 +1,4 @@
-// Classe com os atributos de cada segmento da estrada a serem renderizados
+// Classe com os objetos para criar a gasolina para coletar
 class Fuel extends RoadObjects{
 
     frame = 0;

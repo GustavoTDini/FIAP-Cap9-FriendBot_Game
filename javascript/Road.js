@@ -34,6 +34,9 @@ class Road {
         let HMMath = HelperMethods.math
 
         let baseSegment = this.findSegment(gameCamera.z);
+        if (baseSegment === undefined || baseSegment === null ){
+            return
+        }
         let baseSegmentIndex = baseSegment.index;
         let basePercent   = HMMath.percentageLeft(gameCamera.z, Game.SEGMENT_LENGTH);
         let x  = 0;
@@ -69,17 +72,13 @@ class Road {
                     let curve = RoadConstructor.ROAD_SIZES.CURVE.HARD*dir
                     let lastX = lastScreenPoints.x + HMMath.smoothIn(lastSegmentCounter*dir, curve, lastSegmentCounter/101)
                     let currX = screenPoints.x + HMMath.smoothIn(currSegmentCounter*dir, curve, currSegmentCounter/101)
-                    if (Math.abs(currX - screenPoints.x) <= Math.abs(lastScreenPoints.w)){
+                    if (Math.abs(currX - screenPoints.x) <= Math.abs(lastScreenPoints.w/2)){
                         this.renderSegment(
                             lastScreenPoints.x, lastScreenPoints.y, lastScreenPoints.w,
                             screenPoints.x, screenPoints.y, screenPoints.w,
                             currSegment.color, ctx, currSegment.stage, currSegment.texture, currSegment.index);
-                    } else if (Math.abs(currX - screenPoints.x) > Math.abs(lastScreenPoints.w) && (Math.abs(currX - screenPoints.x) <= Math.abs(2*lastScreenPoints.w))){
-                        this.renderYSegment(
-                            lastScreenPoints.x, lastX, lastScreenPoints.y, lastScreenPoints.w,
-                            screenPoints.x, currX, screenPoints.y, screenPoints.w,
-                            currSegment.color, ctx, currSegment.stage, currSegment.texture, dir)
-                    } else if (Math.abs(currX - screenPoints.x) > Math.abs(2*lastScreenPoints.w)){
+                    }
+                    if (Math.abs(currX - screenPoints.x) > Math.abs(2*lastScreenPoints.w)){
                         this.renderSegment(
                             lastX, lastScreenPoints.y, lastScreenPoints.w,
                             currX, screenPoints.y, screenPoints.w,
@@ -89,14 +88,19 @@ class Road {
                             screenPoints.x, screenPoints.y, screenPoints.w,
                             currSegment.color, ctx, currSegment.stage, currSegment.texture, currSegment.index);
                     }
+                    if (Math.abs(currX - screenPoints.x) > Math.abs(lastScreenPoints.w/10) && (Math.abs(currX - screenPoints.x) <= Math.abs(2.5*screenPoints.w))){
+                        this.renderYSegment(
+                            lastScreenPoints.x, lastX, lastScreenPoints.y, lastScreenPoints.w,
+                            screenPoints.x, currX, screenPoints.y, screenPoints.w,
+                            currSegment.color, ctx, currSegment.stage, currSegment.texture, dir)
+                    }
+
                 } else {
                     this.renderSegment(
                         lastScreenPoints.x, lastScreenPoints.y, lastScreenPoints.w,
                         screenPoints.x, screenPoints.y, screenPoints.w,
                         currSegment.color, ctx, currSegment.stage, currSegment.texture, currSegment.index);
                 }
-
-
                 // move the clipping bottom line up
                 maxBottomLine = currBottomLine;
             }
@@ -156,12 +160,43 @@ class Road {
             this.game.nextStage = null
             this.game.playMusic(this.game, audioCtx)
             this.roadConstructor.newStageSegment()
+            this.game.level++
+            if (this.game.level > Game.MAX_LEVEL){
+                this.game.level = Game.MAX_LEVEL
+            }
+            player.currentSpeed = player.difficulty.START_SPEED + this.game.level*player.difficulty.INCREMENT_SPEED
         }
     }
 
     updateObjects(dt, audioCtx) {
         for (let j = 0; j < this.segments.length; j++) {
             this.segments[j].inRoadObjects = []
+        }
+        for (let i = 0; i < this.totalCoins.length; i++) {
+            let coinSegment = this.findSegment(this.totalCoins[i].z)
+            coinSegment.inRoadObjects.push(this.totalCoins[i])
+            this.totalCoins[i].update(dt)
+        }
+        for (let i = 0; i < this.totalFuel.length; i++) {
+            let fuelSegment = this.findSegment(this.totalFuel[i].z)
+            fuelSegment.inRoadObjects.push(this.totalFuel[i])
+            this.totalFuel[i].update(dt)
+        }
+        for (let i = 0; i < this.totalPowerUps.length; i++) {
+            let upSegment = this.findSegment(this.totalPowerUps[i].z)
+            upSegment.inRoadObjects.push(this.totalPowerUps[i])
+            this.totalPowerUps[i].update(dt)
+        }
+        for (let i = 0; i < this.totalObstacles.length; i++) {
+            let obstaclesSegment = this.findSegment(this.totalObstacles[i].z)
+            obstaclesSegment.inRoadObjects.push(this.totalObstacles[i])
+            console.log(obstaclesSegment)
+            this.totalObstacles[i].update(dt)
+        }
+        for (let i = 0; i < this.totalAnimals.length; i++) {
+            let animalSegment = this.findSegment(this.totalAnimals[i].z)
+            animalSegment.inRoadObjects.push(this.totalAnimals[i])
+            this.totalAnimals[i].update(dt, audioCtx)
         }
         for (let i = 0; i < this.totalCars.length; i++) {
             let carSegment = this.findSegment(this.totalCars[i].z)
@@ -173,34 +208,7 @@ class Road {
             trafficSegment.inRoadObjects.push(this.totalTraffic[i])
             this.totalTraffic[i].update(dt, audioCtx)
         }
-        for (let i = 0; i < this.totalCoins.length; i++) {
-            let coinSegment = this.findSegment(this.totalCoins[i].z)
-            coinSegment.inRoadObjects.push(this.totalCoins[i])
-            this.totalCoins[i].update(dt)
-        }
-        for (let i = 0; i < this.totalPowerUps.length; i++) {
-            let upSegment = this.findSegment(this.totalPowerUps[i].z)
-            upSegment.inRoadObjects.push(this.totalPowerUps[i])
-            this.totalPowerUps[i].update(dt)
-        }
-        for (let i = 0; i < this.totalObstacles.length; i++) {
-            let obstaclesSegment = this.findSegment(this.totalObstacles[i].z)
-            obstaclesSegment.inRoadObjects.push(this.totalObstacles[i])
-            this.totalObstacles[i].update(dt)
-        }
-        for (let i = 0; i < this.totalAnimals.length; i++) {
-            let animalSegment = this.findSegment(this.totalAnimals[i].z)
-            animalSegment.inRoadObjects.push(this.totalAnimals[i])
-            this.totalAnimals[i].update(dt, audioCtx)
-        }
-        for (let i = 0; i < this.totalFuel.length; i++) {
-            let fuelSegment = this.findSegment(this.totalFuel[i].z)
-            fuelSegment.inRoadObjects.push(this.totalFuel[i])
-            this.totalFuel[i].update(dt)
-        }
     }
-
-
 
     // Função para fazer a projeção dos pontos em 3D - usa a regra dos triangulos iguais
     project3D(segment, camera, offSetZ, xCurve, canvasWidth, canvasHeight){

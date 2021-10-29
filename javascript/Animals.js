@@ -1,4 +1,4 @@
-// Classe com os atributos de cada segmento da estrada a serem renderizados
+// Classe com os objetos para criar os animais que atravessam a estrada
 class Animals extends RoadObjects{
 
     guaraSpritesLeft = [ Images.guara1Left, Images.guara2Left, Images.guara3Left, Images.guara4Left, Images.guaraStopped]
